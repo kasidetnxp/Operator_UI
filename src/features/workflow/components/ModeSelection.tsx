@@ -1,4 +1,4 @@
-import { Card, CardContent, CardActionArea } from '@mui/material';
+import { Card, CardActionArea } from '@mui/material';
 import { ArrowDownCircle, ArrowUpCircle } from 'lucide-react';
 import { translations } from '@/shared/utils/translations';
 import type { Language, OperationMode } from '@/shared/types';

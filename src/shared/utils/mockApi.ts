@@ -30,7 +30,7 @@ export interface TaskResponse {
 }
 
 // In-memory task queue (replace with API call)
-let mockTaskQueue: TaskResponse[] = [];
+const mockTaskQueue: TaskResponse[] = [];
 
 // ─── Mock Machine Data (50 machines) ───
 export const mockMachines: Machine[] = [
