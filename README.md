@@ -1,73 +1,82 @@
-# React + TypeScript + Vite
+# FPC Management System - NXP WT
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A modern, responsive Operator User Interface for requesting and returning **Front Opening Pod Carriers (FPCs)** between **Smart Storage** and factory workstations/machines.
 
-Currently, two official plugins are available:
+---
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## 🚀 Technical Stack
 
-## React Compiler
+- **Core**: React 18.3.1 (TypeScript)
+- **Build & Development**: Vite 8.x
+- **Styling**: Tailwind CSS v4 (with custom `@theme` CSS-based tokens) & Vanilla CSS
+- **Component UI**: Material-UI (MUI v7) & Radix UI primitives
+- **Icons**: Lucide React
+- **Charts**: Recharts (for telemetry/queue analytics)
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+---
 
-## Expanding the ESLint configuration
+## ✨ Key Features
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+1. **Employee Authentication**
+   - Lock interface using Employee ID with verification.
+   - Session management and clear logout flow.
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+2. **Dual-Mode Workflow**
+   - **Return FPC**: Dispatch an Automated Guided Vehicle (AGV) to pick up an FPC from a machine and return it to Smart Storage.
+   - **Deliver FPC**: Search/select a specific FPC from Smart Storage and command the AGV to deliver it to a destination machine.
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+3. **Machine Selector**
+   - Real-time search/filtering for over 50 registered machines (`AVT_001` - `AVT_050`).
+   - Visual indicators showing machine availability (Available/Unavailable).
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+4. **Task Queue & AGV Status Tracking**
+   - Real-time progress monitoring: `Queued` ➡️ `In Progress` ➡️ `Arrived` ➡️ `Waiting for Confirmation` ➡️ `Complete` / `Error`.
+   - Simulates physical workflow interactions requiring operator feedback:
+     - **Confirm Barrier Installed**: Safety confirmation when the AGV arrives.
+     - **Confirm Barrier Removed**: Confirmation before the AGV departs.
+
+---
+
+## 📁 Directory Structure
+
+```text
+src/
+├── features/               # Domain-specific feature modules
+│   ├── auth/               # Employee login & session component
+│   ├── queue/              # Task queue monitoring & actions
+│   └── workflow/           # Mode selection, Machine selector, Return/Request forms
+├── shared/                 # Shared components, utilities, and assets
+│   ├── components/         # Reusable UI components (e.g. LanguageSwitcher)
+│   ├── types/              # TypeScript interface and type declarations
+│   ├── utils/              # Translations dictionary, Mock API layer
+│   └── styles/             # Project styling configurations
+├── App.tsx                 # Core App layout & page routing
+├── main.tsx                # Entry point
+└── index.css               # Tailwind & Global custom theme
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+---
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+## 🛠️ Getting Started
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+### 1. Install Dependencies
+```bash
+npm install
+```
+
+### 2. Run Local Development Server
+Runs on port **3000** (configured in [vite.config.ts](file:///c:/Users/nxg22301/Desktop/Anti_Folder/Real_Frontend_project/vite.config.ts) to prevent conflict with other services).
+```bash
+npm run dev
+```
+
+### 3. Lint Code
+```bash
+npm run lint
+```
+
+### 4. Build for Production
+Generates optimized static assets in the `/dist` directory.
+```bash
+npm run build
 ```
