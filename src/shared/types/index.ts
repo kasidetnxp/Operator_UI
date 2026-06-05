@@ -4,6 +4,7 @@
 
 export type Language = 'en' | 'th';
 
-export type OperationMode = 'return' | 'request';
+export type OperationMode = 'return' | 'request' | 'swap';
 
-export type Page = 'mode-selection' | 'return' | 'request' | 'queue';
+export type Page = 'mode-selection' | 'return' | 'request' | 'swap' | 'queue';
+

@@ -22,11 +22,12 @@ export interface TaskResponse {
   status: 'queued' | 'in_progress' | 'arrived' | 'waiting_confirmation' | 'complete' | 'error';
   message: string;
   employeeId: string;
-  type: 'return' | 'request';
+  type: 'return' | 'request' | 'swap';
   sourceMachine?: string;
   destinationMachine?: string;
   fpcId?: string;
   createdAt: string;
+  coverHeadInstalledConfirmed?: boolean;
 }
 
 // In-memory task queue (replace with API call)
@@ -192,38 +193,84 @@ export async function submitRequestFPCJob(
   return task;
 }
 
-/** Confirm barrier installed (Return FPC workflow step) */
-export async function confirmBarrierInstalled(taskId: string): Promise<TaskResponse> {
+/** Submit a Swap FPC job */
+export async function submitSwapFPCJob(
+  employeeId: string,
+  sourceMachineId: string,
+  destinationMachineId: string
+): Promise<TaskResponse> {
+  await delay(1000);
+
+  const taskId = `TASK-${Date.now()}`;
+  const jobId = generateJobId();
+  const srcMachine = mockMachines.find(m => m.id === sourceMachineId);
+  const destMachine = mockMachines.find(m => m.id === destinationMachineId);
+
+  const task: TaskResponse = {
+    taskId,
+    jobId,
+    status: 'queued',
+    message: 'Job submitted successfully',
+    employeeId,
+    type: 'swap',
+    sourceMachine: srcMachine?.name || sourceMachineId,
+    destinationMachine: destMachine?.name || destinationMachineId,
+    createdAt: new Date().toISOString(),
+    coverHeadInstalledConfirmed: false,
+  };
+
+  mockTaskQueue.push(task);
+
+  // Simulate AGV status progression
+  setTimeout(() => updateTaskStatus(taskId, 'in_progress'), 2000);
+  setTimeout(() => updateTaskStatus(taskId, 'arrived'), 5000);
+  setTimeout(() => updateTaskStatus(taskId, 'waiting_confirmation'), 7000);
+
+  return task;
+}
+
+/** Confirm Cover Head installed (Return FPC workflow step, or Swap first stage) */
+export async function confirmCoverHeadInstalled(taskId: string): Promise<TaskResponse> {
   await delay(500);
   const task = mockTaskQueue.find(t => t.taskId === taskId);
   if (task) {
-    task.status = 'in_progress';
-    task.message = 'Barrier installation confirmed, AGV proceeding';
+    if (task.type === 'swap') {
+      task.coverHeadInstalledConfirmed = true;
+      task.status = 'in_progress';
+      task.message = 'Cover Head installation confirmed, AGV proceeding to destination';
+
+      // Simulate transit to destination machine
+      setTimeout(() => updateTaskStatus(taskId, 'arrived'), 3000);
+      setTimeout(() => updateTaskStatus(taskId, 'waiting_confirmation'), 5000);
+    } else {
+      task.status = 'in_progress';
+      task.message = 'Cover Head installation confirmed, AGV proceeding';
+    }
   }
   return task || {
     taskId,
     jobId: 'UNKNOWN',
     status: 'in_progress',
-    message: 'Barrier installation confirmed, AGV proceeding',
+    message: 'Cover Head installation confirmed, AGV proceeding',
     employeeId: '',
     type: 'return',
     createdAt: new Date().toISOString(),
   };
 }
 
-/** Confirm barrier removed (Request FPC workflow step) */
-export async function confirmBarrierRemoved(taskId: string): Promise<TaskResponse> {
+/** Confirm Cover Head removed (Request FPC workflow step, or Swap second stage) */
+export async function confirmCoverHeadRemoved(taskId: string): Promise<TaskResponse> {
   await delay(500);
   const task = mockTaskQueue.find(t => t.taskId === taskId);
   if (task) {
     task.status = 'in_progress';
-    task.message = 'Barrier removal confirmed, AGV proceeding';
+    task.message = 'Cover Head removal confirmed, AGV proceeding';
   }
   return task || {
     taskId,
     jobId: 'UNKNOWN',
     status: 'in_progress',
-    message: 'Barrier removal confirmed, AGV proceeding',
+    message: 'Cover Head removal confirmed, AGV proceeding',
     employeeId: '',
     type: 'request',
     createdAt: new Date().toISOString(),

@@ -21,8 +21,10 @@ export const translations = {
     selectMode: 'Select Operation Mode',
     returnFPC: 'Return FPC',
     requestFPC: 'Deliver FPC',
+    swapFPC: 'Swap FPC',
     returnFPCDesc: 'Pick up FPC from machine and return to Smart Storage',
     requestFPCDesc: 'Request FPC from Smart Storage and deliver to machine',
+    swapFPCDesc: 'Transfer FPC directly from source machine to destination machine',
 
     // Machine Selection
     selectMachine: 'Select Machine',
@@ -56,10 +58,10 @@ export const translations = {
 
     // Actions
     confirm: 'Confirm',
-    confirmBarrierInstalled: 'Confirm Barrier Installed',
-    confirmBarrierRemoved: 'Confirm Barrier Removed',
-    barrierInstallationConfirm: 'Please confirm that the barrier has been installed',
-    barrierRemovalConfirm: 'Please confirm that the barrier has been removed',
+    confirmCoverHeadInstalled: 'Confirm Cover Head Installed',
+    confirmCoverHeadRemoved: 'Confirm Cover Head Removed',
+    coverHeadInstallationConfirm: 'Please confirm that the Cover Head has been installed',
+    coverHeadRemovalConfirm: 'Please confirm that the Cover Head has been removed',
     submit: 'Submit',
     cancel: 'Cancel',
     back: 'Back',
@@ -117,8 +119,10 @@ export const translations = {
     selectMode: 'เลือกโหมดการทำงาน',
     returnFPC: 'คืน FPC',
     requestFPC: 'ส่ง FPC',
+    swapFPC: 'สลับ FPC',
     returnFPCDesc: 'รับ FPC จากเครื่องจักรและส่งคืนไปที่คลังสมาร์ท',
     requestFPCDesc: 'ขอ FPC จากคลังสมาร์ทและส่งไปยังเครื่องจักร',
+    swapFPCDesc: 'โอนย้าย FPC ระหว่างเครื่องจักรโดยตรง',
 
     // Machine Selection
     selectMachine: 'เลือกเครื่องจักร',
@@ -152,10 +156,10 @@ export const translations = {
 
     // Actions
     confirm: 'ยืนยัน',
-    confirmBarrierInstalled: 'ยืนยันติดตั้งแบริเออร์แล้ว',
-    confirmBarrierRemoved: 'ยืนยันถอดแบริเออร์แล้ว',
-    barrierInstallationConfirm: 'กรุณายืนยันว่าได้ติดตั้งแบริเออร์แล้ว',
-    barrierRemovalConfirm: 'กรุณายืนยันว่าได้ถอดแบริเออร์แล้ว',
+    confirmCoverHeadInstalled: 'ยืนยันติดตั้ง Cover Head แล้ว',
+    confirmCoverHeadRemoved: 'ยืนยันถอด Cover Head แล้ว',
+    coverHeadInstallationConfirm: 'กรุณายืนยันว่าได้ติดตั้ง Cover Head แล้ว',
+    coverHeadRemovalConfirm: 'กรุณายืนยันว่าได้ถอด Cover Head แล้ว',
     submit: 'ส่ง',
     cancel: 'ยกเลิก',
     back: 'ย้อนกลับ',

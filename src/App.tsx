@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { EmployeeLogin, EmployeeMenu } from '@/features/auth';
-import { ModeSelection, ReturnFPCWorkflow, RequestFPCWorkflow } from '@/features/workflow';
+import { ModeSelection, ReturnFPCWorkflow, RequestFPCWorkflow, SwapFPCWorkflow } from '@/features/workflow';
 import { TaskQueuePage } from '@/features/queue';
 import { LanguageSwitcher } from '@/shared/components/LanguageSwitcher';
 import type { Language, OperationMode, Page } from '@/shared/types';
@@ -71,6 +71,13 @@ export default function App() {
           />
         ) : currentPage === 'request' ? (
           <RequestFPCWorkflow
+            employeeId={employeeId}
+            language={language}
+            onBack={handleBackToModeSelection}
+            onTaskSubmitted={handleGoToQueue}
+          />
+        ) : currentPage === 'swap' ? (
+          <SwapFPCWorkflow
             employeeId={employeeId}
             language={language}
             onBack={handleBackToModeSelection}

@@ -1,5 +1,5 @@
 import { Card, CardActionArea } from '@mui/material';
-import { ArrowDownCircle, ArrowUpCircle } from 'lucide-react';
+import { ArrowDownCircle, ArrowUpCircle, ArrowLeftRight } from 'lucide-react';
 import { translations } from '@/shared/utils/translations';
 import type { Language, OperationMode } from '@/shared/types';
 
@@ -17,7 +17,7 @@ export function ModeSelection({ onSelectMode, language }: ModeSelectionProps) {
         {t.selectMode}
       </h2>
 
-      <div className="grid grid-cols-2 gap-10 max-w-5xl w-full px-8">
+      <div className="grid grid-cols-3 gap-8 max-w-6xl w-full px-8">
         <Card className="hover:shadow-xl transition-shadow">
           <CardActionArea onClick={() => onSelectMode('return')} className="!p-12">
             <div className="flex flex-col items-center text-center space-y-6">
@@ -27,6 +27,20 @@ export function ModeSelection({ onSelectMode, language }: ModeSelectionProps) {
               </h3>
               <p className="text-xl text-gray-600">
                 {t.returnFPCDesc}
+              </p>
+            </div>
+          </CardActionArea>
+        </Card>
+
+        <Card className="hover:shadow-xl transition-shadow">
+          <CardActionArea onClick={() => onSelectMode('swap')} className="!p-12">
+            <div className="flex flex-col items-center text-center space-y-6">
+              <ArrowLeftRight className="w-28 h-28 text-purple-600" />
+              <h3 className="text-4xl font-bold text-gray-900">
+                {t.swapFPC}
+              </h3>
+              <p className="text-xl text-gray-600">
+                {t.swapFPCDesc}
               </p>
             </div>
           </CardActionArea>
@@ -49,3 +63,4 @@ export function ModeSelection({ onSelectMode, language }: ModeSelectionProps) {
     </div>
   );
 }
+

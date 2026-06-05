@@ -7,8 +7,8 @@ import { translations } from '@/shared/utils/translations';
 import type { Language } from '@/shared/types';
 import {
   getAllTasks,
-  confirmBarrierInstalled,
-  confirmBarrierRemoved,
+  confirmCoverHeadInstalled,
+  confirmCoverHeadRemoved,
   updateTaskStatus,
 } from '@/shared/utils/mockApi';
 import type { TaskResponse } from '@/shared/utils/mockApi';
@@ -51,7 +51,7 @@ export function TaskQueuePage({ employeeId, language, onBack, onNewTask }: TaskQ
     return () => clearInterval(interval);
   }, [selectedTask]);
 
-  const handleConfirmBarrier = async () => {
+  const handleConfirmCoverHead = async () => {
     if (!selectedTask) return;
 
     setIsConfirming(true);
@@ -59,13 +59,25 @@ export function TaskQueuePage({ employeeId, language, onBack, onNewTask }: TaskQ
 
     try {
       if (selectedTask.type === 'return') {
-        await confirmBarrierInstalled(selectedTask.taskId);
-      } else {
-        await confirmBarrierRemoved(selectedTask.taskId);
+        await confirmCoverHeadInstalled(selectedTask.taskId);
+        setTimeout(() => {
+          updateTaskStatus(selectedTask.taskId, 'complete');
+        }, 3000);
+      } else if (selectedTask.type === 'request') {
+        await confirmCoverHeadRemoved(selectedTask.taskId);
+        setTimeout(() => {
+          updateTaskStatus(selectedTask.taskId, 'complete');
+        }, 3000);
+      } else if (selectedTask.type === 'swap') {
+        if (!selectedTask.coverHeadInstalledConfirmed) {
+          await confirmCoverHeadInstalled(selectedTask.taskId);
+        } else {
+          await confirmCoverHeadRemoved(selectedTask.taskId);
+          setTimeout(() => {
+            updateTaskStatus(selectedTask.taskId, 'complete');
+          }, 3000);
+        }
       }
-      setTimeout(() => {
-        updateTaskStatus(selectedTask.taskId, 'complete');
-      }, 3000);
     } catch {
       setError(t.error_network);
     } finally {
@@ -146,7 +158,7 @@ export function TaskQueuePage({ employeeId, language, onBack, onNewTask }: TaskQ
                             {task.jobId}
                           </div>
                           <div className="text-sm text-gray-600">
-                            {task.type === 'return' ? t.returnFPC : t.requestFPC}
+                            {task.type === 'return' ? t.returnFPC : task.type === 'request' ? t.requestFPC : t.swapFPC}
                           </div>
                         </div>
                         {isMyTask(task) && (
@@ -200,7 +212,7 @@ export function TaskQueuePage({ employeeId, language, onBack, onNewTask }: TaskQ
                     <div className="flex justify-between text-xl border-b border-gray-200 pb-3">
                       <span className="text-gray-600 font-semibold">{t.type}:</span>
                       <span className="font-bold text-gray-900">
-                        {selectedTask.type === 'return' ? t.returnFPC : t.requestFPC}
+                        {selectedTask.type === 'return' ? t.returnFPC : selectedTask.type === 'request' ? t.requestFPC : t.swapFPC}
                       </span>
                     </div>
                     {selectedTask.fpcId && (
@@ -238,13 +250,17 @@ export function TaskQueuePage({ employeeId, language, onBack, onNewTask }: TaskQ
                       <div className="space-y-6">
                         <p className="text-xl">
                           {selectedTask.type === 'return'
-                            ? t.barrierInstallationConfirm
-                            : t.barrierRemovalConfirm}
+                            ? t.coverHeadInstallationConfirm
+                            : selectedTask.type === 'request'
+                            ? t.coverHeadRemovalConfirm
+                            : !selectedTask.coverHeadInstalledConfirmed
+                            ? t.coverHeadInstallationConfirm
+                            : t.coverHeadRemovalConfirm}
                         </p>
                         <Button
                           variant="contained"
                           color="warning"
-                          onClick={handleConfirmBarrier}
+                          onClick={handleConfirmCoverHead}
                           disabled={isConfirming}
                           fullWidth
                           className="!py-6 !text-2xl !font-bold"
@@ -252,8 +268,12 @@ export function TaskQueuePage({ employeeId, language, onBack, onNewTask }: TaskQ
                           {isConfirming
                             ? t.processing
                             : selectedTask.type === 'return'
-                            ? t.confirmBarrierInstalled
-                            : t.confirmBarrierRemoved}
+                            ? t.confirmCoverHeadInstalled
+                            : selectedTask.type === 'request'
+                            ? t.confirmCoverHeadRemoved
+                            : !selectedTask.coverHeadInstalledConfirmed
+                            ? t.confirmCoverHeadInstalled
+                            : t.confirmCoverHeadRemoved}
                         </Button>
                       </div>
                     </Alert>
