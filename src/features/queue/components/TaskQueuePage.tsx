@@ -47,9 +47,37 @@ export function TaskQueuePage({ employeeId, language, onBack, onNewTask }: TaskQ
     };
 
     loadTasks();
-    const interval = setInterval(loadTasks, 3000);
+    const interval = setInterval(loadTasks, 1000);
     return () => clearInterval(interval);
   }, [selectedTask]);
+
+  const getStatusLabel = (status: string) => {
+    switch (status) {
+      case 'submitted': return t.submitted;
+      case 'queued': return t.queued;
+      case 'starting': return t.starting;
+      case 'moving_to_source': return t.movingToSource;
+      case 'arrived_at_source': return t.arrivedAtSource;
+      case 'picking_up_fpc': return t.pickingUpFPC;
+      case 'waiting_cover_head_install': return t.waitingCoverHeadInstall;
+      case 'moving_to_destination': return t.movingToDestination;
+      case 'arrived_at_destination': return t.arrivedAtDestination;
+      case 'placing_fpc': return t.placingFPC;
+      case 'waiting_cover_head_remove': return t.waitingCoverHeadRemove;
+      case 'completed': return t.completed;
+      case 'rejected': return t.rejected;
+      case 'blocked': return t.blocked;
+      case 'failed': return t.failedStatus;
+      case 'canceled': return t.canceled;
+      // Legacy
+      case 'in_progress': return t.inProgress;
+      case 'arrived': return t.arrived;
+      case 'waiting_confirmation': return t.waitingConfirmation;
+      case 'complete': return t.complete;
+      case 'error': return t.error;
+      default: return status;
+    }
+  };
 
   const handleConfirmCoverHead = async () => {
     if (!selectedTask) return;
@@ -60,22 +88,28 @@ export function TaskQueuePage({ employeeId, language, onBack, onNewTask }: TaskQ
     try {
       if (selectedTask.type === 'return') {
         await confirmCoverHeadInstalled(selectedTask.taskId);
-        setTimeout(() => {
-          updateTaskStatus(selectedTask.taskId, 'complete');
-        }, 3000);
-      } else if (selectedTask.type === 'request') {
-        await confirmCoverHeadRemoved(selectedTask.taskId);
-        setTimeout(() => {
-          updateTaskStatus(selectedTask.taskId, 'complete');
-        }, 3000);
-      } else if (selectedTask.type === 'swap') {
-        if (!selectedTask.coverHeadInstalledConfirmed) {
-          await confirmCoverHeadInstalled(selectedTask.taskId);
-        } else {
-          await confirmCoverHeadRemoved(selectedTask.taskId);
+        if (selectedTask.status === 'waiting_confirmation') {
           setTimeout(() => {
             updateTaskStatus(selectedTask.taskId, 'complete');
           }, 3000);
+        }
+      } else if (selectedTask.type === 'request') {
+        await confirmCoverHeadRemoved(selectedTask.taskId);
+        if (selectedTask.status === 'waiting_confirmation') {
+          setTimeout(() => {
+            updateTaskStatus(selectedTask.taskId, 'complete');
+          }, 3000);
+        }
+      } else if (selectedTask.type === 'swap') {
+        if (selectedTask.status === 'waiting_cover_head_install' || !selectedTask.coverHeadInstalledConfirmed) {
+          await confirmCoverHeadInstalled(selectedTask.taskId);
+        } else {
+          await confirmCoverHeadRemoved(selectedTask.taskId);
+          if (selectedTask.status === 'waiting_confirmation') {
+            setTimeout(() => {
+              updateTaskStatus(selectedTask.taskId, 'complete');
+            }, 3000);
+          }
         }
       }
     } catch {
@@ -88,7 +122,10 @@ export function TaskQueuePage({ employeeId, language, onBack, onNewTask }: TaskQ
   const isMyTask = (task: TaskResponse) => task.employeeId === employeeId;
 
   const canConfirm = (task: TaskResponse) =>
-    task.status === 'waiting_confirmation' && isMyTask(task);
+    (task.status === 'waiting_confirmation' ||
+     task.status === 'waiting_cover_head_install' ||
+     task.status === 'waiting_cover_head_remove') &&
+    isMyTask(task);
 
   const formatDateTime = (isoString: string) => {
     const date = new Date(isoString);
@@ -172,20 +209,15 @@ export function TaskQueuePage({ employeeId, language, onBack, onNewTask }: TaskQ
                       </div>
 
                       <div className="flex items-center gap-2">
-                        {task.status === 'complete' ? (
+                        {(task.status === 'complete' || task.status === 'completed') ? (
                           <CheckCircle className="w-5 h-5 text-green-600" />
                         ) : (
                           <Clock className="w-5 h-5 text-blue-600" />
                         )}
                         <span className={`text-sm font-medium ${
-                          task.status === 'complete' ? 'text-green-700' : 'text-blue-700'
+                          (task.status === 'complete' || task.status === 'completed') ? 'text-green-700' : 'text-blue-700'
                         }`}>
-                          {task.status === 'queued' && t.queued}
-                          {task.status === 'in_progress' && t.inProgress}
-                          {task.status === 'arrived' && t.arrived}
-                          {task.status === 'waiting_confirmation' && t.waitingConfirmation}
-                          {task.status === 'complete' && t.complete}
-                          {task.status === 'error' && t.error}
+                          {getStatusLabel(task.status)}
                         </span>
                       </div>
                     </div>

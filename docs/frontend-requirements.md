@@ -1,0 +1,215 @@
+# Frontend Project Requirements
+
+## Functional Requirements
+
+### Employee ID and Workflow Entry
+
+The frontend system shall support operator workflows beginning with the entry of an employee ID.
+
+In the current phase, the employee ID is used for transaction logging only and shall not be used for user authentication or access control.
+
+The frontend shall validate that the employee ID field is not empty before allowing the operator to proceed to mode selection.
+
+Authentication may be introduced in a future phase without changing the current workflow definition.
+
+### Display Language
+
+The frontend system shall use Thai as the primary display language for the operator interface.
+
+Common technical terms that are already used by operators, such as LOAD (คืน FPC), UNLOAD (เบิก FPC), สลับ FPC, AGV, Smart Storage, Confirm, and Complete, may remain in English, Thai, or existing shop-floor terms where appropriate to maintain familiarity and reduce confusion for production users.
+
+### Operation Modes
+
+The system shall support three operation modes shown on the user interface as:
+
+- LOAD (คืน FPC)
+- UNLOAD (เบิก FPC)
+- สลับ FPC
+
+In the current phase, the list of machines shall be a predefined configuration used by the frontend.
+
+Each machine shall include an availability state provided by the configured data source or backend response.
+
+Machines marked as Unavailable shall be displayed in gray, shall not be selectable by the operator, and shall not be submitted as part of a job request.
+
+### LOAD (คืน FPC) Mode
+
+In LOAD (คืน FPC) mode, the operator shall select the source machine from which the AGV will pick up the FPC.
+
+The destination shall be fixed as Smart Storage in the current scope.
+
+The frontend shall display the Confirm button only after the backend reports the status indicating that pickup has been completed and operator confirmation is required for cover head installation.
+
+When the operator confirms that the cover head has been installed, the frontend shall send the confirmation to the backend via a REST API so that the backend can allow the AGV to proceed to the next step.
+
+### UNLOAD (เบิก FPC) Mode
+
+In UNLOAD (เบิก FPC) mode, the operator shall be able to search for an FPC using data retrieved from the storage database through backend APIs.
+
+The frontend shall display the search results returned by the backend.
+
+If no matching FPC is found, the frontend shall display a no-result message.
+
+The operator shall then select the desired FPC and an available destination machine.
+
+Machines marked as Unavailable shall not be selectable.
+
+After the AGV arrives at the selected destination machine and the backend reports the status indicating that operator confirmation is required, the frontend shall display a Confirm button for the operator to verify that the cover head has been removed.
+
+When the operator confirms, the frontend shall send the confirmation to the backend via a REST API, enabling the backend to continue the placement process and complete the workflow.
+
+### สลับ FPC Mode
+
+In สลับ FPC mode, the operator shall select both the source machine and the destination machine so that the AGV can pick up an FPC from one machine and deliver it to another machine.
+
+The frontend shall prevent the operator from selecting the same machine as both source and destination.
+
+If operator confirmation is required during pickup or placement, the frontend shall display the appropriate confirmation action only when the backend reports the corresponding status.
+
+The frontend shall send the operator’s confirmation to the backend via a REST API before the workflow can continue.
+
+### Task Status Handling
+
+Task statuses shall be provided by the backend via REST APIs and shall represent the status of each existing task, not the general readiness of the AGV.
+
+The frontend shall display the latest task status received from the backend for each task.
+
+Status codes or status values returned by the backend shall be system-defined values, while the frontend shall be responsible for displaying clear Thai operator-facing text.
+
+The backend shall be responsible for determining and reporting the final Completed status.
+
+The frontend shall not independently determine whether a task is complete.
+
+### Empty Task Queue
+
+When there are no active, queued, pending, completed, failed, or canceled tasks to display, the Task Queue page shall display an empty state such as:
+
+```text
+No Task
+```
+
+This empty state shall not be treated as a task status because it does not belong to any existing task.
+
+### Supported Task Statuses
+
+The frontend shall support the following operator-facing task statuses for tasks returned by the backend:
+
+| Operator-facing Text | Meaning | Operator Action |
+|---|---|---|
+| Submitted | The system has received the job request. | Wait for backend validation and scheduling. |
+| Queued | The job has been accepted and placed in the queue. | Wait for the job to start. |
+| Starting | The backend is preparing the AGV mission. | Wait for the AGV to move. |
+| Moving to Source | The AGV is moving to the source machine. | Wait for arrival at the source. |
+| Arrived at Source | The AGV has arrived at the source machine. | Prepare to observe pickup activity if needed. |
+| Picking Up FPC | The AGV is picking up the FPC. | Wait until pickup is completed. |
+| Waiting for Cover Head Installation Confirmation | Pickup is complete and operator confirmation is required before the workflow can continue. | Verify that the cover head has been installed, then press Confirm. |
+| Moving to Destination | The AGV is moving to the destination location. | Wait for arrival at the destination. |
+| Arrived at Destination | The AGV has arrived at the destination. | Prepare to observe placement activity if needed. |
+| Placing FPC | The AGV is placing or delivering the FPC. | Wait until placement is completed. |
+| Waiting for Cover Head Removal Confirmation | Placement is ready and operator confirmation is required before the workflow can continue. | Verify that the cover head has been removed, then press Confirm. |
+| Completed | The job has been completed successfully. | Review the result or create a new job. |
+| Rejected | The backend did not accept the job request. | Review the input data and submit again if appropriate. |
+| Blocked | The job cannot continue because of an external condition or dependency. | Check the cause or notify the responsible person. |
+| Failed | The job failed during execution. | Retry the job if allowed or contact support. |
+| Canceled | The job was canceled before completion. | Review the reason before creating a new job. |
+
+Each displayed task status shall be written in operator-friendly language and should be shown together with the current step and the next required action when applicable.
+
+For example:
+
+- `Waiting for Cover Head Installation Confirmation` shall indicate that the operator must verify that the cover head has been installed and then press Confirm.
+- `Waiting for Cover Head Removal Confirmation` shall indicate that the operator must verify that the cover head has been removed and then press Confirm.
+
+### Job Queue Submission
+
+While the AGV is executing tasks, the frontend shall still allow the operator to submit new job requests.
+
+The backend shall be solely responsible for job queue management, scheduling, and acceptance decisions.
+
+When a new job request is submitted, the frontend shall display the latest result returned by the backend, such as accepted, queued, rejected, or failed.
+
+### Assigned AGV Display
+
+For each task displayed in the Task Queue, the frontend shall show the assigned AGV information provided by the backend, such as:
+
+- AGV ID
+- AGV name
+- AGV number
+
+If an AGV has not yet been assigned, the frontend shall display a clear placeholder such as:
+
+```text
+Not assigned yet
+```
+
+The frontend shall not independently select or determine which AGV is responsible for the task.
+
+AGV assignment shall be managed and reported by the backend.
+
+### Button State and Error Handling
+
+After submitting a command or confirmation, the frontend shall disable the related action button until a response is received from the backend in order to prevent duplicate requests.
+
+If the backend returns success, the frontend shall update the displayed state based on the response.
+
+If a backend API request fails, times out, or returns an error, the frontend shall display an appropriate error message in Thai and shall allow the operator to retry the same action when applicable.
+
+---
+
+## System Architecture
+
+This system is a web-based frontend application designed for operators to control FPC pickup and delivery workflows using tablets and PC monitors.
+
+The frontend acts as the user interface, displaying system status, receiving user input, performing basic validation, and sending commands or confirmations to the backend via REST APIs.
+
+The backend is responsible for:
+
+- Processing requests from the frontend
+- Validating data
+- Managing job queues
+- Recording operation logs with employee IDs
+- Coordinating with the AGV system
+- Interacting with the storage database to retrieve FPC information
+- Maintaining job-related data such as queue status, operation history, and operator information
+
+The frontend does not communicate directly with the AGV system.
+
+All robot-related commands are routed through the backend to ensure proper validation, logging, and workflow control.
+
+The backend sends instructions to the AGV/Robot to carry out FPC pickup or delivery based on the selected workflow.
+
+The AGV missions are preconfigured in advance.
+
+Since the system does not require real-time robot positioning or continuous status updates, REST APIs are sufficient as the primary communication method between the frontend and backend.
+
+As the backend provides status updates or results, the frontend presents them to the operator through:
+
+- Confirmation buttons
+- Notification messages
+- Completion status indicators
+
+Although the system mainly operates in a local environment, security remains an important consideration.
+
+Key security and reliability measures include:
+
+- User access control
+- Data validation before sending commands
+- Centralized backend validation
+- Operation logging
+- Proper error handling
+
+Operators begin by entering their employee ID and selecting an operation mode.
+
+The system supports three modes shown on the user interface as:
+
+- LOAD (คืน FPC)
+- UNLOAD (เบิก FPC)
+- สลับ FPC
+
+In สลับ FPC mode, the AGV transfers an FPC from one machine to another machine.
+
+For some workflow steps, operator confirmation is required before the backend proceeds, such as confirming cover head installation or removal to ensure safe operation.
+
+In the current scope, the Smart Storage system supports a single destination location for the LOAD (คืน FPC) workflow.
+
+An overview of the system workflow and interactions can be seen in Figure X.X.

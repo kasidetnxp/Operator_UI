@@ -2,11 +2,10 @@ import { useState } from 'react';
 import { EmployeeLogin, EmployeeMenu } from '@/features/auth';
 import { ModeSelection, ReturnFPCWorkflow, RequestFPCWorkflow, SwapFPCWorkflow } from '@/features/workflow';
 import { TaskQueuePage } from '@/features/queue';
-import { LanguageSwitcher } from '@/shared/components/LanguageSwitcher';
 import type { Language, OperationMode, Page } from '@/shared/types';
 
 export default function App() {
-  const [language, setLanguage] = useState<Language>('en');
+  const [language] = useState<Language>('th');
   const [employeeId, setEmployeeId] = useState<string>('');
   const [currentPage, setCurrentPage] = useState<Page>('mode-selection');
 
@@ -35,8 +34,6 @@ export default function App() {
           <h1 className="text-3xl font-bold text-gray-900">NXP WT</h1>
 
           <div className="flex items-center gap-6">
-            <LanguageSwitcher language={language} onLanguageChange={setLanguage} />
-
             {employeeId && (
               <>
                 <button

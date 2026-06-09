@@ -19,7 +19,28 @@ export interface FPCItem {
 export interface TaskResponse {
   taskId: string;
   jobId: string;
-  status: 'queued' | 'in_progress' | 'arrived' | 'waiting_confirmation' | 'complete' | 'error';
+  status:
+    | 'submitted'
+    | 'queued'
+    | 'starting'
+    | 'moving_to_source'
+    | 'arrived_at_source'
+    | 'picking_up_fpc'
+    | 'waiting_cover_head_install'
+    | 'moving_to_destination'
+    | 'arrived_at_destination'
+    | 'placing_fpc'
+    | 'waiting_cover_head_remove'
+    | 'completed'
+    | 'rejected'
+    | 'blocked'
+    | 'failed'
+    | 'canceled'
+    | 'in_progress'
+    | 'arrived'
+    | 'waiting_confirmation'
+    | 'complete'
+    | 'error';
   message: string;
   employeeId: string;
   type: 'return' | 'request' | 'swap';
@@ -139,7 +160,7 @@ export async function submitReturnFPCJob(
   const task: TaskResponse = {
     taskId,
     jobId,
-    status: 'queued',
+    status: 'submitted',
     message: 'Job submitted successfully',
     employeeId,
     type: 'return',
@@ -150,10 +171,13 @@ export async function submitReturnFPCJob(
 
   mockTaskQueue.push(task);
 
-  // Simulate AGV status progression
-  setTimeout(() => updateTaskStatus(taskId, 'in_progress'), 2000);
-  setTimeout(() => updateTaskStatus(taskId, 'arrived'), 5000);
-  setTimeout(() => updateTaskStatus(taskId, 'waiting_confirmation'), 7000);
+  // Detailed status progression
+  setTimeout(() => updateTaskStatus(taskId, 'queued'), 1500);
+  setTimeout(() => updateTaskStatus(taskId, 'starting'), 4000);
+  setTimeout(() => updateTaskStatus(taskId, 'moving_to_source'), 7000);
+  setTimeout(() => updateTaskStatus(taskId, 'arrived_at_source'), 11000);
+  setTimeout(() => updateTaskStatus(taskId, 'picking_up_fpc'), 14500);
+  setTimeout(() => updateTaskStatus(taskId, 'waiting_cover_head_install'), 18000);
 
   return task;
 }
@@ -173,7 +197,7 @@ export async function submitRequestFPCJob(
   const task: TaskResponse = {
     taskId,
     jobId,
-    status: 'queued',
+    status: 'submitted',
     message: 'Job submitted successfully',
     employeeId,
     type: 'request',
@@ -185,10 +209,16 @@ export async function submitRequestFPCJob(
 
   mockTaskQueue.push(task);
 
-  // Simulate AGV status progression
-  setTimeout(() => updateTaskStatus(taskId, 'in_progress'), 2000);
-  setTimeout(() => updateTaskStatus(taskId, 'arrived'), 5000);
-  setTimeout(() => updateTaskStatus(taskId, 'waiting_confirmation'), 7000);
+  // Detailed status progression
+  setTimeout(() => updateTaskStatus(taskId, 'queued'), 1500);
+  setTimeout(() => updateTaskStatus(taskId, 'starting'), 4000);
+  setTimeout(() => updateTaskStatus(taskId, 'moving_to_source'), 7000);
+  setTimeout(() => updateTaskStatus(taskId, 'arrived_at_source'), 11000);
+  setTimeout(() => updateTaskStatus(taskId, 'picking_up_fpc'), 14500);
+  setTimeout(() => updateTaskStatus(taskId, 'moving_to_destination'), 18000);
+  setTimeout(() => updateTaskStatus(taskId, 'arrived_at_destination'), 22000);
+  setTimeout(() => updateTaskStatus(taskId, 'placing_fpc'), 25500);
+  setTimeout(() => updateTaskStatus(taskId, 'waiting_cover_head_remove'), 29000);
 
   return task;
 }
@@ -209,7 +239,7 @@ export async function submitSwapFPCJob(
   const task: TaskResponse = {
     taskId,
     jobId,
-    status: 'queued',
+    status: 'submitted',
     message: 'Job submitted successfully',
     employeeId,
     type: 'swap',
@@ -221,10 +251,13 @@ export async function submitSwapFPCJob(
 
   mockTaskQueue.push(task);
 
-  // Simulate AGV status progression
-  setTimeout(() => updateTaskStatus(taskId, 'in_progress'), 2000);
-  setTimeout(() => updateTaskStatus(taskId, 'arrived'), 5000);
-  setTimeout(() => updateTaskStatus(taskId, 'waiting_confirmation'), 7000);
+  // Detailed status progression
+  setTimeout(() => updateTaskStatus(taskId, 'queued'), 1500);
+  setTimeout(() => updateTaskStatus(taskId, 'starting'), 4000);
+  setTimeout(() => updateTaskStatus(taskId, 'moving_to_source'), 7000);
+  setTimeout(() => updateTaskStatus(taskId, 'arrived_at_source'), 11000);
+  setTimeout(() => updateTaskStatus(taskId, 'picking_up_fpc'), 14500);
+  setTimeout(() => updateTaskStatus(taskId, 'waiting_cover_head_install'), 18000);
 
   return task;
 }
@@ -236,21 +269,27 @@ export async function confirmCoverHeadInstalled(taskId: string): Promise<TaskRes
   if (task) {
     if (task.type === 'swap') {
       task.coverHeadInstalledConfirmed = true;
-      task.status = 'in_progress';
+      task.status = 'moving_to_destination';
       task.message = 'Cover Head installation confirmed, AGV proceeding to destination';
 
       // Simulate transit to destination machine
-      setTimeout(() => updateTaskStatus(taskId, 'arrived'), 3000);
-      setTimeout(() => updateTaskStatus(taskId, 'waiting_confirmation'), 5000);
+      setTimeout(() => updateTaskStatus(taskId, 'arrived_at_destination'), 3000);
+      setTimeout(() => updateTaskStatus(taskId, 'placing_fpc'), 6500);
+      setTimeout(() => updateTaskStatus(taskId, 'waiting_cover_head_remove'), 10000);
     } else {
-      task.status = 'in_progress';
-      task.message = 'Cover Head installation confirmed, AGV proceeding';
+      task.status = 'moving_to_destination';
+      task.message = 'Cover Head installation confirmed, AGV proceeding to Smart Storage';
+
+      // Simulate transit to Smart Storage
+      setTimeout(() => updateTaskStatus(taskId, 'arrived_at_destination'), 3000);
+      setTimeout(() => updateTaskStatus(taskId, 'placing_fpc'), 6500);
+      setTimeout(() => updateTaskStatus(taskId, 'completed'), 10000);
     }
   }
   return task || {
     taskId,
     jobId: 'UNKNOWN',
-    status: 'in_progress',
+    status: 'completed',
     message: 'Cover Head installation confirmed, AGV proceeding',
     employeeId: '',
     type: 'return',
@@ -263,13 +302,13 @@ export async function confirmCoverHeadRemoved(taskId: string): Promise<TaskRespo
   await delay(500);
   const task = mockTaskQueue.find(t => t.taskId === taskId);
   if (task) {
-    task.status = 'in_progress';
-    task.message = 'Cover Head removal confirmed, AGV proceeding';
+    task.status = 'completed';
+    task.message = 'Cover Head removal confirmed, job completed';
   }
   return task || {
     taskId,
     jobId: 'UNKNOWN',
-    status: 'in_progress',
+    status: 'completed',
     message: 'Cover Head removal confirmed, AGV proceeding',
     employeeId: '',
     type: 'request',

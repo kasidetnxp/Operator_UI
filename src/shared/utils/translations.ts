@@ -19,8 +19,8 @@ export const translations = {
 
     // Mode Selection
     selectMode: 'Select Operation Mode',
-    returnFPC: 'Return FPC',
-    requestFPC: 'Deliver FPC',
+    returnFPC: 'LOAD (คืน FPC)',
+    requestFPC: 'UNLOAD (เบิก FPC)',
     swapFPC: 'Swap FPC',
     returnFPCDesc: 'Pick up FPC from machine and return to Smart Storage',
     requestFPCDesc: 'Request FPC from Smart Storage and deliver to machine',
@@ -55,6 +55,21 @@ export const translations = {
     waitingConfirmation: 'Waiting for Confirmation',
     complete: 'Complete',
     error: 'Error',
+    submitted: 'Submitted',
+    starting: 'Starting',
+    movingToSource: 'Moving to Source',
+    arrivedAtSource: 'Arrived at Source',
+    pickingUpFPC: 'Picking Up FPC',
+    waitingCoverHeadInstall: 'Waiting for Cover Head Installation Confirmation',
+    movingToDestination: 'Moving to Destination',
+    arrivedAtDestination: 'Arrived at Destination',
+    placingFPC: 'Placing FPC',
+    waitingCoverHeadRemove: 'Waiting for Cover Head Removal Confirmation',
+    completed: 'Completed',
+    rejected: 'Rejected',
+    blocked: 'Blocked',
+    failedStatus: 'Failed',
+    canceled: 'Canceled',
 
     // Actions
     confirm: 'Confirm',
@@ -97,7 +112,7 @@ export const translations = {
     submittedBy: 'Submitted By',
     createdAt: 'Created At',
     type: 'Type',
-    noTasksInQueue: 'No tasks in queue',
+    noTasksInQueue: 'No Task',
 
     // Confirmation
     confirmSubmit: 'Confirm Submission',
@@ -117,8 +132,8 @@ export const translations = {
 
     // Mode Selection
     selectMode: 'เลือกโหมดการทำงาน',
-    returnFPC: 'คืน FPC',
-    requestFPC: 'ส่ง FPC',
+    returnFPC: 'LOAD (คืน FPC)',
+    requestFPC: 'UNLOAD (เบิก FPC)',
     swapFPC: 'สลับ FPC',
     returnFPCDesc: 'รับ FPC จากเครื่องจักรและส่งคืนไปที่คลังสมาร์ท',
     requestFPCDesc: 'ขอ FPC จากคลังสมาร์ทและส่งไปยังเครื่องจักร',
@@ -153,6 +168,21 @@ export const translations = {
     waitingConfirmation: 'รอการยืนยัน',
     complete: 'เสร็จสมบูรณ์',
     error: 'เกิดข้อผิดพลาด',
+    submitted: 'ส่งคำขอแล้ว',
+    starting: 'กำลังเริ่มต้น',
+    movingToSource: 'กำลังไปต้นทาง',
+    arrivedAtSource: 'ถึงต้นทางแล้ว',
+    pickingUpFPC: 'กำลังหยิบ FPC',
+    waitingCoverHeadInstall: 'รอการยืนยันติดตั้ง Cover Head',
+    movingToDestination: 'กำลังไปปลายทาง',
+    arrivedAtDestination: 'ถึงปลายทางแล้ว',
+    placingFPC: 'กำลังวาง FPC',
+    waitingCoverHeadRemove: 'รอการยืนยันถอด Cover Head',
+    completed: 'เสร็จสมบูรณ์',
+    rejected: 'ปฏิเสธการทำงาน',
+    blocked: 'ถูกบล็อก',
+    failedStatus: 'ล้มเหลว',
+    canceled: 'ยกเลิกแล้ว',
 
     // Actions
     confirm: 'ยืนยัน',
@@ -195,7 +225,7 @@ export const translations = {
     submittedBy: 'ส่งโดย',
     createdAt: 'สร้างเมื่อ',
     type: 'ประเภท',
-    noTasksInQueue: 'ไม่มีงานในคิว',
+    noTasksInQueue: 'No Task',
 
     // Confirmation
     confirmSubmit: 'ยืนยันการส่ง',
