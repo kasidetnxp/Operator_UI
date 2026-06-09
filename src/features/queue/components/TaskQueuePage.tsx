@@ -123,8 +123,8 @@ export function TaskQueuePage({ employeeId, language, onBack, onNewTask }: TaskQ
 
   const canConfirm = (task: TaskResponse) =>
     (task.status === 'waiting_confirmation' ||
-     task.status === 'waiting_cover_head_install' ||
-     task.status === 'waiting_cover_head_remove') &&
+      task.status === 'waiting_cover_head_install' ||
+      task.status === 'waiting_cover_head_remove') &&
     isMyTask(task);
 
   const formatDateTime = (isoString: string) => {
@@ -214,9 +214,8 @@ export function TaskQueuePage({ employeeId, language, onBack, onNewTask }: TaskQ
                         ) : (
                           <Clock className="w-5 h-5 text-blue-600" />
                         )}
-                        <span className={`text-sm font-medium ${
-                          (task.status === 'complete' || task.status === 'completed') ? 'text-green-700' : 'text-blue-700'
-                        }`}>
+                        <span className={`text-sm font-medium ${(task.status === 'complete' || task.status === 'completed') ? 'text-green-700' : 'text-blue-700'
+                          }`}>
                           {getStatusLabel(task.status)}
                         </span>
                       </div>
@@ -284,10 +283,10 @@ export function TaskQueuePage({ employeeId, language, onBack, onNewTask }: TaskQ
                           {selectedTask.type === 'return'
                             ? t.coverHeadInstallationConfirm
                             : selectedTask.type === 'request'
-                            ? t.coverHeadRemovalConfirm
-                            : !selectedTask.coverHeadInstalledConfirmed
-                            ? t.coverHeadInstallationConfirm
-                            : t.coverHeadRemovalConfirm}
+                              ? t.coverHeadRemovalConfirm
+                              : !selectedTask.coverHeadInstalledConfirmed
+                                ? t.coverHeadInstallationConfirm
+                                : t.coverHeadRemovalConfirm}
                         </p>
                         <Button
                           variant="contained"
@@ -300,12 +299,12 @@ export function TaskQueuePage({ employeeId, language, onBack, onNewTask }: TaskQ
                           {isConfirming
                             ? t.processing
                             : selectedTask.type === 'return'
-                            ? t.confirmCoverHeadInstalled
-                            : selectedTask.type === 'request'
-                            ? t.confirmCoverHeadRemoved
-                            : !selectedTask.coverHeadInstalledConfirmed
-                            ? t.confirmCoverHeadInstalled
-                            : t.confirmCoverHeadRemoved}
+                              ? t.confirmCoverHeadInstalled
+                              : selectedTask.type === 'request'
+                                ? t.confirmCoverHeadRemoved
+                                : !selectedTask.coverHeadInstalledConfirmed
+                                  ? t.confirmCoverHeadInstalled
+                                  : t.confirmCoverHeadRemoved}
                         </Button>
                       </div>
                     </Alert>
