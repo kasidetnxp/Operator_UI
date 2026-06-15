@@ -117,6 +117,9 @@ export const translations = {
     // Confirmation
     confirmSubmit: 'Confirm Submission',
     confirmSubmitMessage: 'Are you sure you want to submit this job?',
+    confirmCancel: 'Confirm Cancellation',
+    confirmCancelMessage: 'Are you sure you want to cancel this task?',
+    cancelTask: 'Cancel Task',
     yes: 'Yes',
     no: 'No',
   },
@@ -230,6 +233,9 @@ export const translations = {
     // Confirmation
     confirmSubmit: 'ยืนยันการส่ง',
     confirmSubmitMessage: 'คุณแน่ใจหรือไม่ว่าต้องการส่งงานนี้?',
+    confirmCancel: 'ยืนยันการยกเลิก',
+    confirmCancelMessage: 'คุณแน่ใจหรือไม่ว่าต้องการยกเลิกงานนี้?',
+    cancelTask: 'ยกเลิกงาน',
     yes: 'ใช่',
     no: 'ไม่',
   },

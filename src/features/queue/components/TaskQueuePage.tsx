@@ -1,11 +1,11 @@
 import { useState, useEffect } from 'react';
-import { Card, CardContent, Button, Alert, Chip } from '@mui/material';
+import { Card, CardContent, Button, Alert, Chip, Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material';
 import { ArrowLeft, CheckCircle, Clock } from 'lucide-react';
 import { TaskStatus } from './TaskStatus';
 import type { TaskStatusType } from './TaskStatus';
 import { translations } from '@/shared/utils/translations';
 import type { Language } from '@/shared/types';
-import { getAllTasks } from '@/shared/utils/mockApi';
+import { getAllTasks, cancelTask } from '@/shared/utils/mockApi';
 import type { TaskResponse } from '@/shared/utils/mockApi';
 
 interface TaskQueuePageProps {
@@ -18,6 +18,8 @@ interface TaskQueuePageProps {
 export function TaskQueuePage({ employeeId, language, onBack, onNewTask }: TaskQueuePageProps) {
   const [tasks, setTasks] = useState<TaskResponse[]>([]);
   const [selectedTask, setSelectedTask] = useState<TaskResponse | null>(null);
+  const [showCancelDialog, setShowCancelDialog] = useState(false);
+  const [isCanceling, setIsCanceling] = useState(false);
 
   const t = translations[language];
 
@@ -81,6 +83,35 @@ export function TaskQueuePage({ employeeId, language, onBack, onNewTask }: TaskQ
       task.status === 'waiting_cover_head_install' ||
       task.status === 'waiting_cover_head_remove') &&
     isMyTask(task);
+
+  const isCancelable = (task: TaskResponse) => {
+    const finishedStatuses: TaskResponse['status'][] = [
+      'completed',
+      'complete',
+      'canceled',
+      'failed',
+      'rejected',
+      'error'
+    ];
+    return !finishedStatuses.includes(task.status) && isMyTask(task);
+  };
+
+  const handleConfirmCancel = async () => {
+    if (!selectedTask) return;
+    setIsCanceling(true);
+    try {
+      await cancelTask(selectedTask.taskId);
+      const allTasks = await getAllTasks();
+      setTasks(allTasks);
+      const updated = allTasks.find(t => t.taskId === selectedTask.taskId);
+      if (updated) setSelectedTask(updated);
+    } catch (err) {
+      console.error('Failed to cancel task', err);
+    } finally {
+      setIsCanceling(false);
+      setShowCancelDialog(false);
+    }
+  };
 
   const formatDateTime = (isoString: string) => {
     const date = new Date(isoString);
@@ -243,6 +274,20 @@ export function TaskQueuePage({ employeeId, language, onBack, onNewTask }: TaskQ
                       </p>
                     </Alert>
                   )}
+
+                  {isCancelable(selectedTask) && (
+                    <div className="pt-4 flex justify-end">
+                      <Button
+                        variant="outlined"
+                        color="error"
+                        onClick={() => setShowCancelDialog(true)}
+                        size="large"
+                        className="!py-4 !px-8 !text-xl !font-bold"
+                      >
+                        {t.cancelTask}
+                      </Button>
+                    </div>
+                  )}
                 </div>
               </>
             ) : (
@@ -253,6 +298,62 @@ export function TaskQueuePage({ employeeId, language, onBack, onNewTask }: TaskQ
           </CardContent>
         </Card>
       </div>
+
+      {/* Cancellation Confirmation Dialog */}
+      <Dialog
+        open={showCancelDialog}
+        onClose={() => !isCanceling && setShowCancelDialog(false)}
+        maxWidth="sm"
+        fullWidth
+        PaperProps={{ className: '!p-4' }}
+      >
+        <DialogTitle className="!text-3xl !font-bold !pb-4">
+          {t.confirmCancel}
+        </DialogTitle>
+        <DialogContent>
+          <div className="space-y-4 py-4">
+            <p className="text-2xl text-gray-700 mb-6">
+              {t.confirmCancelMessage}
+            </p>
+            {selectedTask && (
+              <div className="bg-gray-50 rounded-lg p-6 space-y-3">
+                <div className="flex justify-between text-xl">
+                  <span className="text-gray-600">{t.jobId}:</span>
+                  <span className="font-bold text-gray-900">{selectedTask.jobId}</span>
+                </div>
+                <div className="flex justify-between text-xl">
+                  <span className="text-gray-600">{t.type}:</span>
+                  <span className="font-bold text-gray-900">
+                    {selectedTask.type === 'return' ? t.returnFPC : selectedTask.type === 'request' ? t.requestFPC : t.swapFPC}
+                  </span>
+                </div>
+              </div>
+            )}
+          </div>
+        </DialogContent>
+        <DialogActions className="!p-6 !pt-2">
+          <Button
+            onClick={() => setShowCancelDialog(false)}
+            variant="outlined"
+            size="large"
+            className="!py-4 !px-10 !text-xl !min-w-[140px]"
+            disabled={isCanceling}
+          >
+            {t.no}
+          </Button>
+          <Button
+            onClick={handleConfirmCancel}
+            variant="contained"
+            color="error"
+            size="large"
+            autoFocus
+            className="!py-4 !px-10 !text-xl !min-w-[140px]"
+            disabled={isCanceling}
+          >
+            {isCanceling ? t.processing : t.yes}
+          </Button>
+        </DialogActions>
+      </Dialog>
     </div>
   );
 }

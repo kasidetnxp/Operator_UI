@@ -267,6 +267,7 @@ export async function confirmCoverHeadInstalled(taskId: string): Promise<TaskRes
   await delay(500);
   const task = mockTaskQueue.find(t => t.taskId === taskId);
   if (task) {
+    if (task.status === 'canceled') return task;
     if (task.type === 'swap') {
       task.coverHeadInstalledConfirmed = true;
       task.status = 'moving_to_destination';
@@ -302,6 +303,7 @@ export async function confirmCoverHeadRemoved(taskId: string): Promise<TaskRespo
   await delay(500);
   const task = mockTaskQueue.find(t => t.taskId === taskId);
   if (task) {
+    if (task.status === 'canceled') return task;
     task.status = 'completed';
     task.message = 'Cover Head removal confirmed, job completed';
   }
@@ -332,6 +334,7 @@ export async function getAllTasks(): Promise<TaskResponse[]> {
 export function updateTaskStatus(taskId: string, status: TaskResponse['status']): void {
   const task = mockTaskQueue.find(t => t.taskId === taskId);
   if (task) {
+    if (task.status === 'canceled') return;
     task.status = status;
 
     // Simulate AGV physical button confirmation after 5 seconds
@@ -345,6 +348,17 @@ export function updateTaskStatus(taskId: string, status: TaskResponse['status'])
       }, 5000);
     }
   }
+}
+
+/** Cancel a task */
+export async function cancelTask(taskId: string): Promise<TaskResponse | null> {
+  await delay(500);
+  const task = mockTaskQueue.find(t => t.taskId === taskId);
+  if (task) {
+    task.status = 'canceled';
+    task.message = 'Job canceled by user';
+  }
+  return task || null;
 }
 
 /** Optionally pre-populate queue for testing */
