@@ -101,6 +101,9 @@ The **Task Queue** displays all active and historical transport jobs. It simulat
     *   *For Request/Swap Workflow*: Operator must confirm **Cover Head Removed** by pressing a physical button on the AGV machine.
 5.  `complete` / `error`: The job reaches its terminal state.
 
+*   **Task Queue Sorting**: Active tasks (not finished) are automatically sorted by creation time (newest first) and kept at the top of the queue. Finished/completed/canceled tasks are automatically pushed to the bottom of the list.
+*   **Task Cancellation**: Operators can cancel active tasks that they submitted. Prior to cancellation, the interface prompts the operator with a confirmation dialog. Once cancelled, the task's status is changed to `canceled`, and any running simulation tasks/timers for this task are stopped.
+
 ---
 
 ## 🗃️ Data Models & Types
@@ -145,7 +148,28 @@ Represents a transport job and its execution state:
 interface TaskResponse {
   taskId: string;
   jobId: string;
-  status: 'queued' | 'in_progress' | 'arrived' | 'waiting_confirmation' | 'complete' | 'error';
+  status:
+    | 'submitted'
+    | 'queued'
+    | 'starting'
+    | 'moving_to_source'
+    | 'arrived_at_source'
+    | 'picking_up_fpc'
+    | 'waiting_cover_head_install'
+    | 'moving_to_destination'
+    | 'arrived_at_destination'
+    | 'placing_fpc'
+    | 'waiting_cover_head_remove'
+    | 'completed'
+    | 'rejected'
+    | 'blocked'
+    | 'failed'
+    | 'canceled'
+    | 'in_progress'
+    | 'arrived'
+    | 'waiting_confirmation'
+    | 'complete'
+    | 'error';
   message: string;
   employeeId: string;
   type: 'return' | 'request' | 'swap';
@@ -187,6 +211,7 @@ The system currently runs on an in-memory **Simulation Layer** ([src/shared/util
 *   `submitSwapFPCJob(employeeId, sourceMachineId, destinationMachineId)`: Initiates swap transport.
 *   `confirmCoverHeadInstalled(taskId)`: Submits cover head installation confirmation (simulated via 5s delay on waiting status in frontend).
 *   `confirmCoverHeadRemoved(taskId)`: Submits cover head removal confirmation (simulated via 5s delay on waiting status in frontend).
+*   `cancelTask(taskId)`: Sets task status to `canceled` and halts further simulated transitions.
 *   `getTaskStatus(taskId)` / `getAllTasks()`: Fetches status updates.
 
 ### Production Integration

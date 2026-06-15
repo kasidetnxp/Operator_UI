@@ -90,6 +90,22 @@ No Task
 
 This empty state shall not be treated as a task status because it does not belong to any existing task.
 
+### Task Cancellation
+
+The operator shall be able to cancel any of their own active tasks from the Task Details pane.
+
+Before the task is canceled, the frontend shall present a confirmation dialog asking the operator to confirm the cancellation (e.g., "Are you sure you want to cancel this task?").
+
+Once confirmed, the frontend shall invoke the cancellation API to change the task status to `Canceled`. Any ongoing simulation timers or workflow progressions for this task shall be immediately halted to prevent the task from transitioning to other active or completed states.
+
+### Task Queue Sorting and Default Selection
+
+The Task Queue page shall list all tasks dynamically sorted according to the following rules:
+
+1. **Active Tasks** (e.g., `submitted`, `queued`, `starting`, `moving_to_source`, etc.) shall be displayed at the top of the queue list, sorted by their creation timestamp in descending order (newest tasks first).
+2. **Finished Tasks** (e.g., `completed`, `complete`, `canceled`, `failed`, `rejected`, `error`) shall be displayed at the bottom of the queue list.
+3. When the Task Queue page is loaded, the detail view shall default to showing the most recently added active task (the first task in the sorted queue list).
+
 ### Supported Task Statuses
 
 The frontend shall support the following operator-facing task statuses for tasks returned by the backend:
