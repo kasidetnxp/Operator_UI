@@ -137,8 +137,10 @@ Represents an FPC stored inside Smart Storage:
 ```typescript
 interface FPCItem {
   id: string;
-  type: string;
-  location: string;
+  address: string;
+  functionName: string;
+  label: string;
+  comment?: string;
 }
 ```
 

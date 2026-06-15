@@ -48,9 +48,10 @@ export function RequestFPCWorkflow({ employeeId, language, onBack, onTaskSubmitt
     const lowerQuery = searchQuery.toLowerCase();
     return allFPCItems.filter(
       fpc =>
-        fpc.id.toLowerCase().includes(lowerQuery) ||
-        fpc.type.toLowerCase().includes(lowerQuery) ||
-        fpc.location.toLowerCase().includes(lowerQuery)
+        fpc.address.toLowerCase().includes(lowerQuery) ||
+        fpc.functionName.toLowerCase().includes(lowerQuery) ||
+        fpc.label.toLowerCase().includes(lowerQuery) ||
+        (fpc.comment && fpc.comment.toLowerCase().includes(lowerQuery))
     );
   }, [searchQuery, allFPCItems]);
 
@@ -134,9 +135,10 @@ export function RequestFPCWorkflow({ employeeId, language, onBack, onTaskSubmitt
                   <TableHead>
                     <TableRow>
                       <TableCell padding="checkbox" className="!bg-gray-100" />
-                      <TableCell className="!text-xl !font-bold !bg-gray-100 !py-4">{t.fpcId}</TableCell>
-                      <TableCell className="!text-xl !font-bold !bg-gray-100 !py-4">{t.fpcType}</TableCell>
-                      <TableCell className="!text-xl !font-bold !bg-gray-100 !py-4">{t.location}</TableCell>
+                      <TableCell className="!text-xl !font-bold !bg-gray-100 !py-4">{t.address}</TableCell>
+                      <TableCell className="!text-xl !font-bold !bg-gray-100 !py-4">{t.function}</TableCell>
+                      <TableCell className="!text-xl !font-bold !bg-gray-100 !py-4">{t.label}</TableCell>
+                      <TableCell className="!text-xl !font-bold !bg-gray-100 !py-4">{t.comment}</TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>
@@ -158,9 +160,10 @@ export function RequestFPCWorkflow({ employeeId, language, onBack, onTaskSubmitt
                             sx={{ '& .MuiSvgIcon-root': { fontSize: 32 } }}
                           />
                         </TableCell>
-                        <TableCell className="!text-xl !py-4">{fpc.id}</TableCell>
-                        <TableCell className="!text-xl !py-4">{fpc.type}</TableCell>
-                        <TableCell className="!text-xl !py-4">{fpc.location}</TableCell>
+                        <TableCell className="!text-xl !py-4">{fpc.address}</TableCell>
+                        <TableCell className="!text-xl !py-4">{fpc.functionName}</TableCell>
+                        <TableCell className="!text-xl !py-4">{fpc.label}</TableCell>
+                        <TableCell className="!text-xl !py-4">{fpc.comment || '-'}</TableCell>
                       </TableRow>
                     ))}
                   </TableBody>

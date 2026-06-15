@@ -12,8 +12,10 @@ export interface Machine {
 
 export interface FPCItem {
   id: string;
-  type: string;
-  location: string;
+  address: string;
+  functionName: string;
+  label: string;
+  comment?: string;
 }
 
 export interface TaskResponse {
@@ -110,16 +112,18 @@ export const mockMachines: Machine[] = [
 
 // ─── Mock FPC Database ───
 const mockFPCDatabase: FPCItem[] = [
-  { id: 'FPC-2024-001', type: 'Type A', location: 'Smart Storage - A1' },
-  { id: 'FPC-2024-002', type: 'Type B', location: 'Smart Storage - A2' },
-  { id: 'FPC-2024-003', type: 'Type A', location: 'Smart Storage - B1' },
-  { id: 'FPC-2024-004', type: 'Type C', location: 'Smart Storage - B2' },
-  { id: 'FPC-2024-005', type: 'Type B', location: 'Smart Storage - C1' },
-  { id: 'FPC-2024-006', type: 'Type A', location: 'Smart Storage - C2' },
-  { id: 'FPC-2024-007', type: 'Type C', location: 'Smart Storage - D1' },
-  { id: 'FPC-2024-008', type: 'Type B', location: 'Smart Storage - D2' },
-  { id: 'FPC-2025-001', type: 'Type A', location: 'Smart Storage - E1' },
-  { id: 'FPC-2025-002', type: 'Type C', location: 'Smart Storage - E2' },
+  { id: '2ID021FV002B', address: '002', functionName: 'PM Load', label: '2ID021FV002B', comment: '' },
+  { id: 'P14380-FHB-0596', address: '003', functionName: 'PM Load', label: 'P14380-FHB-0596', comment: '' },
+  { id: 'P25250-FNN-0498', address: '004', functionName: 'PM Load', label: 'P25250-FNN-0498', comment: '' },
+  { id: '2ID057TV001B', address: '005', functionName: 'PM Load', label: '2ID057TV001B', comment: '' },
+  { id: 'P15760-TBB-0705', address: '006', functionName: 'PM Load', label: 'P15760-TBB-0705', comment: '' },
+  { id: 'PI0001-SBB-0494', address: '007', functionName: 'PM Load', label: 'PI0001-SBB-0494', comment: '' },
+  { id: 'P14080-FHH-2655', address: '008', functionName: 'PM Load', label: 'P14080-FHH-2655', comment: '' },
+  { id: 'P15450-FHH-2685', address: '009', functionName: 'PM Load', label: 'P15450-FHH-2685', comment: '' },
+  { id: 'PIR011-TBB-0594', address: '010', functionName: 'PM Load', label: 'PIR011-TBB-0594', comment: '' },
+  { id: '2IE075TV001B', address: '011', functionName: 'PM Load', label: '2IE075TV001B', comment: '' },
+  { id: '2ID021FV003B', address: '013', functionName: 'PM Load', label: '2ID021FV003B', comment: '' },
+  { id: 'P15700-FBB-0707', address: '014', functionName: 'PM Load', label: 'P15700-FBB-0707', comment: '' },
 ];
 
 // Simulate network delay (remove when connecting to real API)
@@ -140,9 +144,10 @@ export async function searchFPC(query: string): Promise<FPCItem[]> {
   const lowerQuery = query.toLowerCase();
   return mockFPCDatabase.filter(
     fpc =>
-      fpc.id.toLowerCase().includes(lowerQuery) ||
-      fpc.type.toLowerCase().includes(lowerQuery) ||
-      fpc.location.toLowerCase().includes(lowerQuery)
+      fpc.address.toLowerCase().includes(lowerQuery) ||
+      fpc.functionName.toLowerCase().includes(lowerQuery) ||
+      fpc.label.toLowerCase().includes(lowerQuery) ||
+      (fpc.comment && fpc.comment.toLowerCase().includes(lowerQuery))
   );
 }
 

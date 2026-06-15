@@ -42,10 +42,13 @@ export const translations = {
     search: 'Search',
     noResults: 'No FPC found matching your search',
     searchResults: 'Search Results',
-    selectFPC: 'Select FPC',
     fpcId: 'FPC ID',
     fpcType: 'Type',
     location: 'Location',
+    address: 'ADDRESS',
+    function: 'FUNCTION',
+    label: 'LABEL',
+    comment: 'COMMENT',
 
     // Status
     status: 'Status',
@@ -158,10 +161,13 @@ export const translations = {
     search: 'ค้นหา',
     noResults: 'ไม่พบ FPC ที่ตรงกับการค้นหา',
     searchResults: 'ผลการค้นหา',
-    selectFPC: 'เลือก FPC',
     fpcId: 'รหัส FPC',
     fpcType: 'ประเภท',
     location: 'ตำแหน่ง',
+    address: 'ADDRESS',
+    function: 'FUNCTION',
+    label: 'LABEL',
+    comment: 'COMMENT',
 
     // Status
     status: 'สถานะ',
