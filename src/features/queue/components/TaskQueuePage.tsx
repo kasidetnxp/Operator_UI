@@ -23,18 +23,32 @@ export function TaskQueuePage({ employeeId, language, onBack, onNewTask }: TaskQ
 
   const t = translations[language];
 
+  const sortTasks = (taskList: TaskResponse[]) => {
+    const finishedStatuses = ['completed', 'complete', 'canceled', 'failed', 'rejected', 'error'];
+    return [...taskList].sort((a, b) => {
+      const aFinished = finishedStatuses.includes(a.status);
+      const bFinished = finishedStatuses.includes(b.status);
+
+      if (aFinished && !bFinished) return 1;
+      if (!aFinished && bFinished) return -1;
+
+      return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+    });
+  };
+
   // Load tasks and refresh every 3 seconds
   useEffect(() => {
     const loadTasks = async () => {
       try {
         const allTasks = await getAllTasks();
-        setTasks(allTasks);
+        const sorted = sortTasks(allTasks);
+        setTasks(sorted);
 
         if (selectedTask) {
-          const updated = allTasks.find(t => t.taskId === selectedTask.taskId);
+          const updated = sorted.find(t => t.taskId === selectedTask.taskId);
           if (updated) setSelectedTask(updated);
-        } else if (allTasks.length > 0) {
-          setSelectedTask(allTasks[0]);
+        } else if (sorted.length > 0) {
+          setSelectedTask(sorted[0]);
         }
       } catch (err) {
         console.error('Failed to load tasks', err);
@@ -102,8 +116,9 @@ export function TaskQueuePage({ employeeId, language, onBack, onNewTask }: TaskQ
     try {
       await cancelTask(selectedTask.taskId);
       const allTasks = await getAllTasks();
-      setTasks(allTasks);
-      const updated = allTasks.find(t => t.taskId === selectedTask.taskId);
+      const sorted = sortTasks(allTasks);
+      setTasks(sorted);
+      const updated = sorted.find(t => t.taskId === selectedTask.taskId);
       if (updated) setSelectedTask(updated);
     } catch (err) {
       console.error('Failed to cancel task', err);
