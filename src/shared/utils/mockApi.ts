@@ -333,6 +333,17 @@ export function updateTaskStatus(taskId: string, status: TaskResponse['status'])
   const task = mockTaskQueue.find(t => t.taskId === taskId);
   if (task) {
     task.status = status;
+
+    // Simulate AGV physical button confirmation after 5 seconds
+    if (status === 'waiting_cover_head_install') {
+      setTimeout(() => {
+        confirmCoverHeadInstalled(taskId);
+      }, 5000);
+    } else if (status === 'waiting_cover_head_remove') {
+      setTimeout(() => {
+        confirmCoverHeadRemoved(taskId);
+      }, 5000);
+    }
   }
 }
 

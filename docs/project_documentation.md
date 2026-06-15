@@ -97,8 +97,8 @@ The **Task Queue** displays all active and historical transport jobs. It simulat
 2.  `in_progress`: The AGV is in transit.
 3.  `arrived`: The AGV has arrived at the station.
 4.  `waiting_confirmation`: The system pauses for physical operator interaction:
-    *   *For Return/Swap Workflow*: Operator must confirm **Cover Head Installed** before the AGV is allowed to travel safely.
-    *   *For Request/Swap Workflow*: Operator must confirm **Cover Head Removed** to complete the handover.
+    *   *For Return/Swap Workflow*: Operator must confirm **Cover Head Installed** by pressing a physical button on the AGV machine.
+    *   *For Request/Swap Workflow*: Operator must confirm **Cover Head Removed** by pressing a physical button on the AGV machine.
 5.  `complete` / `error`: The job reaches its terminal state.
 
 ---
@@ -185,8 +185,8 @@ The system currently runs on an in-memory **Simulation Layer** ([src/shared/util
 *   `submitReturnFPCJob(employeeId, sourceMachineId)`: Initiates return transport.
 *   `submitRequestFPCJob(employeeId, fpcId, destinationMachineId)`: Initiates delivery transport.
 *   `submitSwapFPCJob(employeeId, sourceMachineId, destinationMachineId)`: Initiates swap transport.
-*   `confirmCoverHeadInstalled(taskId)`: Submits cover head installation confirmation.
-*   `confirmCoverHeadRemoved(taskId)`: Submits cover head removal confirmation.
+*   `confirmCoverHeadInstalled(taskId)`: Submits cover head installation confirmation (simulated via 5s delay on waiting status in frontend).
+*   `confirmCoverHeadRemoved(taskId)`: Submits cover head removal confirmation (simulated via 5s delay on waiting status in frontend).
 *   `getTaskStatus(taskId)` / `getAllTasks()`: Fetches status updates.
 
 ### Production Integration

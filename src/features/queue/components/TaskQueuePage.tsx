@@ -5,12 +5,7 @@ import { TaskStatus } from './TaskStatus';
 import type { TaskStatusType } from './TaskStatus';
 import { translations } from '@/shared/utils/translations';
 import type { Language } from '@/shared/types';
-import {
-  getAllTasks,
-  confirmCoverHeadInstalled,
-  confirmCoverHeadRemoved,
-  updateTaskStatus,
-} from '@/shared/utils/mockApi';
+import { getAllTasks } from '@/shared/utils/mockApi';
 import type { TaskResponse } from '@/shared/utils/mockApi';
 
 interface TaskQueuePageProps {
@@ -23,8 +18,6 @@ interface TaskQueuePageProps {
 export function TaskQueuePage({ employeeId, language, onBack, onNewTask }: TaskQueuePageProps) {
   const [tasks, setTasks] = useState<TaskResponse[]>([]);
   const [selectedTask, setSelectedTask] = useState<TaskResponse | null>(null);
-  const [isConfirming, setIsConfirming] = useState(false);
-  const [error, setError] = useState('');
 
   const t = translations[language];
 
@@ -79,45 +72,7 @@ export function TaskQueuePage({ employeeId, language, onBack, onNewTask }: TaskQ
     }
   };
 
-  const handleConfirmCoverHead = async () => {
-    if (!selectedTask) return;
 
-    setIsConfirming(true);
-    setError('');
-
-    try {
-      if (selectedTask.type === 'return') {
-        await confirmCoverHeadInstalled(selectedTask.taskId);
-        if (selectedTask.status === 'waiting_confirmation') {
-          setTimeout(() => {
-            updateTaskStatus(selectedTask.taskId, 'complete');
-          }, 3000);
-        }
-      } else if (selectedTask.type === 'request') {
-        await confirmCoverHeadRemoved(selectedTask.taskId);
-        if (selectedTask.status === 'waiting_confirmation') {
-          setTimeout(() => {
-            updateTaskStatus(selectedTask.taskId, 'complete');
-          }, 3000);
-        }
-      } else if (selectedTask.type === 'swap') {
-        if (selectedTask.status === 'waiting_cover_head_install' || !selectedTask.coverHeadInstalledConfirmed) {
-          await confirmCoverHeadInstalled(selectedTask.taskId);
-        } else {
-          await confirmCoverHeadRemoved(selectedTask.taskId);
-          if (selectedTask.status === 'waiting_confirmation') {
-            setTimeout(() => {
-              updateTaskStatus(selectedTask.taskId, 'complete');
-            }, 3000);
-          }
-        }
-      }
-    } catch {
-      setError(t.error_network);
-    } finally {
-      setIsConfirming(false);
-    }
-  };
 
   const isMyTask = (task: TaskResponse) => task.employeeId === employeeId;
 
@@ -273,40 +228,19 @@ export function TaskQueuePage({ employeeId, language, onBack, onNewTask }: TaskQ
                   <TaskStatus
                     status={selectedTask.status as TaskStatusType}
                     language={language}
-                    errorMessage={error}
                   />
 
                   {canConfirm(selectedTask) && (
                     <Alert severity="warning" className="!items-start !text-xl !py-6">
-                      <div className="space-y-6">
-                        <p className="text-xl">
-                          {selectedTask.type === 'return'
-                            ? t.coverHeadInstallationConfirm
-                            : selectedTask.type === 'request'
-                              ? t.coverHeadRemovalConfirm
-                              : !selectedTask.coverHeadInstalledConfirmed
-                                ? t.coverHeadInstallationConfirm
-                                : t.coverHeadRemovalConfirm}
-                        </p>
-                        <Button
-                          variant="contained"
-                          color="warning"
-                          onClick={handleConfirmCoverHead}
-                          disabled={isConfirming}
-                          fullWidth
-                          className="!py-6 !text-2xl !font-bold"
-                        >
-                          {isConfirming
-                            ? t.processing
-                            : selectedTask.type === 'return'
-                              ? t.confirmCoverHeadInstalled
-                              : selectedTask.type === 'request'
-                                ? t.confirmCoverHeadRemoved
-                                : !selectedTask.coverHeadInstalledConfirmed
-                                  ? t.confirmCoverHeadInstalled
-                                  : t.confirmCoverHeadRemoved}
-                        </Button>
-                      </div>
+                      <p className="text-xl">
+                        {selectedTask.type === 'return'
+                          ? t.coverHeadInstallationConfirm
+                          : selectedTask.type === 'request'
+                            ? t.coverHeadRemovalConfirm
+                            : !selectedTask.coverHeadInstalledConfirmed
+                              ? t.coverHeadInstallationConfirm
+                              : t.coverHeadRemovalConfirm}
+                      </p>
                     </Alert>
                   )}
                 </div>

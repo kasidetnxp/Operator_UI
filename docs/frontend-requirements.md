@@ -38,9 +38,9 @@ In LOAD (คืน FPC) mode, the operator shall select the source machine from 
 
 The destination shall be fixed as Smart Storage in the current scope.
 
-The frontend shall display the Confirm button only after the backend reports the status indicating that pickup has been completed and operator confirmation is required for cover head installation.
+The frontend shall display the instruction details when the backend reports the status indicating that pickup has been completed and operator confirmation is required for cover head installation.
 
-When the operator confirms that the cover head has been installed, the frontend shall send the confirmation to the backend via a REST API so that the backend can allow the AGV to proceed to the next step.
+The confirmation is completed by the operator pressing a physical button on the AGV machine, which sends the confirmation signal to the backend to proceed to the next step. No interactive confirmation button is displayed in the web UI.
 
 ### UNLOAD (เบิก FPC) Mode
 
@@ -54,9 +54,9 @@ The operator shall then select the desired FPC and an available destination mach
 
 Machines marked as Unavailable shall not be selectable.
 
-After the AGV arrives at the selected destination machine and the backend reports the status indicating that operator confirmation is required, the frontend shall display a Confirm button for the operator to verify that the cover head has been removed.
+After the AGV arrives at the selected destination machine and the backend reports the status indicating that operator confirmation is required, the frontend shall display instructions for the operator to verify that the cover head has been removed.
 
-When the operator confirms, the frontend shall send the confirmation to the backend via a REST API, enabling the backend to continue the placement process and complete the workflow.
+The confirmation is completed by the operator pressing a physical button on the AGV machine, which sends the confirmation signal to the backend to complete the workflow. No interactive confirmation button is displayed in the web UI.
 
 ### สลับ FPC Mode
 
@@ -64,9 +64,9 @@ In สลับ FPC mode, the operator shall select both the source machine and 
 
 The frontend shall prevent the operator from selecting the same machine as both source and destination.
 
-If operator confirmation is required during pickup or placement, the frontend shall display the appropriate confirmation action only when the backend reports the corresponding status.
+If operator confirmation is required during pickup or placement, the frontend shall display instructions when the backend reports the corresponding status.
 
-The frontend shall send the operator’s confirmation to the backend via a REST API before the workflow can continue.
+The confirmation is completed by the operator pressing a physical button on the AGV machine before the workflow can continue.
 
 ### Task Status Handling
 
@@ -102,11 +102,11 @@ The frontend shall support the following operator-facing task statuses for tasks
 | Moving to Source | The AGV is moving to the source machine. | Wait for arrival at the source. |
 | Arrived at Source | The AGV has arrived at the source machine. | Prepare to observe pickup activity if needed. |
 | Picking Up FPC | The AGV is picking up the FPC. | Wait until pickup is completed. |
-| Waiting for Cover Head Installation Confirmation | Pickup is complete and operator confirmation is required before the workflow can continue. | Verify that the cover head has been installed, then press Confirm. |
+| Waiting for Cover Head Installation Confirmation | Pickup is complete and operator confirmation is required before the workflow can continue. | Verify that the cover head has been installed, then press the physical button on the AGV. |
 | Moving to Destination | The AGV is moving to the destination location. | Wait for arrival at the destination. |
 | Arrived at Destination | The AGV has arrived at the destination. | Prepare to observe placement activity if needed. |
 | Placing FPC | The AGV is placing or delivering the FPC. | Wait until placement is completed. |
-| Waiting for Cover Head Removal Confirmation | Placement is ready and operator confirmation is required before the workflow can continue. | Verify that the cover head has been removed, then press Confirm. |
+| Waiting for Cover Head Removal Confirmation | Placement is ready and operator confirmation is required before the workflow can continue. | Verify that the cover head has been removed, then press the physical button on the AGV. |
 | Completed | The job has been completed successfully. | Review the result or create a new job. |
 | Rejected | The backend did not accept the job request. | Review the input data and submit again if appropriate. |
 | Blocked | The job cannot continue because of an external condition or dependency. | Check the cause or notify the responsible person. |
@@ -117,8 +117,8 @@ Each displayed task status shall be written in operator-friendly language and sh
 
 For example:
 
-- `Waiting for Cover Head Installation Confirmation` shall indicate that the operator must verify that the cover head has been installed and then press Confirm.
-- `Waiting for Cover Head Removal Confirmation` shall indicate that the operator must verify that the cover head has been removed and then press Confirm.
+- `Waiting for Cover Head Installation Confirmation` shall indicate that the operator must verify that the cover head has been installed and then press the physical button on the AGV.
+- `Waiting for Cover Head Removal Confirmation` shall indicate that the operator must verify that the cover head has been removed and then press the physical button on the AGV.
 
 ### Job Queue Submission
 
@@ -208,7 +208,7 @@ The system supports three modes shown on the user interface as:
 
 In สลับ FPC mode, the AGV transfers an FPC from one machine to another machine.
 
-For some workflow steps, operator confirmation is required before the backend proceeds, such as confirming cover head installation or removal to ensure safe operation.
+For some workflow steps, operator confirmation is required before the backend proceeds, such as confirming cover head installation or removal via a physical button on the AGV to ensure safe operation.
 
 In the current scope, the Smart Storage system supports a single destination location for the LOAD (คืน FPC) workflow.
 
