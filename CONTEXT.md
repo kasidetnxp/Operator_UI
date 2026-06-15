@@ -18,3 +18,11 @@ _Avoid_: Waiting for remove confirmation, Pending cover removal
 **FPC Search**:
 A reference screen used by operators to inspect FPC locations, addresses, labels, and comments. Supports filtering by storage category (Storage, Service, Deposit PM, Deposit Production) and query searching.
 _Avoid_: FPC lookup, inventory view
+
+**Admin Page**:
+A administrative console accessible by designated credentials (Employee ID '1111') for inspecting system-wide historical events and operations.
+_Avoid_: Admin screen, configuration page
+
+**Audit Logs**:
+A record of chronological system events, operator actions, and AGV state transitions captured by the FPC Management System.
+_Avoid_: System outputs, log files

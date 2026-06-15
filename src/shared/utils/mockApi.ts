@@ -57,6 +57,41 @@ export interface TaskResponse {
 // In-memory task queue (replace with API call)
 const mockTaskQueue: TaskResponse[] = [];
 
+export interface AuditLog {
+  id: string;
+  timestamp: string;
+  eventType: 'LOGIN' | 'LOGOUT' | 'TASK_SUBMIT' | 'STATE_CHANGE' | 'CONFIRMATION' | 'CANCEL' | 'SYSTEM';
+  employeeId: string;
+  message: string;
+}
+
+const mockAuditLogs: AuditLog[] = [];
+
+export function addAuditLog(
+  eventType: AuditLog['eventType'],
+  employeeId: string,
+  message: string
+): void {
+  const log: AuditLog = {
+    id: `LOG-${Date.now()}-${Math.floor(Math.random() * 1000).toString().padStart(3, '0')}`,
+    timestamp: new Date().toISOString(),
+    eventType,
+    employeeId,
+    message,
+  };
+  mockAuditLogs.unshift(log);
+}
+
+export async function getAuditLogs(): Promise<AuditLog[]> {
+  await delay(100);
+  return [...mockAuditLogs];
+}
+
+export function clearAuditLogs(): void {
+  mockAuditLogs.length = 0;
+  addAuditLog('SYSTEM', '1111', 'Audit logs cleared');
+}
+
 // ─── Mock Machine Data (50 machines) ───
 export const mockMachines: Machine[] = [
   { id: 'AVT_001', name: 'AVT_001', available: true },
@@ -176,6 +211,7 @@ export async function submitReturnFPCJob(
   };
 
   mockTaskQueue.push(task);
+  addAuditLog('TASK_SUBMIT', employeeId, `Submitted Return FPC job (Job: ${jobId}). Source: ${machine?.name || sourceMachineId}`);
 
   // Detailed status progression
   setTimeout(() => updateTaskStatus(taskId, 'queued'), 1500);
@@ -214,6 +250,7 @@ export async function submitRequestFPCJob(
   };
 
   mockTaskQueue.push(task);
+  addAuditLog('TASK_SUBMIT', employeeId, `Submitted Request FPC job (Job: ${jobId}). FPC: ${fpcId}, Destination: ${machine?.name || destinationMachineId}`);
 
   // Detailed status progression
   setTimeout(() => updateTaskStatus(taskId, 'queued'), 1500);
@@ -256,6 +293,7 @@ export async function submitSwapFPCJob(
   };
 
   mockTaskQueue.push(task);
+  addAuditLog('TASK_SUBMIT', employeeId, `Submitted Swap FPC job (Job: ${jobId}). Source: ${srcMachine?.name || sourceMachineId}, Destination: ${destMachine?.name || destinationMachineId}`);
 
   // Detailed status progression
   setTimeout(() => updateTaskStatus(taskId, 'queued'), 1500);
@@ -274,10 +312,15 @@ export async function confirmCoverHeadInstalled(taskId: string): Promise<TaskRes
   const task = mockTaskQueue.find(t => t.taskId === taskId);
   if (task) {
     if (task.status === 'canceled') return task;
+
+    addAuditLog('CONFIRMATION', task.employeeId, `Confirmed Cover Head Installed for ${task.type.toUpperCase()} job (Job: ${task.jobId})`);
+
     if (task.type === 'swap') {
       task.coverHeadInstalledConfirmed = true;
       task.status = 'moving_to_destination';
       task.message = 'Cover Head installation confirmed, AGV proceeding to destination';
+      
+      addAuditLog('STATE_CHANGE', task.employeeId, `Job ${task.jobId} status updated to moving_to_destination`);
 
       // Simulate transit to destination machine
       setTimeout(() => updateTaskStatus(taskId, 'arrived_at_destination'), 3000);
@@ -286,6 +329,8 @@ export async function confirmCoverHeadInstalled(taskId: string): Promise<TaskRes
     } else {
       task.status = 'moving_to_destination';
       task.message = 'Cover Head installation confirmed, AGV proceeding to Smart Storage';
+
+      addAuditLog('STATE_CHANGE', task.employeeId, `Job ${task.jobId} status updated to moving_to_destination`);
 
       // Simulate transit to Smart Storage
       setTimeout(() => updateTaskStatus(taskId, 'arrived_at_destination'), 3000);
@@ -310,8 +355,13 @@ export async function confirmCoverHeadRemoved(taskId: string): Promise<TaskRespo
   const task = mockTaskQueue.find(t => t.taskId === taskId);
   if (task) {
     if (task.status === 'canceled') return task;
+    
+    addAuditLog('CONFIRMATION', task.employeeId, `Confirmed Cover Head Removed for ${task.type.toUpperCase()} job (Job: ${task.jobId})`);
+    
     task.status = 'completed';
     task.message = 'Cover Head removal confirmed, job completed';
+
+    addAuditLog('STATE_CHANGE', task.employeeId, `Job ${task.jobId} status updated to completed`);
   }
   return task || {
     taskId,
@@ -343,6 +393,8 @@ export function updateTaskStatus(taskId: string, status: TaskResponse['status'])
     if (task.status === 'canceled') return;
     task.status = status;
 
+    addAuditLog('STATE_CHANGE', task.employeeId, `Job ${task.jobId} status updated to ${status}`);
+
     // Simulate AGV physical button confirmation after 5 seconds
     if (status === 'waiting_cover_head_install') {
       setTimeout(() => {
@@ -363,6 +415,7 @@ export async function cancelTask(taskId: string): Promise<TaskResponse | null> {
   if (task) {
     task.status = 'canceled';
     task.message = 'Job canceled by user';
+    addAuditLog('CANCEL', task.employeeId, `Job ${task.jobId} was canceled`);
   }
   return task || null;
 }

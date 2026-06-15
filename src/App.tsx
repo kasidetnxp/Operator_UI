@@ -2,6 +2,9 @@ import { useState } from 'react';
 import { EmployeeLogin, EmployeeMenu } from '@/features/auth';
 import { ModeSelection, ReturnFPCWorkflow, RequestFPCWorkflow, SwapFPCWorkflow, FPCSearchPage } from '@/features/workflow';
 import { TaskQueuePage } from '@/features/queue';
+import { AdminLogsPage } from '@/features/admin';
+import { addAuditLog } from '@/shared/utils/mockApi';
+import { translations } from '@/shared/utils/translations';
 import type { Language, OperationMode, Page } from '@/shared/types';
 
 export default function App() {
@@ -9,7 +12,20 @@ export default function App() {
   const [employeeId, setEmployeeId] = useState<string>('');
   const [currentPage, setCurrentPage] = useState<Page>('mode-selection');
 
+  const handleLogin = (id: string) => {
+    setEmployeeId(id);
+    addAuditLog('LOGIN', id, 'Employee logged in successfully');
+    if (id === '1111') {
+      setCurrentPage('admin');
+    } else {
+      setCurrentPage('mode-selection');
+    }
+  };
+
   const handleLogout = () => {
+    if (employeeId) {
+      addAuditLog('LOGOUT', employeeId, 'Employee logged out');
+    }
     setEmployeeId('');
     setCurrentPage('mode-selection');
   };
@@ -30,6 +46,10 @@ export default function App() {
     setCurrentPage('fpc-search');
   };
 
+  const handleGoToAdmin = () => {
+    setCurrentPage('admin');
+  };
+
   return (
     <div className="h-screen overflow-hidden bg-gray-50 flex flex-col">
       {/* ── Header ── */}
@@ -40,6 +60,18 @@ export default function App() {
           <div className="flex items-center gap-4">
             {employeeId && (
               <>
+                {employeeId === '1111' && (
+                  <button
+                    onClick={handleGoToAdmin}
+                    className={`px-8 py-3 text-xl font-bold rounded-lg transition-colors shadow-md ${
+                      currentPage === 'admin'
+                        ? 'text-white bg-indigo-600 hover:bg-indigo-700'
+                        : 'text-indigo-600 bg-white border-2 border-indigo-600 hover:bg-indigo-50'
+                    }`}
+                  >
+                    {translations[language].adminPanel}
+                  </button>
+                )}
                 <button
                   onClick={handleGoToFPCSearch}
                   className="px-8 py-3 text-xl font-bold text-blue-600 bg-white border-2 border-blue-600 rounded-lg hover:bg-blue-50 transition-colors shadow-sm"
@@ -66,7 +98,13 @@ export default function App() {
       {/* ── Main Content ── */}
       <main className="h-[calc(100vh-88px)] px-8 py-6">
         {!employeeId ? (
-          <EmployeeLogin onLogin={setEmployeeId} language={language} />
+          <EmployeeLogin onLogin={handleLogin} language={language} />
+        ) : currentPage === 'admin' ? (
+          <AdminLogsPage
+            employeeId={employeeId}
+            language={language}
+            onBack={handleBackToModeSelection}
+          />
         ) : currentPage === 'mode-selection' ? (
           <ModeSelection onSelectMode={handleSelectMode} language={language} />
         ) : currentPage === 'return' ? (
