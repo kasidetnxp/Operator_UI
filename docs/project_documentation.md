@@ -104,6 +104,18 @@ The **Task Queue** displays all active and historical transport jobs. It simulat
 *   **Task Queue Sorting**: Active tasks (not finished) are automatically sorted by creation time (newest first) and kept at the top of the queue. Finished/completed/canceled tasks are automatically pushed to the bottom of the list.
 *   **Task Cancellation**: Operators can cancel active tasks that they submitted. Prior to cancellation, the interface prompts the operator with a confirmation dialog. Once cancelled, the task's status is changed to `canceled`, and any running simulation tasks/timers for this task are stopped.
 
+### 4. FPC Search Reference View
+*   **Goal**: Provide a standalone reference screen for operators to search FPC positions and check inventory categories.
+*   **Access**: Accessed via the "FPC Search" button in the top navigation bar.
+*   **Filters**:
+    *   `ALL`: Shows all FPCs.
+    *   `Storage`: Shows FPCs stored in primary storage slots.
+    *   `Service`: Shows FPCs in service stations.
+    *   `Deposit PM`: Shows FPCs deposited for Preventative Maintenance.
+    *   `Deposit Production`: Shows FPCs deposited for active production.
+*   **Search**: Supports real-time text query filtering across Address, Function, Label, and Comment fields.
+*   **Interactive behavior**: View-only mode with a "Back" button to return to the Main Menu.
+
 ---
 
 ## 🗃️ Data Models & Types

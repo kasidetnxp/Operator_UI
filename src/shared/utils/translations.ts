@@ -49,6 +49,11 @@ export const translations = {
     function: 'FUNCTION',
     label: 'LABEL',
     comment: 'COMMENT',
+    allTab: 'ALL',
+    storageTab: 'Storage',
+    serviceTab: 'Service',
+    depositPMTab: 'Deposit PM',
+    depositProductionTab: 'Deposit Production',
 
     // Status
     status: 'Status',
@@ -168,6 +173,11 @@ export const translations = {
     function: 'FUNCTION',
     label: 'LABEL',
     comment: 'COMMENT',
+    allTab: 'ALL',
+    storageTab: 'Storage',
+    serviceTab: 'Service',
+    depositPMTab: 'Deposit PM',
+    depositProductionTab: 'Deposit Production',
 
     // Status
     status: 'สถานะ',

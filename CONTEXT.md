@@ -14,3 +14,7 @@ _Avoid_: Waiting for install confirmation, Pending cover head
 **Waiting for Cover Head Removal Confirmation**:
 A status indicating that the FPC has arrived at the destination, and the AGV is waiting for the physical button on the AGV machine to be pressed to confirm that the Cover Head has been removed.
 _Avoid_: Waiting for remove confirmation, Pending cover removal
+
+**FPC Search**:
+A reference screen used by operators to inspect FPC locations, addresses, labels, and comments. Supports filtering by storage category (Storage, Service, Deposit PM, Deposit Production) and query searching.
+_Avoid_: FPC lookup, inventory view

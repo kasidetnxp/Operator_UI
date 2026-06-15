@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { EmployeeLogin, EmployeeMenu } from '@/features/auth';
-import { ModeSelection, ReturnFPCWorkflow, RequestFPCWorkflow, SwapFPCWorkflow } from '@/features/workflow';
+import { ModeSelection, ReturnFPCWorkflow, RequestFPCWorkflow, SwapFPCWorkflow, FPCSearchPage } from '@/features/workflow';
 import { TaskQueuePage } from '@/features/queue';
 import type { Language, OperationMode, Page } from '@/shared/types';
 
@@ -26,6 +26,10 @@ export default function App() {
     setCurrentPage('queue');
   };
 
+  const handleGoToFPCSearch = () => {
+    setCurrentPage('fpc-search');
+  };
+
   return (
     <div className="h-screen overflow-hidden bg-gray-50 flex flex-col">
       {/* ── Header ── */}
@@ -33,9 +37,15 @@ export default function App() {
         <div className="px-8 py-5 flex justify-between items-center">
           <h1 className="text-3xl font-bold text-gray-900">NXP WT</h1>
 
-          <div className="flex items-center gap-6">
+          <div className="flex items-center gap-4">
             {employeeId && (
               <>
+                <button
+                  onClick={handleGoToFPCSearch}
+                  className="px-8 py-3 text-xl font-bold text-blue-600 bg-white border-2 border-blue-600 rounded-lg hover:bg-blue-50 transition-colors shadow-sm"
+                >
+                  {language === 'th' ? 'ค้นหา FPC' : 'FPC Search'}
+                </button>
                 <button
                   onClick={handleGoToQueue}
                   className="px-8 py-3 text-xl font-bold text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors shadow-md"
@@ -79,6 +89,12 @@ export default function App() {
             language={language}
             onBack={handleBackToModeSelection}
             onTaskSubmitted={handleGoToQueue}
+          />
+        ) : currentPage === 'fpc-search' ? (
+          <FPCSearchPage
+            employeeId={employeeId}
+            language={language}
+            onBack={handleBackToModeSelection}
           />
         ) : (
           <TaskQueuePage

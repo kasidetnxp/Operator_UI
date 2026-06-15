@@ -16,6 +16,7 @@ export interface FPCItem {
   functionName: string;
   label: string;
   comment?: string;
+  category: 'Storage' | 'Service' | 'Deposit PM' | 'Deposit Production';
 }
 
 export interface TaskResponse {
@@ -112,18 +113,18 @@ export const mockMachines: Machine[] = [
 
 // ─── Mock FPC Database ───
 const mockFPCDatabase: FPCItem[] = [
-  { id: '2ID021FV002B', address: '002', functionName: 'PM Load', label: '2ID021FV002B', comment: '' },
-  { id: 'P14380-FHB-0596', address: '003', functionName: 'PM Load', label: 'P14380-FHB-0596', comment: '' },
-  { id: 'P25250-FNN-0498', address: '004', functionName: 'PM Load', label: 'P25250-FNN-0498', comment: '' },
-  { id: '2ID057TV001B', address: '005', functionName: 'PM Load', label: '2ID057TV001B', comment: '' },
-  { id: 'P15760-TBB-0705', address: '006', functionName: 'PM Load', label: 'P15760-TBB-0705', comment: '' },
-  { id: 'PI0001-SBB-0494', address: '007', functionName: 'PM Load', label: 'PI0001-SBB-0494', comment: '' },
-  { id: 'P14080-FHH-2655', address: '008', functionName: 'PM Load', label: 'P14080-FHH-2655', comment: '' },
-  { id: 'P15450-FHH-2685', address: '009', functionName: 'PM Load', label: 'P15450-FHH-2685', comment: '' },
-  { id: 'PIR011-TBB-0594', address: '010', functionName: 'PM Load', label: 'PIR011-TBB-0594', comment: '' },
-  { id: '2IE075TV001B', address: '011', functionName: 'PM Load', label: '2IE075TV001B', comment: '' },
-  { id: '2ID021FV003B', address: '013', functionName: 'PM Load', label: '2ID021FV003B', comment: '' },
-  { id: 'P15700-FBB-0707', address: '014', functionName: 'PM Load', label: 'P15700-FBB-0707', comment: '' },
+  { id: '2ID021FV002B', address: '002', functionName: 'PM Load', label: '2ID021FV002B', comment: '', category: 'Storage' },
+  { id: 'P14380-FHB-0596', address: '003', functionName: 'PM Load', label: 'P14380-FHB-0596', comment: '', category: 'Service' },
+  { id: 'P25250-FNN-0498', address: '004', functionName: 'PM Load', label: 'P25250-FNN-0498', comment: '', category: 'Deposit PM' },
+  { id: '2ID057TV001B', address: '005', functionName: 'PM Load', label: '2ID057TV001B', comment: '', category: 'Deposit Production' },
+  { id: 'P15760-TBB-0705', address: '006', functionName: 'PM Load', label: 'P15760-TBB-0705', comment: '', category: 'Storage' },
+  { id: 'PI0001-SBB-0494', address: '007', functionName: 'PM Load', label: 'PI0001-SBB-0494', comment: '', category: 'Service' },
+  { id: 'P14080-FHH-2655', address: '008', functionName: 'PM Load', label: 'P14080-FHH-2655', comment: '', category: 'Deposit PM' },
+  { id: 'P15450-FHH-2685', address: '009', functionName: 'PM Load', label: 'P15450-FHH-2685', comment: '', category: 'Deposit Production' },
+  { id: 'PIR011-TBB-0594', address: '010', functionName: 'PM Load', label: 'PIR011-TBB-0594', comment: '', category: 'Storage' },
+  { id: '2IE075TV001B', address: '011', functionName: 'PM Load', label: '2IE075TV001B', comment: '', category: 'Service' },
+  { id: '2ID021FV003B', address: '013', functionName: 'PM Load', label: '2ID021FV003B', comment: '', category: 'Deposit PM' },
+  { id: 'P15700-FBB-0707', address: '014', functionName: 'PM Load', label: 'P15700-FBB-0707', comment: '', category: 'Deposit Production' },
 ];
 
 // Simulate network delay (remove when connecting to real API)

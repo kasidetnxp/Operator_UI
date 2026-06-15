@@ -106,6 +106,16 @@ The Task Queue page shall list all tasks dynamically sorted according to the fol
 2. **Finished Tasks** (e.g., `completed`, `complete`, `canceled`, `failed`, `rejected`, `error`) shall be displayed at the bottom of the queue list.
 3. When the Task Queue page is loaded, the detail view shall default to showing the most recently added active task (the first task in the sorted queue list).
 
+### Standalone FPC Search Reference Page
+
+The operator shall be able to navigate to a standalone FPC Search reference screen by clicking the "FPC Search" button in the top navigation bar.
+
+This page is purely for reference and viewing status (view-only), and shall contain:
+- A "Back" button at the top left to return the operator to the Main Menu (mode selection).
+- A search query bar to search FPC items in real-time.
+- Category filter tabs: ALL, Storage, Service, Deposit PM, Deposit Production.
+- A table listing matching FPCs with columns: ADDRESS, FUNCTION, LABEL, COMMENT.
+
 ### Supported Task Statuses
 
 The frontend shall support the following operator-facing task statuses for tasks returned by the backend:
