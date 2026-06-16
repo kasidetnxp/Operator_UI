@@ -228,8 +228,12 @@ export function RequestFPCWorkflow({ employeeId, language, onBack, onTaskSubmitt
             </p>
             <div className="bg-gray-50 rounded-lg p-6 space-y-3">
               <div className="flex justify-between text-xl">
-                <span className="text-gray-600">{t.fpcId}:</span>
-                <span className="font-bold text-gray-900">{selectedFPC?.id}</span>
+                <span className="text-gray-600">{t.probecardToReceive}:</span>
+                <span className="font-bold text-blue-600">{selectedFPC?.id}</span>
+              </div>
+              <div className="flex justify-between text-xl border-t border-gray-200 pt-3">
+                <span className="text-gray-600">{t.source}:</span>
+                <span className="font-bold text-gray-900">{t.smartStorage}</span>
               </div>
               <div className="flex justify-between text-xl">
                 <span className="text-gray-600">{t.destination}:</span>

@@ -1,10 +1,11 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { Button, Card, CardContent, Alert, Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material';
 import { ArrowLeft } from 'lucide-react';
 import { MachineSelector } from './MachineSelector';
 import { translations } from '@/shared/utils/translations';
 import type { Language } from '@/shared/types';
-import { mockMachines, submitSwapFPCJob } from '@/shared/utils/mockApi';
+import { mockMachines, submitSwapFPCJob, getAllFPCs } from '@/shared/utils/mockApi';
+import type { FPCItem } from '@/shared/utils/mockApi';
 
 interface SwapFPCWorkflowProps {
   employeeId: string;
@@ -19,6 +20,22 @@ export function SwapFPCWorkflow({ employeeId, language, onBack, onTaskSubmitted 
   const [error, setError] = useState<string>('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
+  const [allFPCs, setAllFPCs] = useState<FPCItem[]>([]);
+
+  useEffect(() => {
+    const loadFPCs = async () => {
+      try {
+        const items = await getAllFPCs();
+        setAllFPCs(items);
+      } catch (err) {
+        console.error('Failed to load FPCs for Swap workflow', err);
+      }
+    };
+    loadFPCs();
+  }, []);
+
+  const sourceFPC = allFPCs.find(f => f.location === selectedSourceMachine);
+  const destFPC = allFPCs.find(f => f.location === selectedDestinationMachine);
 
   const t = translations[language];
 
@@ -154,6 +171,14 @@ export function SwapFPCWorkflow({ employeeId, language, onBack, onTaskSubmitted 
             </p>
             <div className="bg-gray-50 rounded-lg p-6 space-y-3">
               <div className="flex justify-between text-xl">
+                <span className="text-gray-600">{t.probecardToSendFromSource}:</span>
+                <span className="font-bold text-blue-600">{sourceFPC ? sourceFPC.id : '-'}</span>
+              </div>
+              <div className="flex justify-between text-xl">
+                <span className="text-gray-600">{t.probecardToReceiveFromDest}:</span>
+                <span className="font-bold text-green-600">{destFPC ? destFPC.id : '-'}</span>
+              </div>
+              <div className="flex justify-between text-xl border-t border-gray-200 pt-3">
                 <span className="text-gray-600">{t.source}:</span>
                 <span className="font-bold text-gray-900">{sourceMachineName}</span>
               </div>

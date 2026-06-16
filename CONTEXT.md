@@ -39,4 +39,8 @@ _Avoid_: Location error, database conflict
 An administrative action to manually override the system-recorded location of one or more FPCs. This includes moving an FPC to a machine, sending a displaced FPC back to Smart Storage, or swapping the locations of two FPCs.
 _Avoid_: Manual force, database update
 
+**Probecard ID**:
+An alternative term for FPC ID used on confirmation dialogs before submit to match operator shop-floor terminology. It refers to the unique identifier of the FPC item, displayed as "Probecard ID" in English across all language modes.
+
+
 
