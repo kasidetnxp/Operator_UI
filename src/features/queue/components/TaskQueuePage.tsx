@@ -198,6 +198,9 @@ export function TaskQueuePage({ employeeId, language, onBack, onNewTask }: TaskQ
                           <div className="text-sm text-gray-600">
                             {task.type === 'return' ? t.returnFPC : task.type === 'request' ? t.requestFPC : t.swapFPC}
                           </div>
+                          <div className="text-sm text-gray-500 font-semibold mt-1">
+                            {t.assignedAGV}: {task.agvId ? task.agvId : t.notAssigned}
+                          </div>
                         </div>
                         {isMyTask(task) && (
                           <Chip
@@ -253,6 +256,12 @@ export function TaskQueuePage({ employeeId, language, onBack, onNewTask }: TaskQ
                         <span className="font-bold text-gray-900">{selectedTask.fpcId}</span>
                       </div>
                     )}
+                    <div className="flex justify-between text-xl border-b border-gray-200 pb-3">
+                      <span className="text-gray-600 font-semibold">{t.assignedAGV}:</span>
+                      <span className={`font-bold ${selectedTask.agvId ? 'text-gray-900' : 'text-gray-500 italic'}`}>
+                        {selectedTask.agvId ? selectedTask.agvId : t.notAssigned}
+                      </span>
+                    </div>
                     <div className="flex justify-between text-xl border-b border-gray-200 pb-3">
                       <span className="text-gray-600 font-semibold">{t.source}:</span>
                       <span className="font-bold text-gray-900">{selectedTask.sourceMachine}</span>

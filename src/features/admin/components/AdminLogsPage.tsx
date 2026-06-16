@@ -48,7 +48,9 @@ import {
   swapFPCLocations,
   mockMachines,
   type AuditLog,
-  type FPCItem
+  type FPCItem,
+  getAGVSystemStatus,
+  setAGVSystemStatus
 } from '@/shared/utils/mockApi';
 import { translations } from '@/shared/utils/translations';
 import type { Language } from '@/shared/types';
@@ -62,6 +64,7 @@ interface AdminLogsPageProps {
 export function AdminLogsPage({ employeeId, language, onBack }: AdminLogsPageProps) {
   // Page Tab state
   const [activeTab, setActiveTab] = useState(0);
+  const [agvStatus, setLocalAgvStatus] = useState<'OK' | 'ERROR'>(getAGVSystemStatus());
 
   // Audit Logs state
   const [logs, setLogs] = useState<AuditLog[]>([]);
@@ -98,6 +101,7 @@ export function AdminLogsPage({ employeeId, language, onBack }: AdminLogsPagePro
       ]);
       setLogs(logsData);
       setFpcItems(fpcsData);
+      setLocalAgvStatus(getAGVSystemStatus());
     } catch (err) {
       console.error('Failed to fetch admin data:', err);
     } finally {
@@ -334,6 +338,20 @@ export function AdminLogsPage({ employeeId, language, onBack }: AdminLogsPagePro
         </div>
 
         <div className="flex gap-4">
+          <Button
+            variant="contained"
+            color={agvStatus === 'OK' ? 'success' : 'error'}
+            onClick={() => {
+              const nextStatus = agvStatus === 'OK' ? 'ERROR' : 'OK';
+              setAGVSystemStatus(nextStatus);
+              setLocalAgvStatus(nextStatus);
+            }}
+            className="!py-3 !px-5 !text-lg !font-bold !rounded-xl"
+          >
+            {language === 'th'
+              ? `สลับสถานะ AGV: ${agvStatus}`
+              : `Toggle AGV: ${agvStatus}`}
+          </Button>
 
           <Button
             variant="outlined"

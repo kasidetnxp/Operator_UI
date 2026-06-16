@@ -1,9 +1,9 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { EmployeeLogin, EmployeeMenu } from '@/features/auth';
 import { ModeSelection, ReturnFPCWorkflow, RequestFPCWorkflow, SwapFPCWorkflow, FPCSearchPage } from '@/features/workflow';
 import { TaskQueuePage } from '@/features/queue';
 import { AdminLogsPage } from '@/features/admin';
-import { addAuditLog } from '@/shared/utils/mockApi';
+import { addAuditLog, getAGVSystemStatus } from '@/shared/utils/mockApi';
 import { translations } from '@/shared/utils/translations';
 import type { Language, OperationMode, Page } from '@/shared/types';
 
@@ -11,6 +11,16 @@ export default function App() {
   const [language] = useState<Language>('th');
   const [employeeId, setEmployeeId] = useState<string>('');
   const [currentPage, setCurrentPage] = useState<Page>('mode-selection');
+  const [agvStatus, setAgvStatus] = useState<'OK' | 'ERROR'>('OK');
+
+  useEffect(() => {
+    const checkAGVStatus = () => {
+      setAgvStatus(getAGVSystemStatus());
+    };
+    checkAGVStatus();
+    const interval = setInterval(checkAGVStatus, 1000);
+    return () => clearInterval(interval);
+  }, []);
 
   const handleLogin = (id: string) => {
     setEmployeeId(id);
@@ -55,7 +65,25 @@ export default function App() {
       {/* ── Header ── */}
       <header className="bg-white shadow-sm border-b-2 border-gray-200">
         <div className="px-8 py-5 flex justify-between items-center">
-          <h1 className="text-3xl font-bold text-gray-900">NXP WT</h1>
+          <div className="flex items-center gap-6">
+            <h1 className="text-3xl font-bold text-gray-900">NXP WT</h1>
+            {employeeId && (
+              <span
+                className={`px-6 py-2 text-xl font-black rounded-full flex items-center gap-2 border shadow-sm transition-all duration-300 ${
+                  agvStatus === 'OK'
+                    ? 'bg-emerald-50 text-emerald-700 border-emerald-300'
+                    : 'bg-rose-50 text-rose-700 border-rose-300 animate-pulse'
+                }`}
+              >
+                <span
+                  className={`w-3.5 h-3.5 rounded-full ${
+                    agvStatus === 'OK' ? 'bg-emerald-500' : 'bg-rose-500 animate-ping'
+                  }`}
+                />
+                AGV: {agvStatus}
+              </span>
+            )}
+          </div>
 
           <div className="flex items-center gap-4">
             {employeeId && (

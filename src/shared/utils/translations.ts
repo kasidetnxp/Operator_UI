@@ -121,6 +121,8 @@ export const translations = {
     createdAt: 'Created At',
     type: 'Type',
     noTasksInQueue: 'No Task',
+    assignedAGV: 'Assigned AGV',
+    notAssigned: 'Not assigned yet',
 
     // Confirmation
     confirmSubmit: 'Confirm Submission',
@@ -291,6 +293,8 @@ export const translations = {
     createdAt: 'สร้างเมื่อ',
     type: 'ประเภท',
     noTasksInQueue: 'No Task',
+    assignedAGV: 'รถ AGV',
+    notAssigned: 'ยังไม่มอบหมาย',
 
     // Confirmation
     confirmSubmit: 'ยืนยันการส่ง',

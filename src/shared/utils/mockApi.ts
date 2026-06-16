@@ -53,6 +53,7 @@ export interface TaskResponse {
   fpcId?: string;
   createdAt: string;
   coverHeadInstalledConfirmed?: boolean;
+  agvId?: string;
 }
 
 // In-memory task queue (replace with API call)
@@ -171,6 +172,17 @@ function generateJobId(): string {
   const timestamp = Date.now();
   const random = Math.floor(Math.random() * 1000).toString().padStart(3, '0');
   return `JOB-${timestamp}-${random}`;
+}
+
+// Global AGV status state
+let agvSystemStatus: 'OK' | 'ERROR' = 'OK';
+
+export function getAGVSystemStatus(): 'OK' | 'ERROR' {
+  return agvSystemStatus;
+}
+
+export function setAGVSystemStatus(status: 'OK' | 'ERROR'): void {
+  agvSystemStatus = status;
 }
 
 // ─── API Functions (stub — replace with real fetch/axios calls) ───
@@ -485,6 +497,11 @@ export function updateTaskStatus(taskId: string, status: TaskResponse['status'])
   if (task) {
     if (task.status === 'canceled') return;
     task.status = status;
+
+    // Assign AGV dynamically when the task is accepted / queued
+    if (status !== 'submitted' && status !== 'canceled' && !task.agvId) {
+      task.agvId = Math.random() > 0.5 ? 'AGV-01' : 'AGV-02';
+    }
 
     addAuditLog('STATE_CHANGE', task.employeeId, `Job ${task.jobId} status updated to ${status}`);
 
