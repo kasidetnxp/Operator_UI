@@ -17,6 +17,7 @@ export interface FPCItem {
   label: string;
   comment?: string;
   category: 'Storage' | 'Service' | 'Deposit PM' | 'Deposit Production';
+  location: string;
 }
 
 export interface TaskResponse {
@@ -148,18 +149,18 @@ export const mockMachines: Machine[] = [
 
 // ─── Mock FPC Database ───
 const mockFPCDatabase: FPCItem[] = [
-  { id: '2ID021FV002B', address: '002', functionName: 'PM Load', label: '2ID021FV002B', comment: '', category: 'Storage' },
-  { id: 'P14380-FHB-0596', address: '003', functionName: 'PM Load', label: 'P14380-FHB-0596', comment: '', category: 'Service' },
-  { id: 'P25250-FNN-0498', address: '004', functionName: 'PM Load', label: 'P25250-FNN-0498', comment: '', category: 'Deposit PM' },
-  { id: '2ID057TV001B', address: '005', functionName: 'PM Load', label: '2ID057TV001B', comment: '', category: 'Deposit Production' },
-  { id: 'P15760-TBB-0705', address: '006', functionName: 'PM Load', label: 'P15760-TBB-0705', comment: '', category: 'Storage' },
-  { id: 'PI0001-SBB-0494', address: '007', functionName: 'PM Load', label: 'PI0001-SBB-0494', comment: '', category: 'Service' },
-  { id: 'P14080-FHH-2655', address: '008', functionName: 'PM Load', label: 'P14080-FHH-2655', comment: '', category: 'Deposit PM' },
-  { id: 'P15450-FHH-2685', address: '009', functionName: 'PM Load', label: 'P15450-FHH-2685', comment: '', category: 'Deposit Production' },
-  { id: 'PIR011-TBB-0594', address: '010', functionName: 'PM Load', label: 'PIR011-TBB-0594', comment: '', category: 'Storage' },
-  { id: '2IE075TV001B', address: '011', functionName: 'PM Load', label: '2IE075TV001B', comment: '', category: 'Service' },
-  { id: '2ID021FV003B', address: '013', functionName: 'PM Load', label: '2ID021FV003B', comment: '', category: 'Deposit PM' },
-  { id: 'P15700-FBB-0707', address: '014', functionName: 'PM Load', label: 'P15700-FBB-0707', comment: '', category: 'Deposit Production' },
+  { id: '2ID021FV002B', address: '002', functionName: 'PM Load', label: '2ID021FV002B', comment: '', category: 'Storage', location: 'Smart Storage' },
+  { id: 'P14380-FHB-0596', address: '003', functionName: 'PM Load', label: 'P14380-FHB-0596', comment: '', category: 'Service', location: 'Smart Storage' },
+  { id: 'P25250-FNN-0498', address: '004', functionName: 'PM Load', label: 'P25250-FNN-0498', comment: '', category: 'Deposit PM', location: 'Smart Storage' },
+  { id: '2ID057TV001B', address: '005', functionName: 'PM Load', label: '2ID057TV001B', comment: '', category: 'Deposit Production', location: 'Smart Storage' },
+  { id: 'P15760-TBB-0705', address: '006', functionName: 'PM Load', label: 'P15760-TBB-0705', comment: '', category: 'Storage', location: 'Smart Storage' },
+  { id: 'PI0001-SBB-0494', address: '007', functionName: 'PM Load', label: 'PI0001-SBB-0494', comment: '', category: 'Service', location: 'Smart Storage' },
+  { id: 'P14080-FHH-2655', address: '008', functionName: 'PM Load', label: 'P14080-FHH-2655', comment: '', category: 'Deposit PM', location: 'Smart Storage' },
+  { id: 'P15450-FHH-2685', address: '009', functionName: 'PM Load', label: 'P15450-FHH-2685', comment: '', category: 'Deposit Production', location: 'Smart Storage' },
+  { id: 'PIR011-TBB-0594', address: '010', functionName: 'PM Load', label: 'PIR011-TBB-0594', comment: '', category: 'Storage', location: 'Smart Storage' },
+  { id: '2IE075TV001B', address: '011', functionName: 'PM Load', label: '2IE075TV001B', comment: '', category: 'Service', location: 'Smart Storage' },
+  { id: '2ID021FV003B', address: '013', functionName: 'PM Load', label: '2ID021FV003B', comment: '', category: 'Deposit PM', location: 'Smart Storage' },
+  { id: 'P15700-FBB-0707', address: '014', functionName: 'PM Load', label: 'P15700-FBB-0707', comment: '', category: 'Deposit Production', location: 'Smart Storage' },
 ];
 
 // Simulate network delay (remove when connecting to real API)
@@ -184,6 +185,98 @@ export async function searchFPC(query: string): Promise<FPCItem[]> {
       fpc.functionName.toLowerCase().includes(lowerQuery) ||
       fpc.label.toLowerCase().includes(lowerQuery) ||
       (fpc.comment && fpc.comment.toLowerCase().includes(lowerQuery))
+  );
+}
+
+/** Get all FPCs */
+export async function getAllFPCs(): Promise<FPCItem[]> {
+  await delay(200);
+  return [...mockFPCDatabase];
+}
+
+/** Update FPC location */
+export async function updateFPCLocation(
+  employeeId: string,
+  fpcId: string,
+  newLocation: string,
+  newAddress: string | null
+): Promise<void> {
+  await delay(500);
+  
+  const fpc = mockFPCDatabase.find(f => f.id === fpcId);
+  if (!fpc) {
+    throw new Error('FPC not found');
+  }
+
+  const oldLocation = fpc.location;
+  const oldAddress = fpc.address;
+
+  // Validate slot occupancy if moving to Smart Storage
+  if (newLocation === 'Smart Storage' && newAddress) {
+    const occupant = mockFPCDatabase.find(
+      f => f.id !== fpcId && f.location === 'Smart Storage' && f.address === newAddress
+    );
+    if (occupant) {
+      throw new Error(`Slot ${newAddress} is already occupied by FPC ${occupant.id}`);
+    }
+  }
+
+  // Validate machine occupancy if moving to a machine
+  if (newLocation !== 'Smart Storage') {
+    const occupant = mockFPCDatabase.find(
+      f => f.id !== fpcId && f.location === newLocation
+    );
+    if (occupant) {
+      throw new Error(`Machine ${newLocation} is already occupied by FPC ${occupant.id}`);
+    }
+  }
+
+  fpc.location = newLocation;
+  fpc.address = newLocation === 'Smart Storage' ? (newAddress || '') : '-';
+
+  const newLocStr = newLocation === 'Smart Storage' ? `Smart Storage (Slot: ${newAddress})` : `Machine ${newLocation}`;
+  const oldLocStr = oldLocation === 'Smart Storage' ? `Smart Storage (Slot: ${oldAddress})` : `Machine ${oldLocation}`;
+  
+  addAuditLog(
+    'STATE_CHANGE',
+    employeeId,
+    `Admin manually moved FPC ${fpcId} from ${oldLocStr} to ${newLocStr}`
+  );
+}
+
+/** Swap FPC locations */
+export async function swapFPCLocations(
+  employeeId: string,
+  fpcId1: string,
+  fpcId2: string
+): Promise<void> {
+  await delay(500);
+
+  const fpc1 = mockFPCDatabase.find(f => f.id === fpcId1);
+  const fpc2 = mockFPCDatabase.find(f => f.id === fpcId2);
+
+  if (!fpc1 || !fpc2) {
+    throw new Error('One or both FPC items not found');
+  }
+
+  const loc1 = fpc1.location;
+  const addr1 = fpc1.address;
+  const loc2 = fpc2.location;
+  const addr2 = fpc2.address;
+
+  fpc1.location = loc2;
+  fpc1.address = addr2;
+  
+  fpc2.location = loc1;
+  fpc2.address = addr1;
+
+  const locStr1 = loc1 === 'Smart Storage' ? `Smart Storage (Slot: ${addr1})` : `Machine ${loc1}`;
+  const locStr2 = loc2 === 'Smart Storage' ? `Smart Storage (Slot: ${addr2})` : `Machine ${loc2}`;
+
+  addAuditLog(
+    'STATE_CHANGE',
+    employeeId,
+    `Admin manually swapped locations between FPC ${fpcId1} (${locStr1}) and FPC ${fpcId2} (${locStr2})`
   );
 }
 

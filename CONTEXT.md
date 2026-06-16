@@ -26,3 +26,17 @@ _Avoid_: Admin screen, configuration page
 **Audit Logs**:
 A record of chronological system events, operator actions, and AGV state transitions captured by the FPC Management System.
 _Avoid_: System outputs, log files
+
+**FPC Location**:
+The current physical or logical coordinate of an FPC. It can be a slot address inside Smart Storage (along with its category) or a specific Machine (Workstation) where the FPC is currently placed. A Machine can hold at most one FPC at a time.
+_Avoid_: FPC position, container coordinates
+
+**FPC Mismatch**:
+A discrepancy between the system-recorded location of an FPC and its actual physical location on the factory floor, typically caused by manual transport or swaps performed by operators without updating the system.
+_Avoid_: Location error, database conflict
+
+**Location Correction**:
+An administrative action to manually override the system-recorded location of one or more FPCs. This includes moving an FPC to a machine, sending a displaced FPC back to Smart Storage, or swapping the locations of two FPCs.
+_Avoid_: Manual force, database update
+
+

@@ -32,7 +32,10 @@ export function RequestFPCWorkflow({ employeeId, language, onBack, onTaskSubmitt
       setIsLoading(true);
       try {
         const results = await searchFPC('');
-        setAllFPCItems(results);
+        const inStorageItems = results.filter(
+          item => item.location === 'Smart Storage' && item.address && item.address !== '-'
+        );
+        setAllFPCItems(inStorageItems);
       } catch {
         setError(t.error_network);
       } finally {
