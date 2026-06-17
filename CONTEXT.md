@@ -42,5 +42,17 @@ _Avoid_: Manual force, database update
 **Probecard ID**:
 An alternative term for FPC ID used on confirmation dialogs before submit to match operator shop-floor terminology. It refers to the unique identifier of the FPC item, displayed as "Probecard ID" in English across all language modes.
 
+**Admin**:
+A role with full control over the system, including user management, manual override of any data, viewing audit logs, and approving exception operations.
+_Avoid_: Superuser, system manager
+
+**Store**:
+A role that acts as backend support for production, handling process data updates, and resolving exceptions such as FPC mismatches and manual location adjustments.
+_Avoid_: Storage operator, stocker helper
+
+**Operator**:
+A role focused on executing FPC transport workflows (LOAD, UNLOAD, Swap) and interacting with active tasks.
+_Avoid_: Shift worker, floor user
+
 
 

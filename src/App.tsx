@@ -5,12 +5,19 @@ import { TaskQueuePage } from '@/features/queue';
 import { AdminLogsPage } from '@/features/admin';
 import { addAuditLog, getAGVSystemStatus } from '@/shared/utils/mockApi';
 import { translations } from '@/shared/utils/translations';
-import type { Language, OperationMode, Page } from '@/shared/types';
+import type { Language, OperationMode, Page, Role } from '@/shared/types';
 
 export default function App() {
   const [language] = useState<Language>('th');
-  const [employeeId, setEmployeeId] = useState<string>('');
-  const [currentPage, setCurrentPage] = useState<Page>('mode-selection');
+  const [employeeId, setEmployeeId] = useState<string>(() => localStorage.getItem('nxp_employee_id') || '');
+  const [role, setRole] = useState<Role | null>(() => localStorage.getItem('nxp_role') as Role | null);
+  const [currentPage, setCurrentPage] = useState<Page>(() => {
+    const savedRole = localStorage.getItem('nxp_role');
+    if (savedRole === 'admin' || savedRole === 'store') {
+      return 'admin';
+    }
+    return 'mode-selection';
+  });
   const [agvStatus, setAgvStatus] = useState<'OK' | 'ERROR'>('OK');
 
   useEffect(() => {
@@ -22,10 +29,13 @@ export default function App() {
     return () => clearInterval(interval);
   }, []);
 
-  const handleLogin = (id: string) => {
+  const handleLogin = (id: string, userRole: Role) => {
     setEmployeeId(id);
-    addAuditLog('LOGIN', id, 'Employee logged in successfully');
-    if (id === '1111') {
+    setRole(userRole);
+    localStorage.setItem('nxp_employee_id', id);
+    localStorage.setItem('nxp_role', userRole);
+    addAuditLog('LOGIN', id, `Employee logged in successfully as ${userRole}`);
+    if (userRole === 'admin' || userRole === 'store') {
       setCurrentPage('admin');
     } else {
       setCurrentPage('mode-selection');
@@ -37,6 +47,9 @@ export default function App() {
       addAuditLog('LOGOUT', employeeId, 'Employee logged out');
     }
     setEmployeeId('');
+    setRole(null);
+    localStorage.removeItem('nxp_employee_id');
+    localStorage.removeItem('nxp_role');
     setCurrentPage('mode-selection');
   };
 
@@ -45,7 +58,11 @@ export default function App() {
   };
 
   const handleBackToModeSelection = () => {
-    setCurrentPage('mode-selection');
+    if (role === 'admin' || role === 'store') {
+      setCurrentPage('admin');
+    } else {
+      setCurrentPage('mode-selection');
+    }
   };
 
   const handleGoToQueue = () => {
@@ -88,7 +105,7 @@ export default function App() {
           <div className="flex items-center gap-4">
             {employeeId && (
               <>
-                {employeeId === '1111' && (
+                {(role === 'admin' || role === 'store') && (
                   <button
                     onClick={handleGoToAdmin}
                     className={`px-8 py-3 text-xl font-bold rounded-lg transition-colors shadow-md ${
@@ -97,9 +114,35 @@ export default function App() {
                         : 'text-indigo-600 bg-white border-2 border-indigo-600 hover:bg-indigo-50'
                     }`}
                   >
-                    {translations[language].adminPanel}
+                    {role === 'admin' ? translations[language].adminPanel : translations[language].managementPanel}
                   </button>
                 )}
+
+                {role === 'operator' && (
+                  <>
+                    <button
+                      onClick={handleGoToAdmin}
+                      className={`px-8 py-3 text-xl font-bold rounded-lg transition-colors shadow-md ${
+                        currentPage === 'admin'
+                          ? 'text-white bg-indigo-600 hover:bg-indigo-700'
+                          : 'text-indigo-600 bg-white border-2 border-indigo-600 hover:bg-indigo-50'
+                      }`}
+                    >
+                      {translations[language].adminLogsTab}
+                    </button>
+                    <button
+                      onClick={handleBackToModeSelection}
+                      className={`px-8 py-3 text-xl font-bold rounded-lg transition-colors shadow-md ${
+                        currentPage === 'mode-selection'
+                          ? 'text-white bg-blue-600 hover:bg-blue-700'
+                          : 'text-blue-600 bg-white border-2 border-blue-600 hover:bg-blue-50'
+                      }`}
+                    >
+                      {language === 'th' ? 'เมนูหลัก' : 'Main Menu'}
+                    </button>
+                  </>
+                )}
+
                 <button
                   onClick={handleGoToFPCSearch}
                   className="px-8 py-3 text-xl font-bold text-blue-600 bg-white border-2 border-blue-600 rounded-lg hover:bg-blue-50 transition-colors shadow-sm"
@@ -130,8 +173,15 @@ export default function App() {
         ) : currentPage === 'admin' ? (
           <AdminLogsPage
             employeeId={employeeId}
+            userRole={role || 'operator'}
             language={language}
-            onBack={handleBackToModeSelection}
+            onBack={() => {
+              if (role === 'admin' || role === 'store') {
+                setCurrentPage('admin');
+              } else {
+                setCurrentPage('mode-selection');
+              }
+            }}
           />
         ) : currentPage === 'mode-selection' ? (
           <ModeSelection onSelectMode={handleSelectMode} language={language} />

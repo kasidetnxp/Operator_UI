@@ -59,6 +59,35 @@ export interface TaskResponse {
 // In-memory task queue (replace with API call)
 const mockTaskQueue: TaskResponse[] = [];
 
+import type { Role, UserAccount } from '@/shared/types';
+
+// Default mock users
+const DEFAULT_USERS: UserAccount[] = [
+  { employeeId: '1111', passwordHash: 'admin123', role: 'admin' },
+  { employeeId: '2222', passwordHash: 'store123', role: 'store' },
+  { employeeId: '3333', passwordHash: 'op123', role: 'operator' },
+];
+
+// Load users from localStorage or fallback to defaults
+function loadUsers(): UserAccount[] {
+  const data = localStorage.getItem('nxp_users');
+  if (data) {
+    try {
+      return JSON.parse(data);
+    } catch (e) {
+      console.error('Failed to parse nxp_users', e);
+    }
+  }
+  localStorage.setItem('nxp_users', JSON.stringify(DEFAULT_USERS));
+  return DEFAULT_USERS;
+}
+
+const mockUsers: UserAccount[] = loadUsers();
+
+function saveUsers(): void {
+  localStorage.setItem('nxp_users', JSON.stringify(mockUsers));
+}
+
 export interface AuditLog {
   id: string;
   timestamp: string;
@@ -67,7 +96,24 @@ export interface AuditLog {
   message: string;
 }
 
-const mockAuditLogs: AuditLog[] = [];
+// Load logs from localStorage or start empty
+function loadLogs(): AuditLog[] {
+  const data = localStorage.getItem('nxp_audit_logs');
+  if (data) {
+    try {
+      return JSON.parse(data);
+    } catch (e) {
+      console.error('Failed to parse nxp_audit_logs', e);
+    }
+  }
+  return [];
+}
+
+const mockAuditLogs: AuditLog[] = loadLogs();
+
+function saveLogs(): void {
+  localStorage.setItem('nxp_audit_logs', JSON.stringify(mockAuditLogs));
+}
 
 export function addAuditLog(
   eventType: AuditLog['eventType'],
@@ -82,6 +128,7 @@ export function addAuditLog(
     message,
   };
   mockAuditLogs.unshift(log);
+  saveLogs();
 }
 
 export async function getAuditLogs(): Promise<AuditLog[]> {
@@ -89,9 +136,57 @@ export async function getAuditLogs(): Promise<AuditLog[]> {
   return [...mockAuditLogs];
 }
 
-export function clearAuditLogs(): void {
+export function clearAuditLogs(employeeId: string): void {
   mockAuditLogs.length = 0;
-  addAuditLog('SYSTEM', '1111', 'Audit logs cleared');
+  saveLogs();
+  addAuditLog('SYSTEM', employeeId, `Audit logs cleared by user ${employeeId}`);
+}
+
+export async function getUsers(): Promise<UserAccount[]> {
+  await delay(100);
+  return [...mockUsers];
+}
+
+export async function validateCredentials(
+  employeeId: string,
+  passwordHash: string
+): Promise<{ employeeId: string; role: Role } | null> {
+  await delay(200);
+  const user = mockUsers.find(
+    u => u.employeeId === employeeId && u.passwordHash === passwordHash
+  );
+  if (user) {
+    return { employeeId: user.employeeId, role: user.role };
+  }
+  return null;
+}
+
+export async function addUser(
+  adminId: string,
+  employeeId: string,
+  passwordHash: string,
+  role: Role
+): Promise<void> {
+  await delay(200);
+  const exists = mockUsers.some(u => u.employeeId === employeeId);
+  if (exists) {
+    throw new Error('Employee ID already exists');
+  }
+  mockUsers.push({ employeeId, passwordHash, role });
+  saveUsers();
+  addAuditLog('SYSTEM', adminId, `User ${employeeId} added with role ${role}`);
+}
+
+export async function deleteUser(adminId: string, employeeId: string): Promise<void> {
+  await delay(200);
+  const index = mockUsers.findIndex(u => u.employeeId === employeeId);
+  if (index === -1) {
+    throw new Error('User not found');
+  }
+  const role = mockUsers[index].role;
+  mockUsers.splice(index, 1);
+  saveUsers();
+  addAuditLog('SYSTEM', adminId, `User ${employeeId} (${role}) deleted`);
 }
 
 // ─── Mock Machine Data (50 machines) ───

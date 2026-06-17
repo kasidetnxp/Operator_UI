@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import {
   Card,
   CardContent,
@@ -26,7 +26,7 @@ import {
   FormControlLabel,
   RadioGroup,
   Radio,
-  Alert,
+  Alert
 } from '@mui/material';
 import {
   Search,
@@ -50,20 +50,25 @@ import {
   type AuditLog,
   type FPCItem,
   getAGVSystemStatus,
-  setAGVSystemStatus
+  setAGVSystemStatus,
+  clearAuditLogs,
+  getUsers,
+  addUser,
+  deleteUser
 } from '@/shared/utils/mockApi';
 import { translations } from '@/shared/utils/translations';
-import type { Language } from '@/shared/types';
+import type { Language, Role, UserAccount } from '@/shared/types';
 
 interface AdminLogsPageProps {
   employeeId: string;
+  userRole: Role;
   language: Language;
   onBack: () => void;
 }
 
-export function AdminLogsPage({ employeeId, language, onBack }: AdminLogsPageProps) {
-  // Page Tab state
-  const [activeTab, setActiveTab] = useState(0);
+export function AdminLogsPage({ employeeId, userRole, language, onBack }: AdminLogsPageProps) {
+  // Page Tab state (logs, location, users)
+  const [activeTab, setActiveTab] = useState<string>('logs');
   const [agvStatus, setLocalAgvStatus] = useState<'OK' | 'ERROR'>(getAGVSystemStatus());
 
   // Audit Logs state
@@ -75,6 +80,12 @@ export function AdminLogsPage({ employeeId, language, onBack }: AdminLogsPagePro
   const [fpcItems, setFpcItems] = useState<FPCItem[]>([]);
   const [fpcSearchQuery, setFpcSearchQuery] = useState('');
   const [fpcCategoryFilter, setFpcCategoryFilter] = useState<string>('ALL');
+
+  // User Management state
+  const [usersList, setUsersList] = useState<UserAccount[]>([]);
+  const [newEmployeeId, setNewEmployeeId] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [newRole, setNewRole] = useState<'admin' | 'store' | 'operator'>('operator');
 
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
@@ -90,17 +101,25 @@ export function AdminLogsPage({ employeeId, language, onBack }: AdminLogsPagePro
   const [displacedAction, setDisplacedAction] = useState<'swap' | 'evict'>('swap');
   const [evictSlot, setEvictSlot] = useState('');
 
+  // Dialog state for Clear Logs and Delete User
+  const [isClearLogsConfirmOpen, setIsClearLogsConfirmOpen] = useState(false);
+  const [isUserDeleteConfirmOpen, setIsUserDeleteConfirmOpen] = useState(false);
+  const [userToDelete, setUserToDelete] = useState<string | null>(null);
 
   // Fetch all admin data (logs and FPCs)
-  const fetchData = async (showSpinner = false) => {
+  const fetchData = useCallback(async (showSpinner = false) => {
     if (showSpinner) setIsRefreshing(true);
     try {
-      const [logsData, fpcsData] = await Promise.all([
-        getAuditLogs(),
-        getAllFPCs()
-      ]);
-      setLogs(logsData);
-      setFpcItems(fpcsData);
+      const promises: Promise<AuditLog[] | FPCItem[]>[] = [getAuditLogs()];
+      if (userRole === 'admin' || userRole === 'store') {
+        promises.push(getAllFPCs());
+      }
+      
+      const results = await Promise.all(promises);
+      setLogs(results[0] as AuditLog[]);
+      if (userRole === 'admin' || userRole === 'store') {
+        setFpcItems(results[1] as FPCItem[]);
+      }
       setLocalAgvStatus(getAGVSystemStatus());
     } catch (err) {
       console.error('Failed to fetch admin data:', err);
@@ -109,23 +128,52 @@ export function AdminLogsPage({ employeeId, language, onBack }: AdminLogsPagePro
         setTimeout(() => setIsRefreshing(false), 500);
       }
     }
-  };
+  }, [userRole]);
+
+  // Fetch users (Admin only)
+  const fetchUsersList = useCallback(async () => {
+    if (userRole !== 'admin') return;
+    try {
+      const usersData = await getUsers();
+      setUsersList(usersData);
+    } catch (err) {
+      console.error('Failed to fetch users:', err);
+    }
+  }, [userRole]);
 
   // Poll for live data every 1 second
   useEffect(() => {
-    const timer = setTimeout(() => {
-      fetchData();
-    }, 0);
+    let isMounted = true;
+    const run = async () => {
+      if (isMounted) {
+        await fetchData();
+      }
+    };
+    run();
     const interval = setInterval(() => {
-      fetchData();
+      run();
     }, 1000);
     return () => {
-      clearTimeout(timer);
+      isMounted = false;
       clearInterval(interval);
     };
-  }, []);
+  }, [fetchData]);
 
-  const handleTabChange = (_event: React.SyntheticEvent, newValue: number) => {
+  // Fetch users list when users tab is active
+  useEffect(() => {
+    let isMounted = true;
+    const run = async () => {
+      if (isMounted && activeTab === 'users') {
+        await fetchUsersList();
+      }
+    };
+    run();
+    return () => {
+      isMounted = false;
+    };
+  }, [activeTab, fetchUsersList]);
+
+  const handleTabChange = (_event: React.SyntheticEvent, newValue: string) => {
     setActiveTab(newValue);
     setErrorMsg('');
     setSuccessMsg('');
@@ -306,7 +354,60 @@ export function AdminLogsPage({ employeeId, language, onBack }: AdminLogsPagePro
     }
   };
 
+  // Clear audit logs (Admin only)
+  const handleClearLogs = () => {
+    clearAuditLogs(employeeId);
+    setIsClearLogsConfirmOpen(false);
+    setSuccessMsg(language === 'th' ? 'ล้างบันทึกประวัติการทำงานสำเร็จ' : 'Logs cleared successfully');
+    fetchData();
+  };
 
+  // Add user (Admin only)
+  const handleAddUser = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setErrorMsg('');
+    setSuccessMsg('');
+    if (!newEmployeeId.trim() || !newPassword.trim()) {
+      setErrorMsg(t.error_validation);
+      return;
+    }
+    try {
+      await addUser(employeeId, newEmployeeId.trim(), newPassword.trim(), newRole);
+      setSuccessMsg(t.userAddedSuccessfully);
+      setNewEmployeeId('');
+      setNewPassword('');
+      setNewRole('operator');
+      fetchUsersList();
+    } catch (err) {
+      setErrorMsg(err instanceof Error ? err.message : 'Error adding user');
+    }
+  };
+
+  // Click Delete User (Admin only)
+  const handleDeleteUserClick = (targetEmpId: string) => {
+    if (targetEmpId === employeeId) {
+      setErrorMsg(language === 'th' ? 'ไม่สามารถลบตัวเองได้' : 'Cannot delete yourself');
+      return;
+    }
+    setUserToDelete(targetEmpId);
+    setIsUserDeleteConfirmOpen(true);
+  };
+
+  // Confirm delete user
+  const handleConfirmDeleteUser = async () => {
+    if (!userToDelete) return;
+    setErrorMsg('');
+    setSuccessMsg('');
+    try {
+      await deleteUser(employeeId, userToDelete);
+      setSuccessMsg(t.userDeletedSuccessfully);
+      setIsUserDeleteConfirmOpen(false);
+      setUserToDelete(null);
+      fetchUsersList();
+    } catch (err) {
+      setErrorMsg(err instanceof Error ? err.message : 'Error deleting user');
+    }
+  };
 
   // Find occupant of target machine (if any)
   const targetMachineOccupant = selectedFpc && newLocationType === 'machine'
@@ -328,30 +429,32 @@ export function AdminLogsPage({ employeeId, language, onBack }: AdminLogsPagePro
             <div className="flex items-center gap-2">
               <Shield className="w-8 h-8 text-indigo-600 animate-pulse" />
               <h2 className="text-3xl font-extrabold text-gray-900">
-                {t.adminPanel}
+                {userRole === 'admin' ? t.adminPanel : t.managementPanel}
               </h2>
             </div>
             <p className="text-gray-500 text-lg mt-1">
-              {activeTab === 0 ? t.systemLogs : t.adminLocationTab}
+              {activeTab === 'logs' ? t.systemLogs : activeTab === 'location' ? t.adminLocationTab : t.userManagement}
             </p>
           </div>
         </div>
 
         <div className="flex gap-4">
-          <Button
-            variant="contained"
-            color={agvStatus === 'OK' ? 'success' : 'error'}
-            onClick={() => {
-              const nextStatus = agvStatus === 'OK' ? 'ERROR' : 'OK';
-              setAGVSystemStatus(nextStatus);
-              setLocalAgvStatus(nextStatus);
-            }}
-            className="!py-3 !px-5 !text-lg !font-bold !rounded-xl"
-          >
-            {language === 'th'
-              ? `สลับสถานะ AGV: ${agvStatus}`
-              : `Toggle AGV: ${agvStatus}`}
-          </Button>
+          {userRole === 'admin' && (
+            <Button
+              variant="contained"
+              color={agvStatus === 'OK' ? 'success' : 'error'}
+              onClick={() => {
+                const nextStatus = agvStatus === 'OK' ? 'ERROR' : 'OK';
+                setAGVSystemStatus(nextStatus);
+                setLocalAgvStatus(nextStatus);
+              }}
+              className="!py-3 !px-5 !text-lg !font-bold !rounded-xl"
+            >
+              {language === 'th'
+                ? `สลับสถานะ AGV: ${agvStatus}`
+                : `Toggle AGV: ${agvStatus}`}
+            </Button>
+          )}
 
           <Button
             variant="outlined"
@@ -382,8 +485,15 @@ export function AdminLogsPage({ employeeId, language, onBack }: AdminLogsPagePro
             }
           }}
         >
-          <Tab label={t.adminLogsTab} icon={<Clock className="w-5 h-5 mr-1" />} iconPosition="start" />
-          <Tab label={t.adminLocationTab} icon={<Database className="w-5 h-5 mr-1" />} iconPosition="start" />
+          <Tab value="logs" label={t.adminLogsTab} icon={<Clock className="w-5 h-5 mr-1" />} iconPosition="start" />
+          
+          {(userRole === 'admin' || userRole === 'store') && (
+            <Tab value="location" label={t.adminLocationTab} icon={<Database className="w-5 h-5 mr-1" />} iconPosition="start" />
+          )}
+
+          {userRole === 'admin' && (
+            <Tab value="users" label={t.userManagement} icon={<User className="w-5 h-5 mr-1" />} iconPosition="start" />
+          )}
         </Tabs>
       </Box>
 
@@ -400,7 +510,7 @@ export function AdminLogsPage({ employeeId, language, onBack }: AdminLogsPagePro
       )}
 
       {/* Tab Contents */}
-      {activeTab === 0 ? (
+      {activeTab === 'logs' && (
         // ──────────────────────── AUDIT LOGS TAB ────────────────────────
         <div className="flex flex-col flex-1 min-h-0 gap-6">
           {/* Summary Statistics Cards */}
@@ -465,44 +575,57 @@ export function AdminLogsPage({ employeeId, language, onBack }: AdminLogsPagePro
           {/* Logs Table Container */}
           <Card className="flex flex-col flex-1 min-h-0 shadow-lg border-2 border-gray-100 rounded-2xl">
             <CardContent className="flex flex-col h-full p-6 min-h-0 gap-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <TextField
-                  fullWidth
-                  label={language === 'th' ? 'ค้นหาด้วยรหัสพนักงาน' : 'Filter by Employee ID'}
-                  placeholder={t.searchByOperator}
-                  value={searchOperator}
-                  onChange={(e) => setSearchOperator(e.target.value)}
-                  variant="outlined"
-                  InputProps={{
-                    startAdornment: (
-                      <InputAdornment position="start">
-                        <Search className="w-5 h-5 text-gray-400" />
-                      </InputAdornment>
-                    ),
-                    className: '!text-xl'
-                  }}
-                  InputLabelProps={{ className: '!text-lg' }}
-                />
+              <div className="flex flex-col md:flex-row gap-6 justify-between items-center">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 flex-1 w-full">
+                  <TextField
+                    fullWidth
+                    label={language === 'th' ? 'ค้นหาด้วยรหัสพนักงาน' : 'Filter by Employee ID'}
+                    placeholder={t.searchByOperator}
+                    value={searchOperator}
+                    onChange={(e) => setSearchOperator(e.target.value)}
+                    variant="outlined"
+                    InputProps={{
+                      startAdornment: (
+                        <InputAdornment position="start">
+                          <Search className="w-5 h-5 text-gray-400" />
+                        </InputAdornment>
+                      ),
+                      className: '!text-xl'
+                    }}
+                    InputLabelProps={{ className: '!text-lg' }}
+                  />
 
-                <FormControl fullWidth variant="outlined">
-                  <InputLabel className="!text-lg">{t.eventType}</InputLabel>
-                  <Select
-                    value={selectedEventType}
-                    onChange={(e) => setSelectedEventType(e.target.value)}
-                    label={t.eventType}
-                    className="text-xl"
-                    sx={{ '& .MuiSelect-select': { fontSize: '1.25rem' } }}
+                  <FormControl fullWidth variant="outlined">
+                    <InputLabel className="!text-lg">{t.eventType}</InputLabel>
+                    <Select
+                      value={selectedEventType}
+                      onChange={(e) => setSelectedEventType(e.target.value)}
+                      label={t.eventType}
+                      className="text-xl"
+                      sx={{ '& .MuiSelect-select': { fontSize: '1.25rem' } }}
+                    >
+                      <MenuItem value="ALL" className="!text-lg">{t.allEvents}</MenuItem>
+                      <MenuItem value="LOGIN" className="!text-lg">{language === 'th' ? 'LOGIN (เข้าสู่ระบบ)' : 'LOGIN'}</MenuItem>
+                      <MenuItem value="LOGOUT" className="!text-lg">{language === 'th' ? 'LOGOUT (ออกจากระบบ)' : 'LOGOUT'}</MenuItem>
+                      <MenuItem value="TASK_SUBMIT" className="!text-lg">{language === 'th' ? 'TASK_SUBMIT (สร้างงาน)' : 'TASK_SUBMIT'}</MenuItem>
+                      <MenuItem value="STATE_CHANGE" className="!text-lg">{language === 'th' ? 'STATE_CHANGE (เปลี่ยนสถานะ)' : 'STATE_CHANGE'}</MenuItem>
+                      <MenuItem value="CONFIRMATION" className="!text-lg">{language === 'th' ? 'CONFIRMATION (การกดยืนยัน)' : 'CONFIRMATION'}</MenuItem>
+                      <MenuItem value="CANCEL" className="!text-lg">{language === 'th' ? 'CANCEL (ยกเลิกงาน)' : 'CANCEL'}</MenuItem>
+                      <MenuItem value="SYSTEM" className="!text-lg">{language === 'th' ? 'SYSTEM (ระบบ)' : 'SYSTEM'}</MenuItem>
+                    </Select>
+                  </FormControl>
+                </div>
+                
+                {userRole === 'admin' && (
+                  <Button
+                    variant="contained"
+                    color="error"
+                    onClick={() => setIsClearLogsConfirmOpen(true)}
+                    className="!py-4 !px-6 !text-lg !font-bold !rounded-xl self-end md:self-auto shrink-0"
                   >
-                    <MenuItem value="ALL" className="!text-lg">{t.allEvents}</MenuItem>
-                    <MenuItem value="LOGIN" className="!text-lg">{language === 'th' ? 'LOGIN (เข้าสู่ระบบ)' : 'LOGIN'}</MenuItem>
-                    <MenuItem value="LOGOUT" className="!text-lg">{language === 'th' ? 'LOGOUT (ออกจากระบบ)' : 'LOGOUT'}</MenuItem>
-                    <MenuItem value="TASK_SUBMIT" className="!text-lg">{language === 'th' ? 'TASK_SUBMIT (สร้างงาน)' : 'TASK_SUBMIT'}</MenuItem>
-                    <MenuItem value="STATE_CHANGE" className="!text-lg">{language === 'th' ? 'STATE_CHANGE (เปลี่ยนสถานะ)' : 'STATE_CHANGE'}</MenuItem>
-                    <MenuItem value="CONFIRMATION" className="!text-lg">{language === 'th' ? 'CONFIRMATION (การกดยืนยัน)' : 'CONFIRMATION'}</MenuItem>
-                    <MenuItem value="CANCEL" className="!text-lg">{language === 'th' ? 'CANCEL (ยกเลิกงาน)' : 'CANCEL'}</MenuItem>
-                    <MenuItem value="SYSTEM" className="!text-lg">{language === 'th' ? 'SYSTEM (ระบบ)' : 'SYSTEM'}</MenuItem>
-                  </Select>
-                </FormControl>
+                    {t.clearLogs}
+                  </Button>
+                )}
               </div>
 
               <TableContainer component={Paper} className="flex-1 overflow-auto border border-gray-200 rounded-xl min-h-0 shadow-inner">
@@ -545,7 +668,9 @@ export function AdminLogsPage({ employeeId, language, onBack }: AdminLogsPagePro
             </CardContent>
           </Card>
         </div>
-      ) : (
+      )}
+
+      {activeTab === 'location' && (userRole === 'admin' || userRole === 'store') && (
         // ──────────────────────── LOCATION CORRECTION TAB ────────────────────────
         <div className="flex flex-col flex-1 min-h-0 gap-6">
           <Card className="flex flex-col flex-1 min-h-0 shadow-lg border-2 border-gray-100 rounded-2xl">
@@ -640,6 +765,116 @@ export function AdminLogsPage({ employeeId, language, onBack }: AdminLogsPagePro
                         </TableCell>
                       </TableRow>
                     )}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+            </CardContent>
+          </Card>
+        </div>
+      )}
+
+      {activeTab === 'users' && userRole === 'admin' && (
+        // ──────────────────────── USER MANAGEMENT TAB ────────────────────────
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 flex-1 min-h-0">
+          {/* Add User Form Card */}
+          <Card className="shadow-lg border-2 border-gray-100 rounded-2xl h-fit">
+            <CardContent className="p-6 space-y-6">
+              <h3 className="text-2xl font-extrabold text-gray-900">{t.addUser}</h3>
+              <form onSubmit={handleAddUser} className="space-y-6">
+                <TextField
+                  fullWidth
+                  label={t.enterNewEmployeeId}
+                  value={newEmployeeId}
+                  onChange={(e) => setNewEmployeeId(e.target.value)}
+                  variant="outlined"
+                  InputProps={{ className: '!text-lg' }}
+                  InputLabelProps={{ className: '!text-md' }}
+                />
+                
+                <TextField
+                  fullWidth
+                  type="password"
+                  label={t.enterNewPassword}
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                  variant="outlined"
+                  InputProps={{ className: '!text-lg' }}
+                  InputLabelProps={{ className: '!text-md' }}
+                />
+
+                <FormControl fullWidth variant="outlined">
+                  <InputLabel className="!text-md">{t.selectRole}</InputLabel>
+                  <Select
+                    value={newRole}
+                    onChange={(e) => setNewRole(e.target.value as 'admin' | 'store' | 'operator')}
+                    label={t.selectRole}
+                    className="text-lg"
+                  >
+                    <MenuItem value="admin" className="!text-lg">{t.admin}</MenuItem>
+                    <MenuItem value="store" className="!text-lg">{t.store}</MenuItem>
+                    <MenuItem value="operator" className="!text-lg">{t.operatorRole}</MenuItem>
+                  </Select>
+                </FormControl>
+
+                <Button
+                  fullWidth
+                  type="submit"
+                  variant="contained"
+                  size="large"
+                  className="!py-4 !text-lg !font-bold !bg-indigo-600 hover:!bg-indigo-700"
+                >
+                  {t.addUser}
+                </Button>
+              </form>
+            </CardContent>
+          </Card>
+
+          {/* User List Table Card */}
+          <Card className="lg:col-span-2 flex flex-col flex-1 min-h-0 shadow-lg border-2 border-gray-100 rounded-2xl">
+            <CardContent className="flex flex-col h-full p-6 min-h-0 gap-6">
+              <h3 className="text-2xl font-extrabold text-gray-900">{t.userManagement}</h3>
+              <TableContainer component={Paper} className="flex-1 overflow-auto border border-gray-200 rounded-xl min-h-0 shadow-inner">
+                <Table stickyHeader>
+                  <TableHead>
+                    <TableRow>
+                      <TableCell className="!text-lg !font-bold !bg-gray-100 !text-gray-700 !py-4">{t.employeeId}</TableCell>
+                      <TableCell className="!text-lg !font-bold !bg-gray-100 !text-gray-700 !py-4">{t.role}</TableCell>
+                      <TableCell className="!text-lg !font-bold !bg-gray-100 !text-gray-700 !py-4 !text-center">{language === 'th' ? 'การกระทำ' : 'Actions'}</TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {usersList.map((user) => (
+                      <TableRow key={user.employeeId} hover>
+                        <TableCell className="!text-lg !font-bold !text-gray-900 !py-4">
+                          <div className="flex items-center gap-2">
+                            <User className="w-5 h-5 text-gray-400" />
+                            {user.employeeId}
+                          </div>
+                        </TableCell>
+                        <TableCell className="!text-lg !py-4">
+                          <span className={`px-4 py-1 text-base font-bold rounded-full border ${
+                            user.role === 'admin'
+                              ? 'bg-rose-50 text-rose-700 border-rose-200'
+                              : user.role === 'store'
+                              ? 'bg-amber-50 text-amber-700 border-amber-200'
+                              : 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                          }`}>
+                            {user.role === 'admin' ? t.admin : user.role === 'store' ? t.store : t.operatorRole}
+                          </span>
+                        </TableCell>
+                        <TableCell className="!py-4 !text-center">
+                          <Button
+                            variant="outlined"
+                            color="error"
+                            disabled={user.employeeId === employeeId}
+                            onClick={() => handleDeleteUserClick(user.employeeId)}
+                            className="!font-bold !rounded-lg !text-base"
+                          >
+                            {language === 'th' ? 'ลบ' : 'Delete'}
+                          </Button>
+                        </TableCell>
+                      </TableRow>
+                    ))}
                   </TableBody>
                 </Table>
               </TableContainer>
@@ -805,6 +1040,75 @@ export function AdminLogsPage({ employeeId, language, onBack }: AdminLogsPagePro
         </DialogActions>
       </Dialog>
 
+      {/* ──────────────────────── CLEAR LOGS CONFIRM DIALOG ──────────────────────── */}
+      <Dialog
+        open={isClearLogsConfirmOpen}
+        onClose={() => setIsClearLogsConfirmOpen(false)}
+        PaperProps={{ className: '!p-4 !rounded-2xl shadow-xl' }}
+      >
+        <DialogTitle className="!text-2xl !font-extrabold !pb-2">
+          {t.confirmClearLogsTitle}
+        </DialogTitle>
+        <DialogContent>
+          <p className="text-lg text-gray-700">
+            {t.confirmClearLogsMessage}
+          </p>
+        </DialogContent>
+        <DialogActions className="!p-6 !pt-2">
+          <Button
+            onClick={() => setIsClearLogsConfirmOpen(false)}
+            variant="outlined"
+            size="large"
+            className="!py-3 !px-8 !text-lg !rounded-xl"
+          >
+            {t.cancel}
+          </Button>
+          <Button
+            onClick={handleClearLogs}
+            variant="contained"
+            color="error"
+            size="large"
+            className="!py-3 !px-8 !text-lg !rounded-xl"
+          >
+            {t.confirm}
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* ──────────────────────── USER DELETE CONFIRM DIALOG ──────────────────────── */}
+      <Dialog
+        open={isUserDeleteConfirmOpen}
+        onClose={() => setIsUserDeleteConfirmOpen(false)}
+        PaperProps={{ className: '!p-4 !rounded-2xl shadow-xl' }}
+      >
+        <DialogTitle className="!text-2xl !font-extrabold !pb-2">
+          {t.deleteUser}
+        </DialogTitle>
+        <DialogContent>
+          <p className="text-lg text-gray-700">
+            {t.confirmDeleteUser.replace('{employeeId}', userToDelete || '')}
+          </p>
+        </DialogContent>
+        <DialogActions className="!p-6 !pt-2">
+          <Button
+            onClick={() => setIsUserDeleteConfirmOpen(false)}
+            variant="outlined"
+            size="large"
+            className="!py-3 !px-8 !text-lg !rounded-xl"
+          >
+            {t.cancel}
+          </Button>
+          <Button
+            onClick={handleConfirmDeleteUser}
+            variant="contained"
+            color="error"
+            size="large"
+            className="!py-3 !px-8 !text-lg !rounded-xl"
+          >
+            {language === 'th' ? 'ยืนยันการลบ' : 'Confirm Delete'}
+          </Button>
+        </DialogActions>
+      </Dialog>
     </div>
   );
 }
