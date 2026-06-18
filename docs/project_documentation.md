@@ -227,6 +227,8 @@ The system currently runs on an in-memory **Simulation Layer** ([src/shared/util
 *   `confirmCoverHeadRemoved(taskId)`: Submits cover head removal confirmation (simulated via 5s delay on waiting status in frontend).
 *   `cancelTask(taskId)`: Sets task status to `canceled` and halts further simulated transitions.
 *   `getTaskStatus(taskId)` / `getAllTasks()`: Fetches status updates.
+*   `getUsers()` / `addUser(...)` / `deleteUser(...)` / `updateUser(...)`: Performs operations for User Accounts database (restricted to Admin role).
+
 
 ### Production Integration
 To connect this frontend to a production backend (e.g., AGV Fleet Manager API):

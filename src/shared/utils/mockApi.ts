@@ -189,6 +189,25 @@ export async function deleteUser(adminId: string, employeeId: string): Promise<v
   addAuditLog('SYSTEM', adminId, `User ${employeeId} (${role}) deleted`);
 }
 
+export async function updateUser(
+  adminId: string,
+  employeeId: string,
+  newPasswordHash: string,
+  newRole: Role
+): Promise<void> {
+  await delay(200);
+  const user = mockUsers.find(u => u.employeeId === employeeId);
+  if (!user) {
+    throw new Error('User not found');
+  }
+  const oldRole = user.role;
+  user.passwordHash = newPasswordHash;
+  user.role = newRole;
+  saveUsers();
+  addAuditLog('SYSTEM', adminId, `User ${employeeId} updated: role ${oldRole} -> ${newRole}`);
+}
+
+
 // ─── Mock Machine Data (50 machines) ───
 export const mockMachines: Machine[] = [
   { id: 'AVT_001', name: 'AVT_001', available: true },

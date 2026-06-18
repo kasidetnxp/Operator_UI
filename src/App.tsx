@@ -119,28 +119,16 @@ export default function App() {
                 )}
 
                 {role === 'operator' && (
-                  <>
-                    <button
-                      onClick={handleGoToAdmin}
-                      className={`px-8 py-3 text-xl font-bold rounded-lg transition-colors shadow-md ${
-                        currentPage === 'admin'
-                          ? 'text-white bg-indigo-600 hover:bg-indigo-700'
-                          : 'text-indigo-600 bg-white border-2 border-indigo-600 hover:bg-indigo-50'
-                      }`}
-                    >
-                      {translations[language].adminLogsTab}
-                    </button>
-                    <button
-                      onClick={handleBackToModeSelection}
-                      className={`px-8 py-3 text-xl font-bold rounded-lg transition-colors shadow-md ${
-                        currentPage === 'mode-selection'
-                          ? 'text-white bg-blue-600 hover:bg-blue-700'
-                          : 'text-blue-600 bg-white border-2 border-blue-600 hover:bg-blue-50'
-                      }`}
-                    >
-                      {language === 'th' ? 'เมนูหลัก' : 'Main Menu'}
-                    </button>
-                  </>
+                  <button
+                    onClick={handleGoToAdmin}
+                    className={`px-8 py-3 text-xl font-bold rounded-lg transition-colors shadow-md ${
+                      currentPage === 'admin'
+                        ? 'text-white bg-indigo-600 hover:bg-indigo-700'
+                        : 'text-indigo-600 bg-white border-2 border-indigo-600 hover:bg-indigo-50'
+                    }`}
+                  >
+                    {translations[language].adminLogsTab}
+                  </button>
                 )}
 
                 <button
@@ -176,11 +164,7 @@ export default function App() {
             userRole={role || 'operator'}
             language={language}
             onBack={() => {
-              if (role === 'admin' || role === 'store') {
-                setCurrentPage('admin');
-              } else {
-                setCurrentPage('mode-selection');
-              }
+              setCurrentPage('mode-selection');
             }}
           />
         ) : currentPage === 'mode-selection' ? (

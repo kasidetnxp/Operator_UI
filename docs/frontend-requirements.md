@@ -116,6 +116,18 @@ This page is purely for reference and viewing status (view-only), and shall cont
 - Category filter tabs: ALL, Storage, Service, Deposit PM, Deposit Production.
 - A table listing matching FPCs with columns: ADDRESS, FUNCTION, LABEL, COMMENT.
 
+### Admin Panel & User Management
+
+The system shall support an administrative console (Admin Panel / Management Panel) for system audit logging, FPC location corrections, and User Management.
+- **Access Control**: Users with Admin (`1111`) or Store (`2222`) roles shall land on the Admin/Management Panel upon logging in. Operators (`3333`) can access a view-only AGV log view of this panel from the header.
+- **Navigation**:
+  - The Admin/Management Panel shall contain a visible "Back" button (`ArrowLeft` icon button) next to the title. For all roles, clicking this back button shall navigate the user to the Main Menu (Mode Selection screen).
+  - The "Main Menu" button in the header shall be removed for operators to avoid duplicate navigation pathways, relying instead on the internal back buttons of each page.
+- **User Management (Admin-only)**:
+  - The Admin role shall be able to view, add, delete, and edit user accounts.
+  - The Edit User function shall allow modifying the role and password of existing users. The employee ID itself shall remain read-only and uneditable.
+  - A user cannot delete or edit their own active account session to prevent self-lockouts.
+
 ### Supported Task Statuses
 
 The frontend shall support the following operator-facing task statuses for tasks returned by the backend:

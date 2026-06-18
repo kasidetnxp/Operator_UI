@@ -199,6 +199,10 @@ export const translations = {
     store: 'Store',
     operatorRole: 'Operator',
     managementPanel: 'Management Panel',
+    editUser: 'Edit User',
+    userUpdatedSuccessfully: 'User updated successfully',
+    confirmEditUser: 'Are you sure you want to update user {employeeId}?',
+    enterNewPasswordPlaceholder: 'Enter new password (leave empty to keep current)',
   },
   th: {
     appTitle: 'ระบบจัดการ FPC',
@@ -392,5 +396,9 @@ export const translations = {
     store: 'Store',
     operatorRole: 'Operator',
     managementPanel: 'แผงควบคุม',
+    editUser: 'แก้ไขผู้ใช้งาน',
+    userUpdatedSuccessfully: 'อัปเดตผู้ใช้งานสำเร็จ',
+    confirmEditUser: 'คุณแน่ใจหรือไม่ว่าต้องการแก้ไขผู้ใช้ {employeeId}?',
+    enterNewPasswordPlaceholder: 'กรอกรหัสผ่านใหม่ (ปล่อยว่างหากไม่ต้องการเปลี่ยน)',
   },
 };

@@ -54,7 +54,8 @@ import {
   clearAuditLogs,
   getUsers,
   addUser,
-  deleteUser
+  deleteUser,
+  updateUser
 } from '@/shared/utils/mockApi';
 import { translations } from '@/shared/utils/translations';
 import type { Language, Role, UserAccount } from '@/shared/types';
@@ -105,6 +106,12 @@ export function AdminLogsPage({ employeeId, userRole, language, onBack }: AdminL
   const [isClearLogsConfirmOpen, setIsClearLogsConfirmOpen] = useState(false);
   const [isUserDeleteConfirmOpen, setIsUserDeleteConfirmOpen] = useState(false);
   const [userToDelete, setUserToDelete] = useState<string | null>(null);
+
+  // Dialog state for Edit User
+  const [isEditUserOpen, setIsEditUserOpen] = useState(false);
+  const [editEmployeeId, setEditEmployeeId] = useState('');
+  const [editPassword, setEditPassword] = useState('');
+  const [editRole, setEditRole] = useState<'admin' | 'store' | 'operator'>('operator');
 
   // Fetch all admin data (logs and FPCs)
   const fetchData = useCallback(async (showSpinner = false) => {
@@ -406,6 +413,35 @@ export function AdminLogsPage({ employeeId, userRole, language, onBack }: AdminL
       fetchUsersList();
     } catch (err) {
       setErrorMsg(err instanceof Error ? err.message : 'Error deleting user');
+    }
+  };
+
+  const handleEditUserClick = (user: UserAccount) => {
+    setEditEmployeeId(user.employeeId);
+    setEditPassword('');
+    setEditRole(user.role as 'admin' | 'store' | 'operator');
+    setErrorMsg('');
+    setSuccessMsg('');
+    setIsEditUserOpen(true);
+  };
+
+  const handleSaveEditUser = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setErrorMsg('');
+    setSuccessMsg('');
+    const currentUser = usersList.find(u => u.employeeId === editEmployeeId);
+    if (!currentUser) {
+      setErrorMsg('User not found');
+      return;
+    }
+    const finalPassword = editPassword.trim() || currentUser.passwordHash;
+    try {
+      await updateUser(employeeId, editEmployeeId, finalPassword, editRole);
+      setSuccessMsg(t.userUpdatedSuccessfully);
+      setIsEditUserOpen(false);
+      fetchUsersList();
+    } catch (err) {
+      setErrorMsg(err instanceof Error ? err.message : 'Error updating user');
     }
   };
 
@@ -863,15 +899,25 @@ export function AdminLogsPage({ employeeId, userRole, language, onBack }: AdminL
                           </span>
                         </TableCell>
                         <TableCell className="!py-4 !text-center">
-                          <Button
-                            variant="outlined"
-                            color="error"
-                            disabled={user.employeeId === employeeId}
-                            onClick={() => handleDeleteUserClick(user.employeeId)}
-                            className="!font-bold !rounded-lg !text-base"
-                          >
-                            {language === 'th' ? 'ลบ' : 'Delete'}
-                          </Button>
+                          <div className="flex justify-center gap-3">
+                            <Button
+                              variant="outlined"
+                              color="primary"
+                              onClick={() => handleEditUserClick(user)}
+                              className="!font-bold !rounded-lg !text-base"
+                            >
+                              {language === 'th' ? 'แก้ไข' : 'Edit'}
+                            </Button>
+                            <Button
+                              variant="outlined"
+                              color="error"
+                              disabled={user.employeeId === employeeId}
+                              onClick={() => handleDeleteUserClick(user.employeeId)}
+                              className="!font-bold !rounded-lg !text-base"
+                            >
+                              {language === 'th' ? 'ลบ' : 'Delete'}
+                            </Button>
+                          </div>
                         </TableCell>
                       </TableRow>
                     ))}
@@ -1108,6 +1154,76 @@ export function AdminLogsPage({ employeeId, userRole, language, onBack }: AdminL
             {language === 'th' ? 'ยืนยันการลบ' : 'Confirm Delete'}
           </Button>
         </DialogActions>
+      </Dialog>
+
+      {/* ──────────────────────── EDIT USER DIALOG ──────────────────────── */}
+      <Dialog
+        open={isEditUserOpen}
+        onClose={() => setIsEditUserOpen(false)}
+        maxWidth="sm"
+        fullWidth
+        PaperProps={{ className: '!p-4 !rounded-2xl shadow-xl' }}
+      >
+        <DialogTitle className="!text-2xl !font-extrabold !pb-2">
+          {t.editUser} ({editEmployeeId})
+        </DialogTitle>
+        <form onSubmit={handleSaveEditUser}>
+          <DialogContent className="!pt-4 space-y-6">
+            <TextField
+              fullWidth
+              disabled
+              label={t.employeeId}
+              value={editEmployeeId}
+              variant="outlined"
+              InputProps={{ className: '!text-lg' }}
+              InputLabelProps={{ className: '!text-md' }}
+            />
+            
+            <TextField
+              fullWidth
+              type="password"
+              label={t.password}
+              placeholder={t.enterNewPasswordPlaceholder}
+              value={editPassword}
+              onChange={(e) => setEditPassword(e.target.value)}
+              variant="outlined"
+              InputProps={{ className: '!text-lg' }}
+              InputLabelProps={{ className: '!text-md' }}
+            />
+
+            <FormControl fullWidth variant="outlined">
+              <InputLabel className="!text-md">{t.selectRole}</InputLabel>
+              <Select
+                value={editRole}
+                onChange={(e) => setEditRole(e.target.value as 'admin' | 'store' | 'operator')}
+                label={t.selectRole}
+                className="text-lg"
+              >
+                <MenuItem value="admin" className="!text-lg">{t.admin}</MenuItem>
+                <MenuItem value="store" className="!text-lg">{t.store}</MenuItem>
+                <MenuItem value="operator" className="!text-lg">{t.operatorRole}</MenuItem>
+              </Select>
+            </FormControl>
+          </DialogContent>
+          <DialogActions className="!p-6 !pt-2">
+            <Button
+              onClick={() => setIsEditUserOpen(false)}
+              variant="outlined"
+              size="large"
+              className="!py-3 !px-8 !text-lg !rounded-xl"
+            >
+              {t.cancel}
+            </Button>
+            <Button
+              type="submit"
+              variant="contained"
+              size="large"
+              className="!py-3 !px-8 !text-lg !rounded-xl !bg-indigo-600 hover:!bg-indigo-700"
+            >
+              {t.save}
+            </Button>
+          </DialogActions>
+        </form>
       </Dialog>
     </div>
   );
