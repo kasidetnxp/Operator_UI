@@ -2,15 +2,14 @@
 
 ## Functional Requirements
 
-### Employee ID and Workflow Entry
+### Employee ID and Password Authentication
 
-The frontend system shall support operator workflows beginning with the entry of an employee ID.
+The frontend system shall support user workflows beginning with the entry of an employee ID and a password.
 
-In the current phase, the employee ID is used for transaction logging only and shall not be used for user authentication or access control.
+In the current phase, password authentication is required for all roles (Admin, Store, and Operator) to verify credentials and establish access control levels.
 
-The frontend shall validate that the employee ID field is not empty before allowing the operator to proceed to mode selection.
+The frontend shall validate that both the employee ID and password fields are not empty before invoking the authentication API to check credentials.
 
-Authentication may be introduced in a future phase without changing the current workflow definition.
 
 ### Display Language
 

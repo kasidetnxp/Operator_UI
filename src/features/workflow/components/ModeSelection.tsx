@@ -33,20 +33,6 @@ export function ModeSelection({ onSelectMode, language }: ModeSelectionProps) {
         </Card>
 
         <Card className="hover:shadow-xl transition-shadow">
-          <CardActionArea onClick={() => onSelectMode('swap')} className="!p-12">
-            <div className="flex flex-col items-center text-center space-y-6">
-              <ArrowLeftRight className="w-28 h-28 text-purple-600" />
-              <h3 className="text-4xl font-bold text-gray-900">
-                {t.swapFPC}
-              </h3>
-              <p className="text-xl text-gray-600">
-                {t.swapFPCDesc}
-              </p>
-            </div>
-          </CardActionArea>
-        </Card>
-
-        <Card className="hover:shadow-xl transition-shadow">
           <CardActionArea onClick={() => onSelectMode('request')} className="!p-12">
             <div className="flex flex-col items-center text-center space-y-6">
               <ArrowUpCircle className="w-28 h-28 text-green-600" />
@@ -55,6 +41,20 @@ export function ModeSelection({ onSelectMode, language }: ModeSelectionProps) {
               </h3>
               <p className="text-xl text-gray-600">
                 {t.requestFPCDesc}
+              </p>
+            </div>
+          </CardActionArea>
+        </Card>
+
+        <Card className="hover:shadow-xl transition-shadow">
+          <CardActionArea onClick={() => onSelectMode('swap')} className="!p-12">
+            <div className="flex flex-col items-center text-center space-y-6">
+              <ArrowLeftRight className="w-28 h-28 text-purple-600" />
+              <h3 className="text-4xl font-bold text-gray-900">
+                {t.swapFPC}
+              </h3>
+              <p className="text-xl text-gray-600">
+                {t.swapFPCDesc}
               </p>
             </div>
           </CardActionArea>

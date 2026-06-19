@@ -435,8 +435,9 @@ export function AdminLogsPage({ employeeId, userRole, language, onBack }: AdminL
       return;
     }
     const finalPassword = editPassword.trim() || currentUser.passwordHash;
+    const finalRole = editEmployeeId === employeeId ? currentUser.role : editRole;
     try {
-      await updateUser(employeeId, editEmployeeId, finalPassword, editRole);
+      await updateUser(employeeId, editEmployeeId, finalPassword, finalRole);
       setSuccessMsg(t.userUpdatedSuccessfully);
       setIsEditUserOpen(false);
       fetchUsersList();
@@ -1191,7 +1192,7 @@ export function AdminLogsPage({ employeeId, userRole, language, onBack }: AdminL
               InputLabelProps={{ className: '!text-md' }}
             />
 
-            <FormControl fullWidth variant="outlined">
+            <FormControl fullWidth variant="outlined" disabled={editEmployeeId === employeeId}>
               <InputLabel className="!text-md">{t.selectRole}</InputLabel>
               <Select
                 value={editRole}

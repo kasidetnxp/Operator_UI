@@ -42,6 +42,10 @@ _Avoid_: Manual force, database update
 **Probecard ID**:
 An alternative term for FPC ID used on confirmation dialogs before submit to match operator shop-floor terminology. It refers to the unique identifier of the FPC item, displayed as "Probecard ID" in English across all language modes.
 
+**Authentication**:
+The process of validating a user's credentials (Employee ID and password) at workflow entry to determine their system role (Admin, Store, or Operator) and control screen access.
+_Avoid_: Log-in check, user verification
+
 **Admin**:
 A role with full control over the system, including user management, manual override of any data, viewing audit logs, and approving exception operations.
 _Avoid_: Superuser, system manager
