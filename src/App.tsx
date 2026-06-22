@@ -3,7 +3,7 @@ import { EmployeeLogin, EmployeeMenu } from '@/features/auth';
 import { ModeSelection, ReturnFPCWorkflow, RequestFPCWorkflow, SwapFPCWorkflow, FPCSearchPage } from '@/features/workflow';
 import { TaskQueuePage } from '@/features/queue';
 import { AdminLogsPage } from '@/features/admin';
-import { addAuditLog, getAGVSystemStatus } from '@/shared/utils/mockApi';
+import { addAuditLog, getAGV1Status, getAGV2Status } from '@/shared/utils/mockApi';
 import { translations } from '@/shared/utils/translations';
 import type { Language, OperationMode, Page, Role } from '@/shared/types';
 
@@ -18,11 +18,13 @@ export default function App() {
     }
     return 'mode-selection';
   });
-  const [agvStatus, setAgvStatus] = useState<'OK' | 'ERROR'>('OK');
+  const [agv1Status, setAgv1StatusLocal] = useState<'OK' | 'ERROR'>('OK');
+  const [agv2Status, setAgv2StatusLocal] = useState<'OK' | 'ERROR'>('OK');
 
   useEffect(() => {
     const checkAGVStatus = () => {
-      setAgvStatus(getAGVSystemStatus());
+      setAgv1StatusLocal(getAGV1Status());
+      setAgv2StatusLocal(getAGV2Status());
     };
     checkAGVStatus();
     const interval = setInterval(checkAGVStatus, 1000);
@@ -85,20 +87,38 @@ export default function App() {
           <div className="flex items-center gap-6">
             <h1 className="text-3xl font-bold text-foreground">NXP WT</h1>
             {employeeId && (
-              <span
-                className={`px-6 py-2 text-xl font-black rounded-full flex items-center gap-2 border shadow-sm transition-all duration-300 ${
-                  agvStatus === 'OK'
-                    ? 'bg-success-background text-success-foreground border-success'
-                    : 'bg-error-background text-error-foreground border-error animate-pulse'
-                }`}
-              >
+              <div className="flex flex-col sm:flex-row gap-2">
+                {/* AGV 1 Badge */}
                 <span
-                  className={`w-3.5 h-3.5 rounded-full ${
-                    agvStatus === 'OK' ? 'bg-success' : 'bg-error animate-ping'
+                  className={`px-4 py-2 text-lg font-black rounded-full flex items-center gap-2 border shadow-sm transition-all duration-300 ${
+                    agv1Status === 'OK'
+                      ? 'bg-success-background text-success-foreground border-success'
+                      : 'bg-error-background text-error-foreground border-error animate-pulse'
                   }`}
-                />
-                AGV: {agvStatus}
-              </span>
+                >
+                  <span
+                    className={`w-3 h-3 rounded-full ${
+                      agv1Status === 'OK' ? 'bg-success' : 'bg-error animate-ping'
+                    }`}
+                  />
+                  AGV 1: {agv1Status}
+                </span>
+                {/* AGV 2 Badge */}
+                <span
+                  className={`px-4 py-2 text-lg font-black rounded-full flex items-center gap-2 border shadow-sm transition-all duration-300 ${
+                    agv2Status === 'OK'
+                      ? 'bg-success-background text-success-foreground border-success'
+                      : 'bg-error-background text-error-foreground border-error animate-pulse'
+                  }`}
+                >
+                  <span
+                    className={`w-3 h-3 rounded-full ${
+                      agv2Status === 'OK' ? 'bg-success' : 'bg-error animate-ping'
+                    }`}
+                  />
+                  AGV 2: {agv2Status}
+                </span>
+              </div>
             )}
           </div>
 

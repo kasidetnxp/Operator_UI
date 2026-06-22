@@ -300,15 +300,161 @@ function generateJobId(): string {
   return `JOB-${timestamp}-${random}`;
 }
 
-// Global AGV status state
-let agvSystemStatus: 'OK' | 'ERROR' = 'OK';
+// ─── Dual AGV Status ───
+type AGVStatus = 'OK' | 'ERROR';
+let agv1Status: AGVStatus = 'OK';
+let agv2Status: AGVStatus = 'OK';
 
-export function getAGVSystemStatus(): 'OK' | 'ERROR' {
-  return agvSystemStatus;
+export function getAGV1Status(): AGVStatus { return agv1Status; }
+export function getAGV2Status(): AGVStatus { return agv2Status; }
+
+export function setAGV1Status(status: AGVStatus): void {
+  agv1Status = status;
+  addAuditLog('SYSTEM', 'SYSTEM', `AGV 1 status changed to ${status}`);
+  // Pause or resume tasks assigned to AGV-01
+  for (const task of mockTaskQueue) {
+    if (task.agvId === 'AGV-01') {
+      if (status === 'ERROR' && !isTerminal(task.status) && task.status !== 'blocked' && task.status !== 'submitted') {
+        pauseTaskProgression(task.taskId);
+      } else if (status === 'OK' && task.status === 'blocked') {
+        resumeTaskProgression(task.taskId);
+      }
+    }
+  }
 }
 
-export function setAGVSystemStatus(status: 'OK' | 'ERROR'): void {
-  agvSystemStatus = status;
+export function setAGV2Status(status: AGVStatus): void {
+  agv2Status = status;
+  addAuditLog('SYSTEM', 'SYSTEM', `AGV 2 status changed to ${status}`);
+  // Pause or resume tasks assigned to AGV-02
+  for (const task of mockTaskQueue) {
+    if (task.agvId === 'AGV-02') {
+      if (status === 'ERROR' && !isTerminal(task.status) && task.status !== 'blocked' && task.status !== 'submitted') {
+        pauseTaskProgression(task.taskId);
+      } else if (status === 'OK' && task.status === 'blocked') {
+        resumeTaskProgression(task.taskId);
+      }
+    }
+  }
+}
+
+// Legacy compat — returns ERROR if either AGV is ERROR
+export function getAGVSystemStatus(): AGVStatus {
+  return (agv1Status === 'ERROR' || agv2Status === 'ERROR') ? 'ERROR' : 'OK';
+}
+export function setAGVSystemStatus(status: AGVStatus): void {
+  setAGV1Status(status);
+  setAGV2Status(status);
+}
+
+function isTerminal(status: TaskResponse['status']): boolean {
+  return ['completed', 'complete', 'canceled', 'failed', 'rejected', 'error'].includes(status);
+}
+
+// ─── Step-Based Progression Engine ───
+const RETURN_STEPS: TaskResponse['status'][] = [
+  'queued', 'starting', 'moving_to_source', 'arrived_at_source',
+  'picking_up_fpc', 'waiting_cover_head_install'
+];
+const REQUEST_STEPS: TaskResponse['status'][] = [
+  'queued', 'starting', 'moving_to_source', 'arrived_at_source',
+  'picking_up_fpc', 'moving_to_destination', 'arrived_at_destination',
+  'placing_fpc', 'waiting_cover_head_remove'
+];
+const SWAP_STEPS: TaskResponse['status'][] = [
+  'queued', 'starting', 'moving_to_source', 'arrived_at_source',
+  'picking_up_fpc', 'waiting_cover_head_install'
+];
+
+const STEP_DELAYS: Record<string, number> = {
+  queued: 1500,
+  starting: 2500,
+  moving_to_source: 3000,
+  arrived_at_source: 3500,
+  picking_up_fpc: 3500,
+  waiting_cover_head_install: 3500,
+  moving_to_destination: 4000,
+  arrived_at_destination: 3500,
+  placing_fpc: 3500,
+  waiting_cover_head_remove: 3500,
+};
+
+// Active timer handles per task
+const activeTimers = new Map<string, ReturnType<typeof setTimeout>>();
+// Saved "next step" for paused tasks so we can resume
+const pausedNextStep = new Map<string, TaskResponse['status']>();
+
+function getStepsForType(type: TaskResponse['type']): TaskResponse['status'][] {
+  if (type === 'return') return RETURN_STEPS;
+  if (type === 'request') return REQUEST_STEPS;
+  return SWAP_STEPS;
+}
+
+function scheduleNextStep(taskId: string, nextStatus: TaskResponse['status']): void {
+  const delayMs = STEP_DELAYS[nextStatus] || 3000;
+  const timer = setTimeout(() => {
+    activeTimers.delete(taskId);
+    updateTaskStatus(taskId, nextStatus);
+  }, delayMs);
+  activeTimers.set(taskId, timer);
+}
+
+function pauseTaskProgression(taskId: string): void {
+  const task = mockTaskQueue.find(t => t.taskId === taskId);
+  if (!task || isTerminal(task.status)) return;
+
+  // Clear pending timer
+  const timer = activeTimers.get(taskId);
+  if (timer) {
+    clearTimeout(timer);
+    activeTimers.delete(taskId);
+  }
+
+  // Determine what the next step would have been
+  const steps = getStepsForType(task.type);
+  const currentIdx = steps.indexOf(task.status);
+  if (currentIdx >= 0 && currentIdx < steps.length - 1) {
+    pausedNextStep.set(taskId, steps[currentIdx + 1]);
+  }
+
+  // Mark as blocked
+  const previousStatus = task.status;
+  task.status = 'blocked';
+  addAuditLog('STATE_CHANGE', task.employeeId, `Job ${task.jobId} BLOCKED (was ${previousStatus}) — assigned AGV is in ERROR state`);
+}
+
+function resumeTaskProgression(taskId: string): void {
+  const task = mockTaskQueue.find(t => t.taskId === taskId);
+  if (!task || task.status !== 'blocked') return;
+
+  // Restore to the saved next step, or find the next step from savedPre state
+  const savedStep = pausedNextStep.get(taskId);
+  pausedNextStep.delete(taskId);
+
+  if (savedStep) {
+    // Resume: schedule the next step
+    addAuditLog('STATE_CHANGE', task.employeeId, `Job ${task.jobId} RESUMED — AGV back to OK, scheduling ${savedStep}`);
+    // Put task back to a running state temporarily, then let scheduleNextStep advance
+    const steps = getStepsForType(task.type);
+    const savedIdx = steps.indexOf(savedStep);
+    if (savedIdx > 0) {
+      task.status = steps[savedIdx - 1];
+    } else {
+      task.status = 'queued';
+    }
+    scheduleNextStep(taskId, savedStep);
+  } else {
+    // Fallback: just set to queued and let it re-run
+    task.status = 'queued';
+    addAuditLog('STATE_CHANGE', task.employeeId, `Job ${task.jobId} RESUMED — AGV back to OK`);
+  }
+}
+
+function startProgression(taskId: string, type: TaskResponse['type']): void {
+  const steps = getStepsForType(type);
+  if (steps.length > 0) {
+    scheduleNextStep(taskId, steps[0]);
+  }
 }
 
 // ─── API Functions (stub — replace with real fetch/axios calls) ───
@@ -444,13 +590,8 @@ export async function submitReturnFPCJob(
   mockTaskQueue.push(task);
   addAuditLog('TASK_SUBMIT', employeeId, `Submitted Return FPC job (Job: ${jobId}). Source: ${machine?.name || sourceMachineId}`);
 
-  // Detailed status progression
-  setTimeout(() => updateTaskStatus(taskId, 'queued'), 1500);
-  setTimeout(() => updateTaskStatus(taskId, 'starting'), 4000);
-  setTimeout(() => updateTaskStatus(taskId, 'moving_to_source'), 7000);
-  setTimeout(() => updateTaskStatus(taskId, 'arrived_at_source'), 11000);
-  setTimeout(() => updateTaskStatus(taskId, 'picking_up_fpc'), 14500);
-  setTimeout(() => updateTaskStatus(taskId, 'waiting_cover_head_install'), 18000);
+  // Step-based progression
+  startProgression(taskId, 'return');
 
   return task;
 }
@@ -483,16 +624,8 @@ export async function submitRequestFPCJob(
   mockTaskQueue.push(task);
   addAuditLog('TASK_SUBMIT', employeeId, `Submitted Request FPC job (Job: ${jobId}). FPC: ${fpcId}, Destination: ${machine?.name || destinationMachineId}`);
 
-  // Detailed status progression
-  setTimeout(() => updateTaskStatus(taskId, 'queued'), 1500);
-  setTimeout(() => updateTaskStatus(taskId, 'starting'), 4000);
-  setTimeout(() => updateTaskStatus(taskId, 'moving_to_source'), 7000);
-  setTimeout(() => updateTaskStatus(taskId, 'arrived_at_source'), 11000);
-  setTimeout(() => updateTaskStatus(taskId, 'picking_up_fpc'), 14500);
-  setTimeout(() => updateTaskStatus(taskId, 'moving_to_destination'), 18000);
-  setTimeout(() => updateTaskStatus(taskId, 'arrived_at_destination'), 22000);
-  setTimeout(() => updateTaskStatus(taskId, 'placing_fpc'), 25500);
-  setTimeout(() => updateTaskStatus(taskId, 'waiting_cover_head_remove'), 29000);
+  // Step-based progression
+  startProgression(taskId, 'request');
 
   return task;
 }
@@ -526,13 +659,8 @@ export async function submitSwapFPCJob(
   mockTaskQueue.push(task);
   addAuditLog('TASK_SUBMIT', employeeId, `Submitted Swap FPC job (Job: ${jobId}). Source: ${srcMachine?.name || sourceMachineId}, Destination: ${destMachine?.name || destinationMachineId}`);
 
-  // Detailed status progression
-  setTimeout(() => updateTaskStatus(taskId, 'queued'), 1500);
-  setTimeout(() => updateTaskStatus(taskId, 'starting'), 4000);
-  setTimeout(() => updateTaskStatus(taskId, 'moving_to_source'), 7000);
-  setTimeout(() => updateTaskStatus(taskId, 'arrived_at_source'), 11000);
-  setTimeout(() => updateTaskStatus(taskId, 'picking_up_fpc'), 14500);
-  setTimeout(() => updateTaskStatus(taskId, 'waiting_cover_head_install'), 18000);
+  // Step-based progression
+  startProgression(taskId, 'swap');
 
   return task;
 }
@@ -621,7 +749,7 @@ export async function getAllTasks(): Promise<TaskResponse[]> {
 export function updateTaskStatus(taskId: string, status: TaskResponse['status']): void {
   const task = mockTaskQueue.find(t => t.taskId === taskId);
   if (task) {
-    if (task.status === 'canceled') return;
+    if (task.status === 'canceled' || task.status === 'blocked') return;
     task.status = status;
 
     // Assign AGV dynamically when the task is accepted / queued
@@ -630,6 +758,15 @@ export function updateTaskStatus(taskId: string, status: TaskResponse['status'])
     }
 
     addAuditLog('STATE_CHANGE', task.employeeId, `Job ${task.jobId} status updated to ${status}`);
+
+    // Check if the assigned AGV is in ERROR — block immediately
+    if (task.agvId) {
+      const agvOK = task.agvId === 'AGV-01' ? agv1Status === 'OK' : agv2Status === 'OK';
+      if (!agvOK && !isTerminal(status) && status !== 'submitted') {
+        pauseTaskProgression(taskId);
+        return;
+      }
+    }
 
     // Simulate AGV physical button confirmation after 5 seconds
     if (status === 'waiting_cover_head_install') {
@@ -640,6 +777,14 @@ export function updateTaskStatus(taskId: string, status: TaskResponse['status'])
       setTimeout(() => {
         confirmCoverHeadRemoved(taskId);
       }, 5000);
+    } else {
+      // Schedule next step in progression (for non-waiting statuses)
+      const steps = getStepsForType(task.type);
+      const currentIdx = steps.indexOf(status);
+      if (currentIdx >= 0 && currentIdx < steps.length - 1) {
+        const nextStatus = steps[currentIdx + 1];
+        scheduleNextStep(taskId, nextStatus);
+      }
     }
   }
 }

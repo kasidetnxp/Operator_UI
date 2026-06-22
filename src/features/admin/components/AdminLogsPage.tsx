@@ -49,8 +49,10 @@ import {
   mockMachines,
   type AuditLog,
   type FPCItem,
-  getAGVSystemStatus,
-  setAGVSystemStatus,
+  getAGV1Status,
+  getAGV2Status,
+  setAGV1Status,
+  setAGV2Status,
   clearAuditLogs,
   getUsers,
   addUser,
@@ -70,7 +72,8 @@ interface AdminLogsPageProps {
 export function AdminLogsPage({ employeeId, userRole, language, onBack }: AdminLogsPageProps) {
   // Page Tab state (logs, location, users)
   const [activeTab, setActiveTab] = useState<string>('logs');
-  const [agvStatus, setLocalAgvStatus] = useState<'OK' | 'ERROR'>(getAGVSystemStatus());
+  const [agv1Status, setLocalAgv1Status] = useState<'OK' | 'ERROR'>(getAGV1Status());
+  const [agv2Status, setLocalAgv2Status] = useState<'OK' | 'ERROR'>(getAGV2Status());
 
   // Audit Logs state
   const [logs, setLogs] = useState<AuditLog[]>([]);
@@ -128,7 +131,8 @@ export function AdminLogsPage({ employeeId, userRole, language, onBack }: AdminL
       if (userRole === 'admin' || userRole === 'store') {
         setFpcItems(results[1] as FPCItem[]);
       }
-      setLocalAgvStatus(getAGVSystemStatus());
+      setLocalAgv1Status(getAGV1Status());
+      setLocalAgv2Status(getAGV2Status());
     } catch (err) {
       console.error('Failed to fetch admin data:', err);
     } finally {
@@ -523,20 +527,36 @@ export function AdminLogsPage({ employeeId, userRole, language, onBack }: AdminL
 
         <div className="flex flex-wrap gap-4 w-full sm:w-auto">
           {userRole === 'admin' && (
-            <Button
-              variant="contained"
-              color={agvStatus === 'OK' ? 'success' : 'error'}
-              onClick={() => {
-                const nextStatus = agvStatus === 'OK' ? 'ERROR' : 'OK';
-                setAGVSystemStatus(nextStatus);
-                setLocalAgvStatus(nextStatus);
-              }}
-              className="!py-3 !px-5 !text-lg !font-semibold !rounded-xl"
-            >
-              {language === 'th'
-                ? `สลับสถานะ AGV: ${agvStatus}`
-                : `Toggle AGV: ${agvStatus}`}
-            </Button>
+            <div className="flex flex-col sm:flex-row gap-3">
+              <Button
+                variant="contained"
+                color={agv1Status === 'OK' ? 'success' : 'error'}
+                onClick={() => {
+                  const nextStatus = agv1Status === 'OK' ? 'ERROR' : 'OK';
+                  setAGV1Status(nextStatus);
+                  setLocalAgv1Status(nextStatus);
+                }}
+                className="!py-3 !px-5 !text-lg !font-semibold !rounded-xl"
+              >
+                {language === 'th'
+                  ? `สลับ AGV 1: ${agv1Status}`
+                  : `Toggle AGV 1: ${agv1Status}`}
+              </Button>
+              <Button
+                variant="contained"
+                color={agv2Status === 'OK' ? 'success' : 'error'}
+                onClick={() => {
+                  const nextStatus = agv2Status === 'OK' ? 'ERROR' : 'OK';
+                  setAGV2Status(nextStatus);
+                  setLocalAgv2Status(nextStatus);
+                }}
+                className="!py-3 !px-5 !text-lg !font-semibold !rounded-xl"
+              >
+                {language === 'th'
+                  ? `สลับ AGV 2: ${agv2Status}`
+                  : `Toggle AGV 2: ${agv2Status}`}
+              </Button>
+            </div>
           )}
 
           <Button
