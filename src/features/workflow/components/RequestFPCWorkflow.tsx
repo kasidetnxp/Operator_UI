@@ -100,7 +100,7 @@ export function RequestFPCWorkflow({ employeeId, language, onBack, onTaskSubmitt
         >
           {t.back}
         </Button>
-        <h2 className="text-4xl font-bold text-gray-900">
+        <h2 className="text-4xl font-bold text-foreground">
           {t.requestFPC}
         </h2>
         <div className="w-40" />
@@ -109,9 +109,9 @@ export function RequestFPCWorkflow({ employeeId, language, onBack, onTaskSubmitt
       {/* Two-column layout */}
       <div className="flex-1 grid grid-cols-2 gap-6 min-h-0">
         {/* Left — FPC Search */}
-        <Card className="flex flex-col">
+        <Card className="flex flex-col bg-card border border-border">
           <CardContent className="p-8 flex flex-col flex-1 min-h-0">
-            <h3 className="text-3xl font-bold mb-6 text-gray-900">{t.searchFPC}</h3>
+            <h3 className="text-3xl font-bold mb-6 text-foreground">{t.searchFPC}</h3>
 
             <TextField
               fullWidth
@@ -126,22 +126,22 @@ export function RequestFPCWorkflow({ employeeId, language, onBack, onTaskSubmitt
 
             {isLoading ? (
               <div className="flex-1 flex items-center justify-center">
-                <p className="text-2xl text-gray-500">{t.pleaseWait}</p>
+                <p className="text-2xl text-muted-foreground">{t.pleaseWait}</p>
               </div>
             ) : filteredFPCItems.length === 0 ? (
               <Alert severity="info" className="!text-xl !py-4">
                 {t.noResults}
               </Alert>
             ) : (
-              <div className="flex-1 overflow-auto border rounded-lg">
+              <div className="flex-1 overflow-auto border border-border rounded-lg bg-card">
                 <Table stickyHeader>
                   <TableHead>
                     <TableRow>
-                      <TableCell padding="checkbox" className="!bg-gray-100" />
-                      <TableCell className="!text-xl !font-bold !bg-gray-100 !py-4">{t.address}</TableCell>
-                      <TableCell className="!text-xl !font-bold !bg-gray-100 !py-4">{t.function}</TableCell>
-                      <TableCell className="!text-xl !font-bold !bg-gray-100 !py-4">{t.label}</TableCell>
-                      <TableCell className="!text-xl !font-bold !bg-gray-100 !py-4">{t.comment}</TableCell>
+                      <TableCell padding="checkbox" className="!bg-background" />
+                      <TableCell className="!text-xl !font-bold !bg-background !text-muted-foreground !py-4">{t.address}</TableCell>
+                      <TableCell className="!text-xl !font-bold !bg-background !text-muted-foreground !py-4">{t.function}</TableCell>
+                      <TableCell className="!text-xl !font-bold !bg-background !text-muted-foreground !py-4">{t.label}</TableCell>
+                      <TableCell className="!text-xl !font-bold !bg-background !text-muted-foreground !py-4">{t.comment}</TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>
@@ -153,8 +153,8 @@ export function RequestFPCWorkflow({ employeeId, language, onBack, onTaskSubmitt
                         className="cursor-pointer"
                         selected={selectedFPC?.id === fpc.id}
                         sx={{
-                          '&.Mui-selected': { backgroundColor: 'rgba(25, 118, 210, 0.12)' },
-                          '&.Mui-selected:hover': { backgroundColor: 'rgba(25, 118, 210, 0.2)' },
+                          '&.Mui-selected': { backgroundColor: 'var(--info-background)' },
+                          '&.Mui-selected:hover': { backgroundColor: 'var(--info-background)' },
                         }}
                       >
                         <TableCell padding="checkbox" className="!py-4">
@@ -163,10 +163,10 @@ export function RequestFPCWorkflow({ employeeId, language, onBack, onTaskSubmitt
                             sx={{ '& .MuiSvgIcon-root': { fontSize: 32 } }}
                           />
                         </TableCell>
-                        <TableCell className="!text-xl !py-4">{fpc.address}</TableCell>
-                        <TableCell className="!text-xl !py-4">{fpc.functionName}</TableCell>
-                        <TableCell className="!text-xl !py-4">{fpc.label}</TableCell>
-                        <TableCell className="!text-xl !py-4">{fpc.comment || '-'}</TableCell>
+                        <TableCell className="!text-xl !py-4 text-foreground">{fpc.address}</TableCell>
+                        <TableCell className="!text-xl !py-4 text-foreground">{fpc.functionName}</TableCell>
+                        <TableCell className="!text-xl !py-4 text-info">{fpc.label}</TableCell>
+                        <TableCell className="!text-xl !py-4 text-muted-foreground">{fpc.comment || '-'}</TableCell>
                       </TableRow>
                     ))}
                   </TableBody>
@@ -177,7 +177,7 @@ export function RequestFPCWorkflow({ employeeId, language, onBack, onTaskSubmitt
         </Card>
 
         {/* Right — Destination Machine */}
-        <Card className="flex flex-col overflow-hidden">
+        <Card className="flex flex-col overflow-hidden bg-card border border-border">
           <CardContent className="p-8 flex flex-col flex-1 min-h-0">
             <div className="flex-1 min-h-0">
               <MachineSelector
@@ -216,28 +216,28 @@ export function RequestFPCWorkflow({ employeeId, language, onBack, onTaskSubmitt
         onClose={() => setShowConfirmDialog(false)}
         maxWidth="sm"
         fullWidth
-        PaperProps={{ className: '!p-4' }}
+        PaperProps={{ className: '!p-4 !bg-card !text-foreground' }}
       >
         <DialogTitle className="!text-3xl !font-bold !pb-4">
           {t.confirmSubmit}
         </DialogTitle>
         <DialogContent>
           <div className="space-y-4 py-4">
-            <p className="text-2xl text-gray-700 mb-6">
+            <p className="text-2xl text-foreground mb-6">
               {t.confirmSubmitMessage}
             </p>
-            <div className="bg-gray-50 rounded-lg p-6 space-y-3">
+            <div className="bg-background rounded-lg p-6 space-y-3 border border-border">
               <div className="flex justify-between text-xl">
-                <span className="text-gray-600">{t.probecardToReceive}:</span>
-                <span className="font-bold text-blue-600">{selectedFPC?.id}</span>
+                <span className="text-muted-foreground">{t.probecardToReceive}:</span>
+                <span className="font-bold text-info">{selectedFPC?.id}</span>
               </div>
-              <div className="flex justify-between text-xl border-t border-gray-200 pt-3">
-                <span className="text-gray-600">{t.source}:</span>
-                <span className="font-bold text-gray-900">{t.smartStorage}</span>
+              <div className="flex justify-between text-xl border-t border-border pt-3">
+                <span className="text-muted-foreground">{t.source}:</span>
+                <span className="font-bold text-foreground">{t.smartStorage}</span>
               </div>
               <div className="flex justify-between text-xl">
-                <span className="text-gray-600">{t.destination}:</span>
-                <span className="font-bold text-gray-900">{selectedMachineName}</span>
+                <span className="text-muted-foreground">{t.destination}:</span>
+                <span className="font-bold text-foreground">{selectedMachineName}</span>
               </div>
             </div>
           </div>

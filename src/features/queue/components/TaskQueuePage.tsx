@@ -151,7 +151,7 @@ export function TaskQueuePage({ employeeId, language, onBack, onNewTask }: TaskQ
         >
           {t.back}
         </Button>
-        <h2 className="text-4xl font-bold text-gray-900">
+        <h2 className="text-4xl font-bold text-foreground">
           {t.taskQueuePage}
         </h2>
         <Button
@@ -168,12 +168,12 @@ export function TaskQueuePage({ employeeId, language, onBack, onNewTask }: TaskQ
         {/* Left — Queue list */}
         <Card className="w-1/3 flex flex-col overflow-hidden">
           <CardContent className="p-6 flex flex-col flex-1 min-h-0">
-            <h3 className="text-3xl font-bold mb-6 text-gray-900">{t.taskQueue}</h3>
+            <h3 className="text-3xl font-bold mb-6 text-foreground">{t.taskQueue}</h3>
 
             <div className="flex-1 overflow-auto space-y-3">
               {tasks.length === 0 ? (
                 <div className="flex items-center justify-center h-40">
-                  <p className="text-xl text-gray-500">{t.noTasksInQueue}</p>
+                  <p className="text-xl text-muted-foreground">{t.noTasksInQueue}</p>
                 </div>
               ) : (
                 tasks.map((task) => (
@@ -183,8 +183,8 @@ export function TaskQueuePage({ employeeId, language, onBack, onNewTask }: TaskQ
                     className={`
                       w-full text-left p-5 rounded-lg border-2 transition-all
                       ${selectedTask?.taskId === task.taskId
-                        ? 'bg-blue-50 border-blue-500 shadow-md'
-                        : 'bg-white border-gray-300 hover:border-blue-300 hover:shadow-sm'
+                        ? 'bg-info-background border-info shadow-md'
+                        : 'bg-card border-border hover:border-info hover:shadow-sm'
                       }
                       ${isMyTask(task) ? 'ring-2 ring-green-400' : ''}
                     `}
@@ -192,13 +192,13 @@ export function TaskQueuePage({ employeeId, language, onBack, onNewTask }: TaskQ
                     <div className="space-y-2">
                       <div className="flex items-start justify-between">
                         <div className="flex-1">
-                          <div className="text-lg font-bold text-gray-900 mb-1">
+                          <div className="text-lg font-bold text-foreground mb-1">
                             {task.jobId}
                           </div>
-                          <div className="text-sm text-gray-600">
+                          <div className="text-sm text-muted-foreground">
                             {task.type === 'return' ? t.returnFPC : task.type === 'request' ? t.requestFPC : t.swapFPC}
                           </div>
-                          <div className="text-sm text-gray-500 font-semibold mt-1">
+                          <div className="text-sm text-muted-foreground font-semibold mt-1">
                             {t.assignedAGV}: {task.agvId ? task.agvId : t.notAssigned}
                           </div>
                         </div>
@@ -214,11 +214,11 @@ export function TaskQueuePage({ employeeId, language, onBack, onNewTask }: TaskQ
 
                       <div className="flex items-center gap-2">
                         {(task.status === 'complete' || task.status === 'completed') ? (
-                          <CheckCircle className="w-5 h-5 text-green-600" />
+                          <CheckCircle className="w-5 h-5 text-success" />
                         ) : (
-                          <Clock className="w-5 h-5 text-blue-600" />
+                          <Clock className="w-5 h-5 text-info" />
                         )}
-                        <span className={`text-sm font-medium ${(task.status === 'complete' || task.status === 'completed') ? 'text-green-700' : 'text-blue-700'
+                        <span className={`text-sm font-medium ${(task.status === 'complete' || task.status === 'completed') ? 'text-success-foreground' : 'text-info-foreground'
                           }`}>
                           {getStatusLabel(task.status)}
                         </span>
@@ -236,47 +236,47 @@ export function TaskQueuePage({ employeeId, language, onBack, onNewTask }: TaskQ
           <CardContent className="p-8 h-full flex flex-col">
             {selectedTask ? (
               <>
-                <h3 className="text-3xl font-bold mb-6 text-gray-900">{t.taskDetails}</h3>
+                <h3 className="text-3xl font-bold mb-6 text-foreground">{t.taskDetails}</h3>
 
                 <div className="flex-1 overflow-auto space-y-6">
-                  <div className="bg-gray-50 rounded-lg p-6 space-y-4">
-                    <div className="flex justify-between text-xl border-b border-gray-200 pb-3">
-                      <span className="text-gray-600 font-semibold">{t.jobId}:</span>
-                      <span className="font-bold text-gray-900">{selectedTask.jobId}</span>
+                  <div className="bg-background rounded-lg p-6 space-y-4">
+                    <div className="flex justify-between text-xl border-b border-border pb-3">
+                      <span className="text-muted-foreground font-semibold">{t.jobId}:</span>
+                      <span className="font-bold text-foreground">{selectedTask.jobId}</span>
                     </div>
-                    <div className="flex justify-between text-xl border-b border-gray-200 pb-3">
-                      <span className="text-gray-600 font-semibold">{t.type}:</span>
-                      <span className="font-bold text-gray-900">
+                    <div className="flex justify-between text-xl border-b border-border pb-3">
+                      <span className="text-muted-foreground font-semibold">{t.type}:</span>
+                      <span className="font-bold text-foreground">
                         {selectedTask.type === 'return' ? t.returnFPC : selectedTask.type === 'request' ? t.requestFPC : t.swapFPC}
                       </span>
                     </div>
                     {selectedTask.fpcId && (
-                      <div className="flex justify-between text-xl border-b border-gray-200 pb-3">
-                        <span className="text-gray-600 font-semibold">{t.fpcId}:</span>
-                        <span className="font-bold text-gray-900">{selectedTask.fpcId}</span>
+                      <div className="flex justify-between text-xl border-b border-border pb-3">
+                        <span className="text-muted-foreground font-semibold">{t.fpcId}:</span>
+                        <span className="font-bold text-foreground">{selectedTask.fpcId}</span>
                       </div>
                     )}
-                    <div className="flex justify-between text-xl border-b border-gray-200 pb-3">
-                      <span className="text-gray-600 font-semibold">{t.assignedAGV}:</span>
-                      <span className={`font-bold ${selectedTask.agvId ? 'text-gray-900' : 'text-gray-500 italic'}`}>
+                    <div className="flex justify-between text-xl border-b border-border pb-3">
+                      <span className="text-muted-foreground font-semibold">{t.assignedAGV}:</span>
+                      <span className={`font-bold ${selectedTask.agvId ? 'text-foreground' : 'text-muted-foreground italic'}`}>
                         {selectedTask.agvId ? selectedTask.agvId : t.notAssigned}
                       </span>
                     </div>
-                    <div className="flex justify-between text-xl border-b border-gray-200 pb-3">
-                      <span className="text-gray-600 font-semibold">{t.source}:</span>
-                      <span className="font-bold text-gray-900">{selectedTask.sourceMachine}</span>
+                    <div className="flex justify-between text-xl border-b border-border pb-3">
+                      <span className="text-muted-foreground font-semibold">{t.source}:</span>
+                      <span className="font-bold text-foreground">{selectedTask.sourceMachine}</span>
                     </div>
-                    <div className="flex justify-between text-xl border-b border-gray-200 pb-3">
-                      <span className="text-gray-600 font-semibold">{t.destination}:</span>
-                      <span className="font-bold text-gray-900">{selectedTask.destinationMachine}</span>
+                    <div className="flex justify-between text-xl border-b border-border pb-3">
+                      <span className="text-muted-foreground font-semibold">{t.destination}:</span>
+                      <span className="font-bold text-foreground">{selectedTask.destinationMachine}</span>
                     </div>
-                    <div className="flex justify-between text-xl border-b border-gray-200 pb-3">
-                      <span className="text-gray-600 font-semibold">{t.submittedBy}:</span>
-                      <span className="font-bold text-gray-900">{selectedTask.employeeId}</span>
+                    <div className="flex justify-between text-xl border-b border-border pb-3">
+                      <span className="text-muted-foreground font-semibold">{t.submittedBy}:</span>
+                      <span className="font-bold text-foreground">{selectedTask.employeeId}</span>
                     </div>
                     <div className="flex justify-between text-xl">
-                      <span className="text-gray-600 font-semibold">{t.createdAt}:</span>
-                      <span className="font-bold text-gray-900">{formatDateTime(selectedTask.createdAt)}</span>
+                      <span className="text-muted-foreground font-semibold">{t.createdAt}:</span>
+                      <span className="font-bold text-foreground">{formatDateTime(selectedTask.createdAt)}</span>
                     </div>
                   </div>
 
@@ -316,7 +316,7 @@ export function TaskQueuePage({ employeeId, language, onBack, onNewTask }: TaskQ
               </>
             ) : (
               <div className="flex-1 flex items-center justify-center">
-                <p className="text-2xl text-gray-500">{t.noTasksInQueue}</p>
+                <p className="text-2xl text-muted-foreground">{t.noTasksInQueue}</p>
               </div>
             )}
           </CardContent>
@@ -336,18 +336,18 @@ export function TaskQueuePage({ employeeId, language, onBack, onNewTask }: TaskQ
         </DialogTitle>
         <DialogContent>
           <div className="space-y-4 py-4">
-            <p className="text-2xl text-gray-700 mb-6">
+            <p className="text-2xl text-foreground mb-6">
               {t.confirmCancelMessage}
             </p>
             {selectedTask && (
-              <div className="bg-gray-50 rounded-lg p-6 space-y-3">
+              <div className="bg-background rounded-lg p-6 space-y-3 border border-border">
                 <div className="flex justify-between text-xl">
-                  <span className="text-gray-600">{t.jobId}:</span>
-                  <span className="font-bold text-gray-900">{selectedTask.jobId}</span>
+                  <span className="text-muted-foreground">{t.jobId}:</span>
+                  <span className="font-bold text-foreground">{selectedTask.jobId}</span>
                 </div>
                 <div className="flex justify-between text-xl">
-                  <span className="text-gray-600">{t.type}:</span>
-                  <span className="font-bold text-gray-900">
+                  <span className="text-muted-foreground">{t.type}:</span>
+                  <span className="font-bold text-foreground">
                     {selectedTask.type === 'return' ? t.returnFPC : selectedTask.type === 'request' ? t.requestFPC : t.swapFPC}
                   </span>
                 </div>

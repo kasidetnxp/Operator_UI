@@ -74,13 +74,13 @@ export function ReturnFPCWorkflow({ employeeId, language, onBack, onTaskSubmitte
         >
           {t.back}
         </Button>
-        <h2 className="text-4xl font-bold text-gray-900">
+        <h2 className="text-4xl font-bold text-foreground">
           {t.returnFPC}
         </h2>
         <div className="w-40" />
       </div>
 
-      <Card className="flex-1 overflow-hidden">
+      <Card className="flex-1 overflow-hidden bg-card border border-border">
         <CardContent className="p-8 h-full flex flex-col">
           <div className="flex-1 min-h-0">
             <MachineSelector
@@ -117,28 +117,28 @@ export function ReturnFPCWorkflow({ employeeId, language, onBack, onTaskSubmitte
         onClose={() => setShowConfirmDialog(false)}
         maxWidth="sm"
         fullWidth
-        PaperProps={{ className: '!p-4' }}
+        PaperProps={{ className: '!p-4 !bg-card !text-foreground' }}
       >
         <DialogTitle className="!text-3xl !font-bold !pb-4">
           {t.confirmSubmit}
         </DialogTitle>
         <DialogContent>
           <div className="space-y-4 py-4">
-            <p className="text-2xl text-gray-700 mb-6">
+            <p className="text-2xl text-foreground mb-6">
               {t.confirmSubmitMessage}
             </p>
-            <div className="bg-gray-50 rounded-lg p-6 space-y-3">
+            <div className="bg-background rounded-lg p-6 space-y-3 border border-border">
               <div className="flex justify-between text-xl">
-                <span className="text-gray-600">{t.probecardToSend}:</span>
-                <span className="font-bold text-blue-600">{currentFPC ? currentFPC.id : '-'}</span>
+                <span className="text-muted-foreground">{t.probecardToSend}:</span>
+                <span className="font-bold text-info">{currentFPC ? currentFPC.id : '-'}</span>
               </div>
-              <div className="flex justify-between text-xl border-t border-gray-200 pt-3">
-                <span className="text-gray-600">{t.source}:</span>
-                <span className="font-bold text-gray-900">{selectedMachineName}</span>
+              <div className="flex justify-between text-xl border-t border-border pt-3">
+                <span className="text-muted-foreground">{t.source}:</span>
+                <span className="font-bold text-foreground">{selectedMachineName}</span>
               </div>
               <div className="flex justify-between text-xl">
-                <span className="text-gray-600">{t.destination}:</span>
-                <span className="font-bold text-gray-900">{t.smartStorage}</span>
+                <span className="text-muted-foreground">{t.destination}:</span>
+                <span className="font-bold text-foreground">{t.smartStorage}</span>
               </div>
             </div>
           </div>

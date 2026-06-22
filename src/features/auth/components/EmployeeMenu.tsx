@@ -32,10 +32,10 @@ export function EmployeeMenu({ employeeId, onLogout, language }: EmployeeMenuPro
     <>
       <button
         onClick={handleClick}
-        className="flex items-center gap-3 px-6 py-3 text-lg font-semibold text-gray-700 bg-white border-2 border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+        className="flex items-center gap-3 px-6 py-3 text-lg font-semibold text-muted-foreground bg-card border-2 border-border rounded-lg hover:bg-accent transition-colors"
       >
         <User className="w-6 h-6" />
-        <span className="text-xl font-bold text-gray-900">{employeeId}</span>
+        <span className="text-xl font-bold text-foreground">{employeeId}</span>
       </button>
 
       <Menu

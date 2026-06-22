@@ -74,17 +74,17 @@ export function FPCSearchPage({ language, onBack }: FPCSearchPageProps) {
         >
           {t.back}
         </Button>
-        <h2 className="text-4xl font-bold text-gray-900">
+        <h2 className="text-4xl font-bold text-foreground">
           {t.searchFPC}
         </h2>
         <div className="w-40" />
       </div>
-
+ 
       {/* Main Content Area */}
-      <Card className="flex-1 flex flex-col overflow-hidden">
+      <Card className="flex-1 flex flex-col overflow-hidden bg-card border border-border">
         <CardContent className="p-8 flex flex-col flex-1 min-h-0">
           {/* Tabs Filter */}
-          <div className="border-b border-gray-200 mb-6">
+          <div className="border-b border-border mb-6">
             <Tabs
               value={activeTab}
               onChange={handleTabChange}
@@ -110,7 +110,7 @@ export function FPCSearchPage({ language, onBack }: FPCSearchPageProps) {
               <Tab value="Deposit Production" label={t.depositProductionTab} />
             </Tabs>
           </div>
-
+ 
           {/* Search bar */}
           <TextField
             fullWidth
@@ -122,30 +122,30 @@ export function FPCSearchPage({ language, onBack }: FPCSearchPageProps) {
             InputProps={{ className: '!text-2xl !py-4' }}
             inputProps={{ style: { fontSize: '1.5rem', padding: '1rem' } }}
           />
-
+ 
           {error && (
             <Alert severity="error" className="!text-xl !py-4 !mb-6">
               {error}
             </Alert>
           )}
-
+ 
           {isLoading ? (
             <div className="flex-1 flex items-center justify-center">
-              <p className="text-2xl text-gray-500">{t.pleaseWait}</p>
+              <p className="text-2xl text-muted-foreground">{t.pleaseWait}</p>
             </div>
           ) : filteredItems.length === 0 ? (
-            <div className="flex-1 flex items-center justify-center border rounded-lg bg-gray-50">
-              <p className="text-2xl text-gray-400">{t.noResults}</p>
+            <div className="flex-1 flex items-center justify-center border border-border rounded-lg bg-background">
+              <p className="text-2xl text-muted-foreground">{t.noResults}</p>
             </div>
           ) : (
-            <div className="flex-1 overflow-auto border rounded-lg shadow-inner bg-white">
+            <div className="flex-1 overflow-auto border border-border rounded-lg shadow-inner bg-card">
               <Table stickyHeader>
                 <TableHead>
                   <TableRow>
-                    <TableCell className="!text-xl !font-bold !bg-gray-100 !py-4 !pl-8">{t.address}</TableCell>
-                    <TableCell className="!text-xl !font-bold !bg-gray-100 !py-4">{t.function}</TableCell>
-                    <TableCell className="!text-xl !font-bold !bg-gray-100 !py-4">{t.label}</TableCell>
-                    <TableCell className="!text-xl !font-bold !bg-gray-100 !py-4 !pr-8">{t.comment}</TableCell>
+                    <TableCell className="!text-xl !font-bold !bg-background !text-muted-foreground !py-4 !pl-8">{t.address}</TableCell>
+                    <TableCell className="!text-xl !font-bold !bg-background !text-muted-foreground !py-4">{t.function}</TableCell>
+                    <TableCell className="!text-xl !font-bold !bg-background !text-muted-foreground !py-4">{t.label}</TableCell>
+                    <TableCell className="!text-xl !font-bold !bg-background !text-muted-foreground !py-4 !pr-8">{t.comment}</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
@@ -153,12 +153,12 @@ export function FPCSearchPage({ language, onBack }: FPCSearchPageProps) {
                     <TableRow
                       key={fpc.id}
                       hover
-                      className="transition-colors hover:bg-blue-50/40"
+                      className="transition-colors hover:bg-info-background/40"
                     >
-                      <TableCell className="!text-xl !py-5 !pl-8 font-medium text-gray-700">{fpc.address}</TableCell>
-                      <TableCell className="!text-xl !py-5 font-semibold text-gray-900">{fpc.functionName}</TableCell>
-                      <TableCell className="!text-xl !py-5 font-mono text-blue-800">{fpc.label}</TableCell>
-                      <TableCell className="!text-xl !py-5 !pr-8 text-gray-500">{fpc.comment || '-'}</TableCell>
+                      <TableCell className="!text-xl !py-5 !pl-8 font-medium text-foreground">{fpc.address}</TableCell>
+                      <TableCell className="!text-xl !py-5 font-semibold text-foreground">{fpc.functionName}</TableCell>
+                      <TableCell className="!text-xl !py-5 font-mono text-info">{fpc.label}</TableCell>
+                      <TableCell className="!text-xl !py-5 !pr-8 text-muted-foreground">{fpc.comment || '-'}</TableCell>
                     </TableRow>
                   ))}
                 </TableBody>

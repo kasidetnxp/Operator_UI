@@ -103,7 +103,7 @@ export function TaskStatus({ status, language, errorMessage }: TaskStatusProps) 
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
-          <span className="font-bold text-2xl text-gray-900">{t.status}:</span>
+          <span className="font-bold text-2xl text-foreground">{t.status}:</span>
           <Chip
             icon={config.icon}
             label={config.label}

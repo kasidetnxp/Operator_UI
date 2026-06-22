@@ -214,14 +214,14 @@ export function AdminLogsPage({ employeeId, userRole, language, onBack }: AdminL
 
   const getEventBadgeClass = (type: AuditLog['eventType']) => {
     switch (type) {
-      case 'LOGIN': return 'bg-emerald-50 text-emerald-700 border-emerald-200';
-      case 'LOGOUT': return 'bg-slate-50 text-slate-600 border-slate-200';
-      case 'TASK_SUBMIT': return 'bg-sky-50 text-sky-700 border-sky-200';
-      case 'STATE_CHANGE': return 'bg-indigo-50 text-indigo-700 border-indigo-200';
-      case 'CONFIRMATION': return 'bg-amber-50 text-amber-700 border-amber-200';
-      case 'CANCEL': return 'bg-rose-50 text-rose-700 border-rose-200';
+      case 'LOGIN': return 'bg-success-background text-success-foreground border-success/30';
+      case 'LOGOUT': return 'bg-canceled-background text-canceled-foreground border-canceled/30';
+      case 'TASK_SUBMIT': return 'bg-info-background text-info-foreground border-info/30';
+      case 'STATE_CHANGE': return 'bg-info-background text-info-foreground border-info/30';
+      case 'CONFIRMATION': return 'bg-warning-background text-warning-foreground border-warning/30';
+      case 'CANCEL': return 'bg-error-background text-error-foreground border-error/30';
       case 'SYSTEM':
-      default: return 'bg-purple-50 text-purple-700 border-purple-200';
+      default: return 'bg-muted text-muted-foreground border-border';
     }
   };
 
@@ -458,18 +458,18 @@ export function AdminLogsPage({ employeeId, userRole, language, onBack }: AdminL
         <div className="flex items-center gap-4">
           <button
             onClick={onBack}
-            className="p-3 text-gray-600 hover:text-gray-900 bg-white border-2 border-gray-200 hover:border-gray-300 rounded-xl transition-all shadow-sm flex items-center justify-center"
+            className="p-3 text-muted-foreground hover:text-foreground bg-card border border-border hover:border-muted-foreground rounded-xl transition-all shadow-sm flex items-center justify-center"
           >
             <ArrowLeft className="w-6 h-6" />
           </button>
           <div>
             <div className="flex items-center gap-2">
-              <Shield className="w-8 h-8 text-indigo-600 animate-pulse" />
-              <h2 className="text-3xl font-extrabold text-gray-900">
+              <Shield className="w-8 h-8 text-primary" />
+              <h2 className="text-3xl font-bold text-foreground">
                 {userRole === 'admin' ? t.adminPanel : t.managementPanel}
               </h2>
             </div>
-            <p className="text-gray-500 text-lg mt-1">
+            <p className="text-muted-foreground text-base mt-1">
               {activeTab === 'logs' ? t.systemLogs : activeTab === 'location' ? t.adminLocationTab : t.userManagement}
             </p>
           </div>
@@ -485,7 +485,7 @@ export function AdminLogsPage({ employeeId, userRole, language, onBack }: AdminL
                 setAGVSystemStatus(nextStatus);
                 setLocalAgvStatus(nextStatus);
               }}
-              className="!py-3 !px-5 !text-lg !font-bold !rounded-xl"
+              className="!py-3 !px-5 !text-lg !font-semibold !rounded-xl"
             >
               {language === 'th'
                 ? `สลับสถานะ AGV: ${agvStatus}`
@@ -496,7 +496,7 @@ export function AdminLogsPage({ employeeId, userRole, language, onBack }: AdminL
           <Button
             variant="outlined"
             onClick={() => fetchData(true)}
-            className="!py-3 !px-5 !text-lg !font-bold !border-2 !rounded-xl"
+            className="!py-3 !px-5 !text-lg !font-semibold !border !rounded-xl"
             startIcon={
               <RefreshCw className={`w-5 h-5 ${isRefreshing ? 'animate-spin' : ''}`} />
             }
@@ -507,7 +507,7 @@ export function AdminLogsPage({ employeeId, userRole, language, onBack }: AdminL
       </div>
 
       {/* Tabs Menu */}
-      <Box className="border-b border-gray-200 bg-white rounded-xl shadow-sm px-4">
+      <Box className="border-b border-border bg-card rounded-xl shadow-sm px-4">
         <Tabs
           value={activeTab}
           onChange={handleTabChange}
@@ -515,8 +515,8 @@ export function AdminLogsPage({ employeeId, userRole, language, onBack }: AdminL
           textColor="primary"
           sx={{
             '& .MuiTab-root': {
-              fontSize: '1.2rem',
-              fontWeight: 'bold',
+              fontSize: '1.05rem',
+              fontWeight: '600',
               py: 2,
               textTransform: 'none',
             }
@@ -552,57 +552,57 @@ export function AdminLogsPage({ employeeId, userRole, language, onBack }: AdminL
         <div className="flex flex-col flex-1 min-h-0 gap-6">
           {/* Summary Statistics Cards */}
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-            <Card className="shadow-md border-l-4 border-l-blue-600 transition-all hover:scale-[1.02]">
+            <Card className="shadow-sm border border-border transition-all hover:border-muted-foreground/40 bg-card">
               <CardContent className="flex items-center justify-between p-6">
                 <div>
-                  <p className="text-sm font-semibold text-gray-500 uppercase tracking-wider">
+                  <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                     {language === 'th' ? 'Log ทั้งหมด' : 'Total Logs'}
                   </p>
-                  <h3 className="text-4xl font-extrabold text-gray-950 mt-1">{totalCount}</h3>
+                  <h3 className="text-3xl font-semibold text-foreground mt-1">{totalCount}</h3>
                 </div>
-                <div className="p-4 bg-blue-50 text-blue-600 rounded-2xl">
+                <div className="p-4 bg-info-background text-info-foreground rounded-2xl">
                   <Activity className="w-8 h-8" />
                 </div>
               </CardContent>
             </Card>
 
-            <Card className="shadow-md border-l-4 border-l-emerald-600 transition-all hover:scale-[1.02]">
+            <Card className="shadow-sm border border-border transition-all hover:border-muted-foreground/40 bg-card">
               <CardContent className="flex items-center justify-between p-6">
                 <div>
-                  <p className="text-sm font-semibold text-gray-500 uppercase tracking-wider">
+                  <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                     {language === 'th' ? 'การเข้าใช้งาน' : 'Logins'}
                   </p>
-                  <h3 className="text-4xl font-extrabold text-gray-950 mt-1">{loginCount}</h3>
+                  <h3 className="text-3xl font-semibold text-foreground mt-1">{loginCount}</h3>
                 </div>
-                <div className="p-4 bg-emerald-50 text-emerald-600 rounded-2xl">
+                <div className="p-4 bg-success-background text-success-foreground rounded-2xl">
                   <User className="w-8 h-8" />
                 </div>
               </CardContent>
             </Card>
 
-            <Card className="shadow-md border-l-4 border-l-sky-600 transition-all hover:scale-[1.02]">
+            <Card className="shadow-sm border border-border transition-all hover:border-muted-foreground/40 bg-card">
               <CardContent className="flex items-center justify-between p-6">
                 <div>
-                  <p className="text-sm font-semibold text-gray-500 uppercase tracking-wider">
+                  <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                     {language === 'th' ? 'ส่งคำขอเคลื่อนย้าย' : 'Tasks Submitted'}
                   </p>
-                  <h3 className="text-4xl font-extrabold text-gray-950 mt-1">{taskSubmitCount}</h3>
+                  <h3 className="text-3xl font-semibold text-foreground mt-1">{taskSubmitCount}</h3>
                 </div>
-                <div className="p-4 bg-sky-50 text-sky-600 rounded-2xl">
+                <div className="p-4 bg-info-background text-info-foreground rounded-2xl">
                   <Activity className="w-8 h-8" />
                 </div>
               </CardContent>
             </Card>
 
-            <Card className="shadow-md border-l-4 border-l-indigo-600 transition-all hover:scale-[1.02]">
+            <Card className="shadow-sm border border-border transition-all hover:border-muted-foreground/40 bg-card">
               <CardContent className="flex items-center justify-between p-6">
                 <div>
-                  <p className="text-sm font-semibold text-gray-500 uppercase tracking-wider">
+                  <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                     {language === 'th' ? 'เปลี่ยนสถานะ AGV' : 'State Changes'}
                   </p>
-                  <h3 className="text-4xl font-extrabold text-gray-950 mt-1">{stateChangeCount}</h3>
+                  <h3 className="text-3xl font-semibold text-foreground mt-1">{stateChangeCount}</h3>
                 </div>
-                <div className="p-4 bg-indigo-50 text-indigo-600 rounded-2xl">
+                <div className="p-4 bg-accent text-primary rounded-2xl">
                   <Clock className="w-8 h-8" />
                 </div>
               </CardContent>
@@ -610,7 +610,7 @@ export function AdminLogsPage({ employeeId, userRole, language, onBack }: AdminL
           </div>
 
           {/* Logs Table Container */}
-          <Card className="flex flex-col flex-1 min-h-0 shadow-lg border-2 border-gray-100 rounded-2xl">
+          <Card className="flex flex-col flex-1 min-h-0 shadow-sm border border-border rounded-2xl bg-card">
             <CardContent className="flex flex-col h-full p-6 min-h-0 gap-6">
               <div className="flex flex-col md:flex-row gap-6 justify-between items-center">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 flex-1 w-full">
@@ -624,7 +624,7 @@ export function AdminLogsPage({ employeeId, userRole, language, onBack }: AdminL
                     InputProps={{
                       startAdornment: (
                         <InputAdornment position="start">
-                          <Search className="w-5 h-5 text-gray-400" />
+                          <Search className="w-5 h-5 text-muted-foreground" />
                         </InputAdornment>
                       ),
                       className: '!text-xl'
@@ -658,45 +658,45 @@ export function AdminLogsPage({ employeeId, userRole, language, onBack }: AdminL
                     variant="contained"
                     color="error"
                     onClick={() => setIsClearLogsConfirmOpen(true)}
-                    className="!py-4 !px-6 !text-lg !font-bold !rounded-xl self-end md:self-auto shrink-0"
+                    className="!py-4 !px-6 !text-lg !font-semibold !rounded-xl self-end md:self-auto shrink-0"
                   >
                     {t.clearLogs}
                   </Button>
                 )}
               </div>
 
-              <TableContainer component={Paper} className="flex-1 overflow-auto border border-gray-200 rounded-xl min-h-0 shadow-inner">
+              <TableContainer component={Paper} className="flex-1 overflow-auto border border-border rounded-xl min-h-0 bg-card">
                 <Table stickyHeader className="min-w-[700px]">
                   <TableHead>
                     <TableRow>
-                      <TableCell className="!text-lg !font-bold !bg-gray-100 !text-gray-700 !py-4" style={{ width: '15%' }}>{t.timestamp}</TableCell>
-                      <TableCell className="!text-lg !font-bold !bg-gray-100 !text-gray-700 !py-4" style={{ width: '18%' }}>{t.eventType}</TableCell>
-                      <TableCell className="!text-lg !font-bold !bg-gray-100 !text-gray-700 !py-4" style={{ width: '15%' }}>{t.operator}</TableCell>
-                      <TableCell className="!text-lg !font-bold !bg-gray-100 !text-gray-700 !py-4">{t.message}</TableCell>
+                      <TableCell className="!text-base !font-semibold !bg-background !text-muted-foreground !py-3" style={{ width: '15%' }}>{t.timestamp}</TableCell>
+                      <TableCell className="!text-base !font-semibold !bg-background !text-muted-foreground !py-3" style={{ width: '18%' }}>{t.eventType}</TableCell>
+                      <TableCell className="!text-base !font-semibold !bg-background !text-muted-foreground !py-3" style={{ width: '15%' }}>{t.operator}</TableCell>
+                      <TableCell className="!text-base !font-semibold !bg-background !text-muted-foreground !py-3">{t.message}</TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>
                     {filteredLogs.length > 0 ? (
                       filteredLogs.map((log) => (
                         <TableRow key={log.id} hover className="transition-colors">
-                          <TableCell className="!text-lg !text-gray-600 !py-4">{formatTime(log.timestamp)}</TableCell>
-                          <TableCell className="!py-4">
-                            <span className={`px-4 py-1.5 text-base font-bold rounded-full border ${getEventBadgeClass(log.eventType)}`}>
+                          <TableCell className="!text-base !text-muted-foreground !py-3">{formatTime(log.timestamp)}</TableCell>
+                          <TableCell className="!py-3">
+                            <span className={`px-4 py-1.5 text-base font-semibold rounded-full border ${getEventBadgeClass(log.eventType)}`}>
                               {getEventTypeName(log.eventType)}
                             </span>
                           </TableCell>
-                          <TableCell className="!text-lg !font-bold !text-gray-900 !py-4">
+                          <TableCell className="!text-base !font-semibold !text-foreground !py-3">
                             <div className="flex items-center gap-2">
-                              <User className="w-5 h-5 text-gray-400" />
+                              <User className="w-5 h-5 text-muted-foreground" />
                               {log.employeeId}
                             </div>
                           </TableCell>
-                          <TableCell className="!text-lg !text-gray-800 !py-4">{log.message}</TableCell>
+                          <TableCell className="!text-base !text-foreground !py-3">{log.message}</TableCell>
                         </TableRow>
                       ))
                     ) : (
                       <TableRow>
-                        <TableCell colSpan={4} className="text-center !py-12 !text-xl !text-gray-400">{t.noLogs}</TableCell>
+                        <TableCell colSpan={4} className="text-center !py-12 !text-xl !text-muted-foreground">{t.noLogs}</TableCell>
                       </TableRow>
                     )}
                   </TableBody>
@@ -710,7 +710,7 @@ export function AdminLogsPage({ employeeId, userRole, language, onBack }: AdminL
       {activeTab === 'location' && (userRole === 'admin' || userRole === 'store') && (
         // ──────────────────────── LOCATION CORRECTION TAB ────────────────────────
         <div className="flex flex-col flex-1 min-h-0 gap-6">
-          <Card className="flex flex-col flex-1 min-h-0 shadow-lg border-2 border-gray-100 rounded-2xl">
+          <Card className="flex flex-col flex-1 min-h-0 shadow-sm border border-border rounded-xl bg-card">
             <CardContent className="flex flex-col h-full p-6 min-h-0 gap-6">
               
               {/* Search & Category tabs */}
@@ -724,7 +724,7 @@ export function AdminLogsPage({ employeeId, userRole, language, onBack }: AdminL
                   InputProps={{
                     startAdornment: (
                       <InputAdornment position="start">
-                        <Search className="w-5 h-5 text-gray-400" />
+                        <Search className="w-5 h-5 text-muted-foreground" />
                       </InputAdornment>
                     ),
                     className: '!text-xl'
@@ -750,45 +750,45 @@ export function AdminLogsPage({ employeeId, userRole, language, onBack }: AdminL
               </div>
 
               {/* FPC Items Table */}
-              <TableContainer component={Paper} className="flex-1 overflow-auto border border-gray-200 rounded-xl min-h-0 shadow-inner">
+              <TableContainer component={Paper} className="flex-1 overflow-auto border border-border rounded-xl min-h-0 shadow-inner bg-card">
                 <Table stickyHeader className="min-w-[800px]">
                   <TableHead>
                     <TableRow>
-                      <TableCell className="!text-lg !font-bold !bg-gray-100 !text-gray-700 !py-4" style={{ width: '20%' }}>{t.fpcId}</TableCell>
-                      <TableCell className="!text-lg !font-bold !bg-gray-100 !text-gray-700 !py-4" style={{ width: '15%' }}>{language === 'th' ? 'ประเภท' : 'Category'}</TableCell>
-                      <TableCell className="!text-lg !font-bold !bg-gray-100 !text-gray-700 !py-4" style={{ width: '35%' }}>{t.currentLocation}</TableCell>
-                      <TableCell className="!text-lg !font-bold !bg-gray-100 !text-gray-700 !py-4" style={{ width: '15%' }}>{t.slotAddress}</TableCell>
-                      <TableCell className="!text-lg !font-bold !bg-gray-100 !text-gray-700 !py-4 !text-center">{language === 'th' ? 'การกระทำ' : 'Actions'}</TableCell>
+                      <TableCell className="!text-base !font-semibold !bg-background !text-muted-foreground !py-3" style={{ width: '20%' }}>{t.fpcId}</TableCell>
+                      <TableCell className="!text-base !font-semibold !bg-background !text-muted-foreground !py-3" style={{ width: '15%' }}>{language === 'th' ? 'ประเภท' : 'Category'}</TableCell>
+                      <TableCell className="!text-base !font-semibold !bg-background !text-muted-foreground !py-3" style={{ width: '35%' }}>{t.currentLocation}</TableCell>
+                      <TableCell className="!text-base !font-semibold !bg-background !text-muted-foreground !py-3" style={{ width: '15%' }}>{t.slotAddress}</TableCell>
+                      <TableCell className="!text-base !font-semibold !bg-background !text-muted-foreground !py-3 !text-center">{language === 'th' ? 'การกระทำ' : 'Actions'}</TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>
                     {filteredFpcs.length > 0 ? (
                       filteredFpcs.map((fpc) => (
                         <TableRow key={fpc.id} hover className="transition-colors">
-                          <TableCell className="!text-lg !font-mono !font-bold !text-gray-900 !py-4">{fpc.id}</TableCell>
-                          <TableCell className="!text-lg !text-gray-600 !py-4">{fpc.location === 'Smart Storage' ? fpc.category : '-'}</TableCell>
-                          <TableCell className="!text-lg !py-4">
+                          <TableCell className="!text-base !font-mono !font-semibold !text-foreground !py-3">{fpc.id}</TableCell>
+                          <TableCell className="!text-base !text-muted-foreground !py-3">{fpc.location === 'Smart Storage' ? fpc.category : '-'}</TableCell>
+                          <TableCell className="!text-base !py-3">
                             <div className="flex items-center gap-2">
                               {fpc.location === 'Smart Storage' ? (
                                 <>
-                                  <Database className="w-5 h-5 text-sky-600" />
-                                  <span className="font-semibold text-sky-800">{t.smartStorage}</span>
+                                  <Database className="w-5 h-5 text-info" />
+                                  <span className="font-semibold text-info-foreground">{t.smartStorage}</span>
                                 </>
                               ) : (
                                 <>
-                                  <Monitor className="w-5 h-5 text-indigo-600" />
-                                  <span className="font-bold text-indigo-800">{fpc.location}</span>
+                                  <Monitor className="w-5 h-5 text-primary" />
+                                  <span className="font-semibold text-foreground">{fpc.location}</span>
                                 </>
                               )}
                             </div>
                           </TableCell>
-                          <TableCell className="!text-lg !font-semibold !text-gray-700 !py-4">{fpc.address}</TableCell>
-                          <TableCell className="!py-4 !text-center">
+                          <TableCell className="!text-base !font-medium !text-muted-foreground !py-3">{fpc.address}</TableCell>
+                          <TableCell className="!py-3 !text-center">
                             <Button
                               variant="outlined"
                               onClick={() => handleOpenEdit(fpc)}
                               startIcon={<Edit className="w-4 h-4" />}
-                              className="!font-bold !rounded-lg !text-base"
+                              className="!font-semibold !rounded-lg !text-base"
                             >
                               {t.editLocation}
                             </Button>
@@ -797,7 +797,7 @@ export function AdminLogsPage({ employeeId, userRole, language, onBack }: AdminL
                       ))
                     ) : (
                       <TableRow>
-                        <TableCell colSpan={5} className="text-center !py-12 !text-xl !text-gray-400">
+                        <TableCell colSpan={5} className="text-center !py-12 !text-base !text-muted-foreground">
                           {language === 'th' ? 'ไม่พบข้อมูล FPC' : 'No FPC items found.'}
                         </TableCell>
                       </TableRow>
@@ -814,9 +814,9 @@ export function AdminLogsPage({ employeeId, userRole, language, onBack }: AdminL
         // ──────────────────────── USER MANAGEMENT TAB ────────────────────────
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 flex-1 min-h-0">
           {/* Add User Form Card */}
-          <Card className="shadow-lg border-2 border-gray-100 rounded-2xl h-fit">
+          <Card className="shadow-sm border border-border rounded-xl h-fit bg-card">
             <CardContent className="p-6 space-y-6">
-              <h3 className="text-2xl font-extrabold text-gray-900">{t.addUser}</h3>
+              <h3 className="text-xl font-semibold text-foreground">{t.addUser}</h3>
               <form onSubmit={handleAddUser} className="space-y-6">
                 <TextField
                   fullWidth
@@ -858,7 +858,7 @@ export function AdminLogsPage({ employeeId, userRole, language, onBack }: AdminL
                   type="submit"
                   variant="contained"
                   size="large"
-                  className="!py-4 !text-lg !font-bold !bg-indigo-600 hover:!bg-indigo-700"
+                  className="!py-4 !text-base !font-semibold !bg-primary hover:!bg-primary/90 text-primary-foreground"
                 >
                   {t.addUser}
                 </Button>
@@ -867,45 +867,45 @@ export function AdminLogsPage({ employeeId, userRole, language, onBack }: AdminL
           </Card>
 
           {/* User List Table Card */}
-          <Card className="lg:col-span-2 flex flex-col flex-1 min-h-0 shadow-lg border-2 border-gray-100 rounded-2xl">
+          <Card className="lg:col-span-2 flex flex-col flex-1 min-h-0 shadow-sm border border-border rounded-xl bg-card">
             <CardContent className="flex flex-col h-full p-6 min-h-0 gap-6">
-              <h3 className="text-2xl font-extrabold text-gray-900">{t.userManagement}</h3>
-              <TableContainer component={Paper} className="flex-1 overflow-auto border border-gray-200 rounded-xl min-h-0 shadow-inner">
+              <h3 className="text-xl font-semibold text-foreground">{t.userManagement}</h3>
+              <TableContainer component={Paper} className="flex-1 overflow-auto border border-border rounded-xl min-h-0 shadow-inner bg-card">
                 <Table stickyHeader>
                   <TableHead>
                     <TableRow>
-                      <TableCell className="!text-lg !font-bold !bg-gray-100 !text-gray-700 !py-4">{t.employeeId}</TableCell>
-                      <TableCell className="!text-lg !font-bold !bg-gray-100 !text-gray-700 !py-4">{t.role}</TableCell>
-                      <TableCell className="!text-lg !font-bold !bg-gray-100 !text-gray-700 !py-4 !text-center">{language === 'th' ? 'การกระทำ' : 'Actions'}</TableCell>
+                      <TableCell className="!text-base !font-semibold !bg-background !text-muted-foreground !py-3">{t.employeeId}</TableCell>
+                      <TableCell className="!text-base !font-semibold !bg-background !text-muted-foreground !py-3">{t.role}</TableCell>
+                      <TableCell className="!text-base !font-semibold !bg-background !text-muted-foreground !py-3 !text-center">{language === 'th' ? 'การกระทำ' : 'Actions'}</TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>
                     {usersList.map((user) => (
                       <TableRow key={user.employeeId} hover>
-                        <TableCell className="!text-lg !font-bold !text-gray-900 !py-4">
+                        <TableCell className="!text-base !font-semibold !text-foreground !py-3">
                           <div className="flex items-center gap-2">
-                            <User className="w-5 h-5 text-gray-400" />
+                            <User className="w-5 h-5 text-muted-foreground" />
                             {user.employeeId}
                           </div>
                         </TableCell>
-                        <TableCell className="!text-lg !py-4">
-                          <span className={`px-4 py-1 text-base font-bold rounded-full border ${
+                        <TableCell className="!text-base !py-3">
+                          <span className={`px-4 py-1 text-base font-semibold rounded-full border ${
                             user.role === 'admin'
-                              ? 'bg-rose-50 text-rose-700 border-rose-200'
+                              ? 'bg-error-background text-error-foreground border-error/30'
                               : user.role === 'store'
-                              ? 'bg-amber-50 text-amber-700 border-amber-200'
-                              : 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                              ? 'bg-warning-background text-warning-foreground border-warning/30'
+                              : 'bg-success-background text-success-foreground border-success/30'
                           }`}>
                             {user.role === 'admin' ? t.admin : user.role === 'store' ? t.store : t.operatorRole}
                           </span>
                         </TableCell>
-                        <TableCell className="!py-4 !text-center">
+                        <TableCell className="!py-3 !text-center">
                           <div className="flex justify-center gap-3">
                             <Button
                               variant="outlined"
                               color="primary"
                               onClick={() => handleEditUserClick(user)}
-                              className="!font-bold !rounded-lg !text-base"
+                              className="!font-semibold !rounded-lg !text-base"
                             >
                               {language === 'th' ? 'แก้ไข' : 'Edit'}
                             </Button>
@@ -914,7 +914,7 @@ export function AdminLogsPage({ employeeId, userRole, language, onBack }: AdminL
                               color="error"
                               disabled={user.employeeId === employeeId}
                               onClick={() => handleDeleteUserClick(user.employeeId)}
-                              className="!font-bold !rounded-lg !text-base"
+                              className="!font-semibold !rounded-lg !text-base"
                             >
                               {language === 'th' ? 'ลบ' : 'Delete'}
                             </Button>
@@ -936,9 +936,9 @@ export function AdminLogsPage({ employeeId, userRole, language, onBack }: AdminL
         onClose={() => setIsEditOpen(false)}
         maxWidth="sm"
         fullWidth
-        PaperProps={{ className: '!p-4 !rounded-2xl shadow-xl' }}
+        PaperProps={{ className: '!p-4 !rounded-xl shadow-md !bg-card !text-foreground' }}
       >
-        <DialogTitle className="!text-2xl !font-extrabold !pb-2">
+        <DialogTitle className="!text-xl !font-semibold !pb-2">
           {t.editLocation} ({selectedFpc?.id})
         </DialogTitle>
         <DialogContent className="!pt-4 space-y-6">
@@ -952,13 +952,13 @@ export function AdminLogsPage({ employeeId, userRole, language, onBack }: AdminL
               <FormControlLabel
                 value="storage"
                 control={<Radio sx={{ '& .MuiSvgIcon-root': { fontSize: 28 } }} />}
-                label={<span className="text-lg font-semibold">{t.smartStorageOption}</span>}
+                label={<span className="text-base font-medium">{t.smartStorageOption}</span>}
                 className="!mr-8"
               />
               <FormControlLabel
                 value="machine"
                 control={<Radio sx={{ '& .MuiSvgIcon-root': { fontSize: 28 } }} />}
-                label={<span className="text-lg font-semibold">{t.machineOption}</span>}
+                label={<span className="text-base font-medium">{t.machineOption}</span>}
               />
             </RadioGroup>
           </FormControl>
@@ -999,16 +999,16 @@ export function AdminLogsPage({ employeeId, userRole, language, onBack }: AdminL
 
               {/* Target Machine Occupancy Alert & Displaced Options */}
               {targetMachineOccupant && (
-                <div className="space-y-4 p-4 border border-rose-200 bg-rose-50 rounded-xl">
-                  <div className="flex items-start gap-2 text-rose-800">
-                    <AlertTriangle className="w-6 h-6 shrink-0 mt-0.5" />
+                <div className="space-y-4 p-4 border border-error/30 bg-error-background rounded-xl">
+                  <div className="flex items-start gap-2 text-error-foreground">
+                    <AlertTriangle className="w-5 h-5 shrink-0 mt-0.5" />
                     <div>
-                      <p className="font-bold text-lg">
+                      <p className="font-semibold text-base">
                         {t.errorMachineOccupied
                           .replace('{machineId}', targetMachine)
                           .replace('{fpcId}', targetMachineOccupant.id)}
                       </p>
-                      <p className="text-sm mt-1">{t.displacedActionDesc}</p>
+                      <p className="text-xs mt-1 text-muted-foreground">{t.displacedActionDesc}</p>
                     </div>
                   </div>
 
@@ -1021,7 +1021,7 @@ export function AdminLogsPage({ employeeId, userRole, language, onBack }: AdminL
                       value="swap"
                       control={<Radio size="small" />}
                       label={
-                        <span className="text-base font-semibold text-rose-950">
+                        <span className="text-sm font-medium text-foreground">
                           {t.swapWithOccupant} ({selectedFpc?.id} ↔ {targetMachineOccupant.id})
                         </span>
                       }
@@ -1030,7 +1030,7 @@ export function AdminLogsPage({ employeeId, userRole, language, onBack }: AdminL
                       value="evict"
                       control={<Radio size="small" />}
                       label={
-                        <span className="text-base font-semibold text-rose-950">
+                        <span className="text-sm font-medium text-foreground">
                           {t.moveDisplacedToStorage}
                         </span>
                       }
@@ -1071,7 +1071,7 @@ export function AdminLogsPage({ employeeId, userRole, language, onBack }: AdminL
             onClick={() => setIsEditOpen(false)}
             variant="outlined"
             size="large"
-            className="!py-3 !px-8 !text-lg !rounded-xl"
+            className="!py-2.5 !px-6 !text-base !font-semibold !rounded-xl"
           >
             {t.cancel}
           </Button>
@@ -1080,7 +1080,7 @@ export function AdminLogsPage({ employeeId, userRole, language, onBack }: AdminL
             variant="contained"
             size="large"
             disabled={!editValidation.isValid}
-            className="!py-3 !px-8 !text-lg !rounded-xl !bg-indigo-600 hover:!bg-indigo-700 disabled:!bg-gray-300"
+            className="!py-2.5 !px-6 !text-base !font-semibold !rounded-xl !bg-primary hover:!bg-primary/90 text-primary-foreground disabled:opacity-50"
           >
             {t.save}
           </Button>
@@ -1091,13 +1091,13 @@ export function AdminLogsPage({ employeeId, userRole, language, onBack }: AdminL
       <Dialog
         open={isClearLogsConfirmOpen}
         onClose={() => setIsClearLogsConfirmOpen(false)}
-        PaperProps={{ className: '!p-4 !rounded-2xl shadow-xl' }}
+        PaperProps={{ className: '!p-4 !rounded-xl shadow-md !bg-card !text-foreground' }}
       >
-        <DialogTitle className="!text-2xl !font-extrabold !pb-2">
+        <DialogTitle className="!text-xl !font-semibold !pb-2">
           {t.confirmClearLogsTitle}
         </DialogTitle>
         <DialogContent>
-          <p className="text-lg text-gray-700">
+          <p className="text-base text-foreground">
             {t.confirmClearLogsMessage}
           </p>
         </DialogContent>
@@ -1106,7 +1106,7 @@ export function AdminLogsPage({ employeeId, userRole, language, onBack }: AdminL
             onClick={() => setIsClearLogsConfirmOpen(false)}
             variant="outlined"
             size="large"
-            className="!py-3 !px-8 !text-lg !rounded-xl"
+            className="!py-2.5 !px-6 !text-base !font-semibold !rounded-xl"
           >
             {t.cancel}
           </Button>
@@ -1115,7 +1115,7 @@ export function AdminLogsPage({ employeeId, userRole, language, onBack }: AdminL
             variant="contained"
             color="error"
             size="large"
-            className="!py-3 !px-8 !text-lg !rounded-xl"
+            className="!py-2.5 !px-6 !text-base !font-semibold !rounded-xl"
           >
             {t.confirm}
           </Button>
@@ -1126,13 +1126,13 @@ export function AdminLogsPage({ employeeId, userRole, language, onBack }: AdminL
       <Dialog
         open={isUserDeleteConfirmOpen}
         onClose={() => setIsUserDeleteConfirmOpen(false)}
-        PaperProps={{ className: '!p-4 !rounded-2xl shadow-xl' }}
+        PaperProps={{ className: '!p-4 !rounded-xl shadow-md !bg-card !text-foreground' }}
       >
-        <DialogTitle className="!text-2xl !font-extrabold !pb-2">
+        <DialogTitle className="!text-xl !font-semibold !pb-2">
           {t.deleteUser}
         </DialogTitle>
         <DialogContent>
-          <p className="text-lg text-gray-700">
+          <p className="text-base text-foreground">
             {t.confirmDeleteUser.replace('{employeeId}', userToDelete || '')}
           </p>
         </DialogContent>
@@ -1141,7 +1141,7 @@ export function AdminLogsPage({ employeeId, userRole, language, onBack }: AdminL
             onClick={() => setIsUserDeleteConfirmOpen(false)}
             variant="outlined"
             size="large"
-            className="!py-3 !px-8 !text-lg !rounded-xl"
+            className="!py-2.5 !px-6 !text-base !font-semibold !rounded-xl"
           >
             {t.cancel}
           </Button>
@@ -1150,7 +1150,7 @@ export function AdminLogsPage({ employeeId, userRole, language, onBack }: AdminL
             variant="contained"
             color="error"
             size="large"
-            className="!py-3 !px-8 !text-lg !rounded-xl"
+            className="!py-2.5 !px-6 !text-base !font-semibold !rounded-xl"
           >
             {language === 'th' ? 'ยืนยันการลบ' : 'Confirm Delete'}
           </Button>
@@ -1163,9 +1163,9 @@ export function AdminLogsPage({ employeeId, userRole, language, onBack }: AdminL
         onClose={() => setIsEditUserOpen(false)}
         maxWidth="sm"
         fullWidth
-        PaperProps={{ className: '!p-4 !rounded-2xl shadow-xl' }}
+        PaperProps={{ className: '!p-4 !rounded-xl shadow-md !bg-card !text-foreground' }}
       >
-        <DialogTitle className="!text-2xl !font-extrabold !pb-2">
+        <DialogTitle className="!text-xl !font-semibold !pb-2">
           {t.editUser} ({editEmployeeId})
         </DialogTitle>
         <form onSubmit={handleSaveEditUser}>
@@ -1211,7 +1211,7 @@ export function AdminLogsPage({ employeeId, userRole, language, onBack }: AdminL
               onClick={() => setIsEditUserOpen(false)}
               variant="outlined"
               size="large"
-              className="!py-3 !px-8 !text-lg !rounded-xl"
+              className="!py-2.5 !px-6 !text-base !font-semibold !rounded-xl"
             >
               {t.cancel}
             </Button>
@@ -1219,7 +1219,7 @@ export function AdminLogsPage({ employeeId, userRole, language, onBack }: AdminL
               type="submit"
               variant="contained"
               size="large"
-              className="!py-3 !px-8 !text-lg !rounded-xl !bg-indigo-600 hover:!bg-indigo-700"
+              className="!py-2.5 !px-6 !text-base !font-semibold !rounded-xl !bg-primary hover:!bg-primary/90 text-primary-foreground"
             >
               {t.save}
             </Button>

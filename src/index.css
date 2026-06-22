@@ -44,6 +44,27 @@
   --sidebar-accent-foreground: oklch(0.205 0 0);
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
+
+  /* Semantic Status Colors - Light Mode */
+  --success: oklch(0.627 0.194 149.21);
+  --success-foreground: oklch(0.366 0.12 148.86);
+  --success-background: oklch(0.962 0.018 147.45);
+  
+  --error: oklch(0.577 0.228 15.25);
+  --error-foreground: oklch(0.384 0.144 19.34);
+  --error-background: oklch(0.957 0.015 21.09);
+  
+  --warning: oklch(0.641 0.17 76.54);
+  --warning-foreground: oklch(0.428 0.125 71.02);
+  --warning-background: oklch(0.968 0.018 84.14);
+  
+  --info: oklch(0.588 0.195 252.32);
+  --info-foreground: oklch(0.362 0.128 250.77);
+  --info-background: oklch(0.954 0.018 249.27);
+
+  --canceled: oklch(0.55 0 0);
+  --canceled-foreground: oklch(0.35 0 0);
+  --canceled-background: oklch(0.95 0 0);
 }
 
 .dark {
@@ -81,6 +102,27 @@
   --sidebar-accent-foreground: oklch(0.985 0 0);
   --sidebar-border: oklch(0.269 0 0);
   --sidebar-ring: oklch(0.439 0 0);
+
+  /* Semantic Status Colors - Dark Mode */
+  --success: oklch(0.75 0.15 149.21);
+  --success-foreground: oklch(0.9 0.05 149.21);
+  --success-background: oklch(0.2 0.05 149.21);
+  
+  --error: oklch(0.7 0.18 15.25);
+  --error-foreground: oklch(0.9 0.05 19.34);
+  --error-background: oklch(0.2 0.06 15.25);
+  
+  --warning: oklch(0.75 0.15 76.54);
+  --warning-foreground: oklch(0.9 0.05 71.02);
+  --warning-background: oklch(0.2 0.05 76.54);
+  
+  --info: oklch(0.7 0.15 252.32);
+  --info-foreground: oklch(0.9 0.05 250.77);
+  --info-background: oklch(0.2 0.05 252.32);
+
+  --canceled: oklch(0.6 0 0);
+  --canceled-foreground: oklch(0.9 0 0);
+  --canceled-background: oklch(0.25 0 0);
 }
 
 @theme inline {
@@ -122,6 +164,23 @@
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
+
+  /* Semantic Status Colors */
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
+  --color-success-background: var(--success-background);
+  --color-error: var(--error);
+  --color-error-foreground: var(--error-foreground);
+  --color-error-background: var(--error-background);
+  --color-warning: var(--warning);
+  --color-warning-foreground: var(--warning-foreground);
+  --color-warning-background: var(--warning-background);
+  --color-info: var(--info);
+  --color-info-foreground: var(--info-foreground);
+  --color-info-background: var(--info-background);
+  --color-canceled: var(--canceled);
+  --color-canceled-foreground: var(--canceled-foreground);
+  --color-canceled-background: var(--canceled-background);
 }
 
 @layer base {

@@ -78,23 +78,23 @@ export default function App() {
   };
 
   return (
-    <div className="h-screen overflow-hidden bg-gray-50 flex flex-col">
+    <div className="h-screen overflow-hidden bg-background text-foreground flex flex-col">
       {/* ── Header ── */}
-      <header className="bg-white shadow-sm border-b-2 border-gray-200">
+      <header className="bg-card shadow-sm border-b-2 border-border">
         <div className="px-8 py-5 flex justify-between items-center">
           <div className="flex items-center gap-6">
-            <h1 className="text-3xl font-bold text-gray-900">NXP WT</h1>
+            <h1 className="text-3xl font-bold text-foreground">NXP WT</h1>
             {employeeId && (
               <span
                 className={`px-6 py-2 text-xl font-black rounded-full flex items-center gap-2 border shadow-sm transition-all duration-300 ${
                   agvStatus === 'OK'
-                    ? 'bg-emerald-50 text-emerald-700 border-emerald-300'
-                    : 'bg-rose-50 text-rose-700 border-rose-300 animate-pulse'
+                    ? 'bg-success-background text-success-foreground border-success'
+                    : 'bg-error-background text-error-foreground border-error animate-pulse'
                 }`}
               >
                 <span
                   className={`w-3.5 h-3.5 rounded-full ${
-                    agvStatus === 'OK' ? 'bg-emerald-500' : 'bg-rose-500 animate-ping'
+                    agvStatus === 'OK' ? 'bg-success' : 'bg-error animate-ping'
                   }`}
                 />
                 AGV: {agvStatus}
@@ -110,8 +110,8 @@ export default function App() {
                     onClick={handleGoToAdmin}
                     className={`px-8 py-3 text-xl font-bold rounded-lg transition-colors shadow-md ${
                       currentPage === 'admin'
-                        ? 'text-white bg-indigo-600 hover:bg-indigo-700'
-                        : 'text-indigo-600 bg-white border-2 border-indigo-600 hover:bg-indigo-50'
+                        ? 'text-primary-foreground bg-primary hover:bg-primary/90'
+                        : 'text-primary bg-card border-2 border-primary hover:bg-accent'
                     }`}
                   >
                     {role === 'admin' ? translations[language].adminPanel : translations[language].managementPanel}
@@ -123,8 +123,8 @@ export default function App() {
                     onClick={handleGoToAdmin}
                     className={`px-8 py-3 text-xl font-bold rounded-lg transition-colors shadow-md ${
                       currentPage === 'admin'
-                        ? 'text-white bg-indigo-600 hover:bg-indigo-700'
-                        : 'text-indigo-600 bg-white border-2 border-indigo-600 hover:bg-indigo-50'
+                        ? 'text-primary-foreground bg-primary hover:bg-primary/90'
+                        : 'text-primary bg-card border-2 border-primary hover:bg-accent'
                     }`}
                   >
                     {translations[language].adminLogsTab}
@@ -133,13 +133,13 @@ export default function App() {
 
                 <button
                   onClick={handleGoToFPCSearch}
-                  className="px-8 py-3 text-xl font-bold text-blue-600 bg-white border-2 border-blue-600 rounded-lg hover:bg-blue-50 transition-colors shadow-sm"
+                  className="px-8 py-3 text-xl font-bold text-info bg-card border-2 border-info rounded-lg hover:bg-info-background transition-colors shadow-sm"
                 >
                   {language === 'th' ? 'ค้นหา FPC' : 'FPC Search'}
                 </button>
                 <button
                   onClick={handleGoToQueue}
-                  className="px-8 py-3 text-xl font-bold text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors shadow-md"
+                  className="px-8 py-3 text-xl font-bold text-info-foreground bg-info rounded-lg hover:bg-info/90 transition-colors shadow-md"
                 >
                   {language === 'th' ? 'ดูคิว' : 'View Queue'}
                 </button>

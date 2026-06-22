@@ -96,7 +96,7 @@ export function SwapFPCWorkflow({ employeeId, language, onBack, onTaskSubmitted 
         >
           {t.back}
         </Button>
-        <h2 className="text-4xl font-bold text-gray-900">
+        <h2 className="text-4xl font-bold text-foreground">
           {t.swapFPC}
         </h2>
         <div className="w-40" />
@@ -105,7 +105,7 @@ export function SwapFPCWorkflow({ employeeId, language, onBack, onTaskSubmitted 
       {/* Two-column layout */}
       <div className="flex-1 grid grid-cols-2 gap-6 min-h-0">
         {/* Left Column — Source Machine Selector */}
-        <Card className="flex flex-col overflow-hidden">
+        <Card className="flex flex-col overflow-hidden bg-card border border-border">
           <CardContent className="p-8 flex flex-col flex-1 min-h-0">
             <div className="flex-1 min-h-0">
               <MachineSelector
@@ -120,7 +120,7 @@ export function SwapFPCWorkflow({ employeeId, language, onBack, onTaskSubmitted 
         </Card>
 
         {/* Right Column — Destination Machine Selector */}
-        <Card className="flex flex-col overflow-hidden">
+        <Card className="flex flex-col overflow-hidden bg-card border border-border">
           <CardContent className="p-8 flex flex-col flex-1 min-h-0">
             <div className="flex-1 min-h-0">
               <MachineSelector
@@ -159,32 +159,32 @@ export function SwapFPCWorkflow({ employeeId, language, onBack, onTaskSubmitted 
         onClose={() => setShowConfirmDialog(false)}
         maxWidth="sm"
         fullWidth
-        PaperProps={{ className: '!p-4' }}
+        PaperProps={{ className: '!p-4 !bg-card !text-foreground' }}
       >
         <DialogTitle className="!text-3xl !font-bold !pb-4">
           {t.confirmSubmit}
         </DialogTitle>
         <DialogContent>
           <div className="space-y-4 py-4">
-            <p className="text-2xl text-gray-700 mb-6">
+            <p className="text-2xl text-foreground mb-6">
               {t.confirmSubmitMessage}
             </p>
-            <div className="bg-gray-50 rounded-lg p-6 space-y-3">
+            <div className="bg-background rounded-lg p-6 space-y-3 border border-border">
               <div className="flex justify-between text-xl">
-                <span className="text-gray-600">{t.probecardToSendFromSource}:</span>
-                <span className="font-bold text-blue-600">{sourceFPC ? sourceFPC.id : '-'}</span>
+                <span className="text-muted-foreground">{t.probecardToSendFromSource}:</span>
+                <span className="font-bold text-info">{sourceFPC ? sourceFPC.id : '-'}</span>
               </div>
               <div className="flex justify-between text-xl">
-                <span className="text-gray-600">{t.probecardToReceiveFromDest}:</span>
-                <span className="font-bold text-green-600">{destFPC ? destFPC.id : '-'}</span>
+                <span className="text-muted-foreground">{t.probecardToReceiveFromDest}:</span>
+                <span className="font-bold text-success">{destFPC ? destFPC.id : '-'}</span>
               </div>
-              <div className="flex justify-between text-xl border-t border-gray-200 pt-3">
-                <span className="text-gray-600">{t.source}:</span>
-                <span className="font-bold text-gray-900">{sourceMachineName}</span>
+              <div className="flex justify-between text-xl border-t border-border pt-3">
+                <span className="text-muted-foreground">{t.source}:</span>
+                <span className="font-bold text-foreground">{sourceMachineName}</span>
               </div>
               <div className="flex justify-between text-xl">
-                <span className="text-gray-600">{t.destination}:</span>
-                <span className="font-bold text-gray-900">{destinationMachineName}</span>
+                <span className="text-muted-foreground">{t.destination}:</span>
+                <span className="font-bold text-foreground">{destinationMachineName}</span>
               </div>
             </div>
           </div>
