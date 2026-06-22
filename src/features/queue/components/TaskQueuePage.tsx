@@ -141,32 +141,32 @@ export function TaskQueuePage({ employeeId, language, onBack, onNewTask }: TaskQ
 
   return (
     <div className="h-full flex flex-col">
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex flex-col sm:flex-row items-center justify-between mb-6 gap-4">
         <Button
-          startIcon={<ArrowLeft className="w-7 h-7" />}
+          startIcon={<ArrowLeft className="w-6 h-6" />}
           onClick={onBack}
           variant="outlined"
           size="large"
-          className="!px-8 !py-4 !text-xl"
+          className="!px-6 !py-3 !text-lg w-full sm:w-auto shrink-0"
         >
           {t.back}
         </Button>
-        <h2 className="text-4xl font-bold text-foreground">
+        <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-foreground text-center truncate">
           {t.taskQueuePage}
         </h2>
         <Button
           onClick={onNewTask}
           variant="contained"
           size="large"
-          className="!px-10 !py-4 !text-2xl !font-bold"
+          className="!px-6 !py-3 !text-lg !font-semibold w-full sm:w-auto shrink-0"
         >
           + {t.new}
         </Button>
       </div>
 
-      <div className="flex-1 flex gap-6 min-h-0">
+      <div className="flex-1 flex flex-col lg:flex-row gap-6 min-h-0">
         {/* Left — Queue list */}
-        <Card className="w-1/3 flex flex-col overflow-hidden">
+        <Card className="w-full lg:w-1/3 flex flex-col overflow-hidden">
           <CardContent className="p-6 flex flex-col flex-1 min-h-0">
             <h3 className="text-3xl font-bold mb-6 text-foreground">{t.taskQueue}</h3>
 

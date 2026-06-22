@@ -454,7 +454,7 @@ export function AdminLogsPage({ employeeId, userRole, language, onBack }: AdminL
   return (
     <div className="flex flex-col h-full gap-6 overflow-hidden">
       {/* Page Title Panel */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div className="flex items-center gap-4">
           <button
             onClick={onBack}
@@ -475,7 +475,7 @@ export function AdminLogsPage({ employeeId, userRole, language, onBack }: AdminL
           </div>
         </div>
 
-        <div className="flex gap-4">
+        <div className="flex flex-wrap gap-4 w-full sm:w-auto">
           {userRole === 'admin' && (
             <Button
               variant="contained"

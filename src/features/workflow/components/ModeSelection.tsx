@@ -17,7 +17,7 @@ export function ModeSelection({ onSelectMode, language }: ModeSelectionProps) {
         {t.selectMode}
       </h2>
 
-      <div className="grid grid-cols-3 gap-8 max-w-6xl w-full px-8">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl w-full px-8">
         <Card className="hover:shadow-xl transition-shadow bg-card border border-border">
           <CardActionArea onClick={() => onSelectMode('return')} className="!p-12">
             <div className="flex flex-col items-center text-center space-y-6">

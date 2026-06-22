@@ -64,20 +64,20 @@ export function FPCSearchPage({ language, onBack }: FPCSearchPageProps) {
   return (
     <div className="h-full flex flex-col">
       {/* Header */}
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex flex-col sm:flex-row items-center justify-between mb-6 gap-4">
         <Button
-          startIcon={<ArrowLeft className="w-7 h-7" />}
+          startIcon={<ArrowLeft className="w-6 h-6" />}
           onClick={onBack}
           variant="outlined"
           size="large"
-          className="!px-8 !py-4 !text-xl"
+          className="!px-6 !py-3 !text-lg w-full sm:w-auto shrink-0"
         >
           {t.back}
         </Button>
-        <h2 className="text-4xl font-bold text-foreground">
+        <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-foreground text-center truncate">
           {t.searchFPC}
         </h2>
-        <div className="w-40" />
+        <div className="hidden sm:block w-24 sm:w-32 md:w-40 shrink-0" />
       </div>
  
       {/* Main Content Area */}

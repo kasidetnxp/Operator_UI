@@ -49,7 +49,7 @@ export function EmployeeLogin({ onLogin, language }: EmployeeLoginProps) {
   return (
     <div className="flex items-center justify-center h-full">
       <Card className="w-full max-w-2xl">
-        <CardContent className="p-12">
+        <CardContent className="p-6 sm:p-12">
           <h2 className="text-4xl font-bold text-center mb-10 text-foreground">
             NXP WT
           </h2>
