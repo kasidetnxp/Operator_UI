@@ -24,10 +24,11 @@ A modern, responsive Operator User Interface for requesting, returning, and swap
    - Role-based access control (Admin, Store, Operator).
    - Session management and clear logout flow.
 
-2. **Three-Mode Workflow (LOAD / UNLOAD / Swap)**
+2. **Four-Mode Workflow (LOAD / UNLOAD / Swap / UNLOAD & LOAD)**
    - **LOAD (คืน FPC)**: Dispatch an AGV to pick up an FPC from a machine and return it to Smart Storage.
    - **UNLOAD (เบิก FPC)**: Search/select a specific FPC from Smart Storage and command the AGV to deliver it to a destination machine.
    - **สลับ FPC (Swap)**: Transfer an FPC directly from a source machine to a destination machine without going through Smart Storage.
+   - **UNLOAD & LOAD (เปลี่ยน FPC)**: Remove the old FPC from a machine and install a new FPC from Smart Storage in a single task sequence. The database automatically swaps the location records of the FPCs once the task is completed.
 
 3. **Machine Selector**
    - Real-time search/filtering for over 50 registered machines (`AVT_001` - `AVT_050`).
@@ -54,7 +55,7 @@ src/
 │   ├── admin/              # Admin panel & audit log management
 │   ├── auth/               # Employee login & session component
 │   ├── queue/              # Task queue monitoring & actions
-│   └── workflow/           # Mode selection, Machine selector, Return/Request/Swap forms
+│   └── workflow/           # Mode selection, Machine selector, Return/Request/Swap/UnloadLoad forms
 ├── shared/                 # Shared components, utilities, and assets
 │   ├── components/         # Reusable UI components (currently empty)
 │   ├── types/              # TypeScript interface and type declarations

@@ -19,11 +19,12 @@ Common technical terms that are already used by operators, such as LOAD (คื�
 
 ### Operation Modes
 
-The system shall support three operation modes shown on the user interface as:
+The system shall support four operation modes shown on the user interface as:
 
 - LOAD (คืน FPC)
 - UNLOAD (เบิก FPC)
 - สลับ FPC
+- เปลี่ยน FPC (UNLOAD & LOAD)
 
 In the current phase, the list of machines shall be a predefined configuration used by the frontend.
 
@@ -66,6 +67,24 @@ The frontend shall prevent the operator from selecting the same machine as both 
 If operator confirmation is required during pickup or placement, the frontend shall display instructions when the backend reports the corresponding status.
 
 The confirmation is completed by the operator pressing a physical button on the AGV machine before the workflow can continue.
+
+### เปลี่ยน FPC (UNLOAD & LOAD) Mode
+
+In เปลี่ยน FPC (UNLOAD & LOAD) mode, the operator shall select a new FPC from Smart Storage and select a destination machine.
+
+The destination machine must have an FPC already installed on it. If the selected machine is empty, the frontend shall present a validation error message (e.g., "Machine does not have an FPC installed") and disable the job submission button.
+
+When the job is submitted and starts, the AGV shall perform the following operational flow:
+1. Retrieve the new FPC from Smart Storage.
+2. Move to the destination machine.
+3. Retrieve the old FPC from the destination machine.
+4. Wait for the operator to verify that the cover head has been installed on the old FPC, then confirm via the physical button on the AGV.
+5. Wait for the operator to verify that the cover head has been removed from the new FPC, then confirm via the physical button on the AGV.
+6. Install the new FPC onto the destination machine.
+7. Return to Smart Storage with the old FPC.
+8. Place the old FPC into the Smart Storage slot vacated by the new FPC.
+
+After the task transitions to the `Completed` status, the system shall swap the location records of the two FPCs in the database.
 
 ### Task Status Handling
 
