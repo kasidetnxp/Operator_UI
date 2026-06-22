@@ -19,9 +19,13 @@ _Avoid_: Waiting for remove confirmation, Pending cover removal
 A reference screen used by operators to inspect FPC locations, addresses, labels, and comments. Supports filtering by storage category (Storage, Service, Deposit PM, Deposit Production) and query searching.
 _Avoid_: FPC lookup, inventory view
 
-**Admin Page**:
-A administrative console accessible by designated credentials (Employee ID '1111') for inspecting system-wide historical events and operations.
+**Admin Panel (Admin role)**:
+An administrative console accessible by users with the Admin role. Provides full system control including user management (add, edit, delete accounts), audit log viewing and clearing, and manual FPC location corrections.
 _Avoid_: Admin screen, configuration page
+
+**Admin Panel (Store role)**:
+A management console accessible by users with the Store role. Provides limited administrative capabilities including FPC location corrections and audit log viewing, but excludes user management operations.
+_Avoid_: Store dashboard, stocker console
 
 **Audit Logs**:
 A record of chronological system events, operator actions, and AGV state transitions captured by the FPC Management System.

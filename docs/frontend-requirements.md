@@ -118,7 +118,7 @@ This page is purely for reference and viewing status (view-only), and shall cont
 ### Admin Panel & User Management
 
 The system shall support an administrative console (Admin Panel / Management Panel) for system audit logging, FPC location corrections, and User Management.
-- **Access Control**: Users with Admin (`1111`) or Store (`2222`) roles shall land on the Admin/Management Panel upon logging in. Operators (`3333`) can access a view-only AGV log view of this panel from the header.
+- **Access Control**: Users with Admin (`admin`) or Store (`store`) roles shall land on the Admin/Management Panel upon logging in. Operators (`operator`) can access a view-only AGV log view of this panel from the header.
 - **Navigation**:
   - The Admin/Management Panel shall contain a visible "Back" button (`ArrowLeft` icon button) next to the title. For all roles, clicking this back button shall navigate the user to the Main Menu (Mode Selection screen).
   - The "Main Menu" button in the header shall be removed for operators to avoid duplicate navigation pathways, relying instead on the internal back buttons of each page.

@@ -63,9 +63,9 @@ import type { Role, UserAccount } from '@/shared/types';
 
 // Default mock users
 const DEFAULT_USERS: UserAccount[] = [
-  { employeeId: '1111', passwordHash: 'admin123', role: 'admin' },
-  { employeeId: '2222', passwordHash: 'store123', role: 'store' },
-  { employeeId: '3333', passwordHash: 'op123', role: 'operator' },
+  { employeeId: 'admin', passwordHash: 'admin', role: 'admin' },
+  { employeeId: 'store', passwordHash: 'store', role: 'store' },
+  { employeeId: 'operator', passwordHash: 'operator', role: 'operator' },
 ];
 
 // Load users from localStorage or fallback to defaults

@@ -73,7 +73,7 @@ These map to the 16 backend task states:
 * **Mode Selection Screen**: Three large, equal-weight tiles (LOAD, UNLOAD, สลับ FPC) displayed centrally.
 * **Task Queue**: Two-pane list+detail layout (List on the left pane, Selected Task details on the right pane).
 * **Header / Navigation Bar**: Includes the company logo, a link button to FPC Search, and a role-aware employee profile dropdown.
-* **Header Constraints**: Operators (Employee ID `3333` / role Operator) must NOT have a "Main Menu" button in the header. They rely solely on the sub-page's internal back button to return.
+* **Header Constraints**: Operators (Employee ID `operator` / role Operator) must NOT have a "Main Menu" button in the header. They rely solely on the sub-page's internal back button to return.
 * **Sub-page Navigation**: Every sub-page must feature a prominent Back button (ArrowLeft icon) in the top-left corner leading back to the Mode Selection screen.
 * **Form Workflows**: Vertical stack format, displaying step-by-step progress with generous spacing.
 * **Data Tables**: Sticky headers, no zebra striping, with hover row highlights only.
@@ -98,8 +98,8 @@ All 16 statuses must correspond to specific icons, colors, and Thai translations
 
 ### 5. Role-based Landing Pages
 Upon authentication, the user is redirected based on credentials:
-* **Admin (1111) & Store (2222)** → Lands directly on the Admin Panel / Management Panel.
-* **Operator (3333)** → Lands directly on the Mode Selection screen.
+* **Admin (`admin`) & Store (`store`)** → Lands directly on the Admin Panel / Management Panel.
+* **Operator (`operator`)** → Lands directly on the Mode Selection screen.
 
 ### 6. Duplicate Submission Prevention
 Disable all submit buttons immediately upon click, keeping them disabled until a success/error response is returned by the backend. If an API call fails, display a clear Thai error notification and re-enable the action button to allow retries.
