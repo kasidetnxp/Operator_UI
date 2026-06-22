@@ -63,9 +63,21 @@ import type { Role, UserAccount } from '@/shared/types';
 
 // Default mock users
 const DEFAULT_USERS: UserAccount[] = [
-  { employeeId: 'admin', passwordHash: 'admin', role: 'admin' },
-  { employeeId: 'store', passwordHash: 'store', role: 'store' },
-  { employeeId: 'operator', passwordHash: 'operator', role: 'operator' },
+  {
+    employeeId: import.meta.env.VITE_MOCK_ADMIN_ID || 'admin',
+    passwordHash: import.meta.env.VITE_MOCK_ADMIN_PASSWORD || 'admin',
+    role: 'admin'
+  },
+  {
+    employeeId: import.meta.env.VITE_MOCK_STORE_ID || 'store',
+    passwordHash: import.meta.env.VITE_MOCK_STORE_PASSWORD || 'store',
+    role: 'store'
+  },
+  {
+    employeeId: import.meta.env.VITE_MOCK_OPERATOR_ID || 'operator',
+    passwordHash: import.meta.env.VITE_MOCK_OPERATOR_PASSWORD || 'operator',
+    role: 'operator'
+  }
 ];
 
 // Load users from localStorage or fallback to defaults
