@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Card, CardContent, Button, Alert, Chip, Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material';
 import { ArrowLeft, CheckCircle, Clock } from 'lucide-react';
 import { TaskStatus } from './TaskStatus';
@@ -17,9 +17,14 @@ interface TaskQueuePageProps {
 
 export function TaskQueuePage({ employeeId, language, onBack, onNewTask }: TaskQueuePageProps) {
   const [tasks, setTasks] = useState<TaskResponse[]>([]);
-  const [selectedTask, setSelectedTask] = useState<TaskResponse | null>(null);
+  const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null);
   const [showCancelDialog, setShowCancelDialog] = useState(false);
   const [isCanceling, setIsCanceling] = useState(false);
+
+  const selectedTask = useMemo(() => {
+    if (!selectedTaskId) return null;
+    return tasks.find(t => t.taskId === selectedTaskId) || null;
+  }, [tasks, selectedTaskId]);
 
   const t = translations[language];
 
@@ -44,21 +49,21 @@ export function TaskQueuePage({ employeeId, language, onBack, onNewTask }: TaskQ
         const sorted = sortTasks(allTasks);
         setTasks(sorted);
 
-        if (selectedTask) {
-          const updated = sorted.find(t => t.taskId === selectedTask.taskId);
-          if (updated) setSelectedTask(updated);
-        } else if (sorted.length > 0) {
-          setSelectedTask(sorted[0]);
-        }
+        setSelectedTaskId(currId => {
+          if (!currId && sorted.length > 0) {
+            return sorted[0].taskId;
+          }
+          return currId;
+        });
       } catch (err) {
         console.error('Failed to load tasks', err);
       }
     };
 
     loadTasks();
-    const interval = setInterval(loadTasks, 1000);
+    const interval = setInterval(loadTasks, 3000);
     return () => clearInterval(interval);
-  }, [selectedTask]);
+  }, []);
 
   const getStatusLabel = (status: string) => {
     switch (status) {
@@ -118,8 +123,6 @@ export function TaskQueuePage({ employeeId, language, onBack, onNewTask }: TaskQ
       const allTasks = await getAllTasks();
       const sorted = sortTasks(allTasks);
       setTasks(sorted);
-      const updated = sorted.find(t => t.taskId === selectedTask.taskId);
-      if (updated) setSelectedTask(updated);
     } catch (err) {
       console.error('Failed to cancel task', err);
     } finally {
@@ -179,14 +182,14 @@ export function TaskQueuePage({ employeeId, language, onBack, onNewTask }: TaskQ
                 tasks.map((task) => (
                   <button
                     key={task.taskId}
-                    onClick={() => setSelectedTask(task)}
+                    onClick={() => setSelectedTaskId(task.taskId)}
                     className={`
                       w-full text-left p-5 rounded-lg border-2 transition-all
-                      ${selectedTask?.taskId === task.taskId
+                      ${selectedTaskId === task.taskId
                         ? 'bg-info-background border-info shadow-md'
                         : 'bg-card border-border hover:border-info hover:shadow-sm'
                       }
-                      ${isMyTask(task) ? 'ring-2 ring-green-400' : ''}
+                      ${isMyTask(task) ? 'ring-2 ring-success' : ''}
                     `}
                   >
                     <div className="space-y-2">

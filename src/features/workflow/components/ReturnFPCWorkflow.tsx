@@ -96,17 +96,16 @@ export function ReturnFPCWorkflow({ employeeId, language, onBack, onTaskSubmitte
             {error && (
               <Alert severity="error" className="!text-xl !py-4">{error}</Alert>
             )}
-            <div className="flex justify-end">
               <Button
+                fullWidth
                 variant="contained"
                 size="large"
                 onClick={handleSubmitClick}
                 disabled={!selectedMachine || isSubmitting}
-                className="!py-6 !px-12 !text-2xl !font-bold"
+                className="!py-6 !text-2xl !font-bold"
               >
                 {isSubmitting ? t.processing : t.submit}
               </Button>
-            </div>
           </div>
         </CardContent>
       </Card>

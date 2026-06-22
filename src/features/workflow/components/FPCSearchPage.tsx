@@ -153,7 +153,7 @@ export function FPCSearchPage({ language, onBack }: FPCSearchPageProps) {
                     <TableRow
                       key={fpc.id}
                       hover
-                      className="transition-colors hover:bg-info-background/40"
+                      className="transition-colors"
                     >
                       <TableCell className="!text-xl !py-5 !pl-8 font-medium text-foreground">{fpc.address}</TableCell>
                       <TableCell className="!text-xl !py-5 font-semibold text-foreground">{fpc.functionName}</TableCell>

@@ -80,7 +80,8 @@ export function EmployeeLogin({ onLogin, language }: EmployeeLoginProps) {
                 className: '!text-xl',
               }}
               inputProps={{
-                style: { fontSize: '1.5rem', padding: '1.25rem' }
+                style: { fontSize: '1.5rem', padding: '1.25rem' },
+                maxLength: 50
               }}
             />
 
@@ -105,6 +106,7 @@ export function EmployeeLogin({ onLogin, language }: EmployeeLoginProps) {
                       edge="end"
                       size="large"
                       disabled={loading}
+                      aria-label={showPassword ? t.hidePassword : t.showPassword}
                     >
                       {showPassword ? <EyeOff className="w-8 h-8" /> : <Eye className="w-8 h-8" />}
                     </IconButton>
@@ -115,7 +117,8 @@ export function EmployeeLogin({ onLogin, language }: EmployeeLoginProps) {
                 className: '!text-xl',
               }}
               inputProps={{
-                style: { fontSize: '1.5rem', padding: '1.25rem' }
+                style: { fontSize: '1.5rem', padding: '1.25rem' },
+                maxLength: 100
               }}
             />
 

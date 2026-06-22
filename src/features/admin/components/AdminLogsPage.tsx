@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import {
   Card,
   CardContent,
@@ -89,6 +89,7 @@ export function AdminLogsPage({ employeeId, userRole, language, onBack }: AdminL
   const [newRole, setNewRole] = useState<'admin' | 'store' | 'operator'>('operator');
 
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [isUpdating, setIsUpdating] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
   const [successMsg, setSuccessMsg] = useState('');
   const t = translations[language];
@@ -148,7 +149,7 @@ export function AdminLogsPage({ employeeId, userRole, language, onBack }: AdminL
     }
   }, [userRole]);
 
-  // Poll for live data every 1 second
+  // Poll for live data every 3 seconds
   useEffect(() => {
     let isMounted = true;
     const run = async () => {
@@ -159,7 +160,7 @@ export function AdminLogsPage({ employeeId, userRole, language, onBack }: AdminL
     run();
     const interval = setInterval(() => {
       run();
-    }, 1000);
+    }, 3000);
     return () => {
       isMounted = false;
       clearInterval(interval);
@@ -186,31 +187,52 @@ export function AdminLogsPage({ employeeId, userRole, language, onBack }: AdminL
     setSuccessMsg('');
   };
 
-  // Filter logs
-  const filteredLogs = logs.filter(log => {
-    const matchesOperator = log.employeeId.toLowerCase().includes(searchOperator.toLowerCase());
-    const matchesType = selectedEventType === 'ALL' || log.eventType === selectedEventType;
-    return matchesOperator && matchesType;
-  });
+  // Filter logs (memoized to avoid recalculation on every polling tick)
+  const filteredLogs = useMemo(() => {
+    const lowerOperator = searchOperator.toLowerCase();
+    return logs.filter(log => {
+      const matchesOperator = log.employeeId.toLowerCase().includes(lowerOperator);
+      const matchesType = selectedEventType === 'ALL' || log.eventType === selectedEventType;
+      return matchesOperator && matchesType;
+    });
+  }, [logs, searchOperator, selectedEventType]);
 
-  // Filter FPCs
-  const filteredFpcs = fpcItems.filter(fpc => {
-    const matchesCategory = fpcCategoryFilter === 'ALL' || fpc.category === fpcCategoryFilter;
+  // Filter FPCs (memoized to avoid recalculation on every polling tick)
+  const filteredFpcs = useMemo(() => {
     const lowerQuery = fpcSearchQuery.toLowerCase();
-    const matchesSearch =
-      fpc.id.toLowerCase().includes(lowerQuery) ||
-      fpc.address.toLowerCase().includes(lowerQuery) ||
-      fpc.label.toLowerCase().includes(lowerQuery) ||
-      fpc.location.toLowerCase().includes(lowerQuery) ||
-      (fpc.comment && fpc.comment.toLowerCase().includes(lowerQuery));
-    return matchesCategory && matchesSearch;
-  });
+    return fpcItems.filter(fpc => {
+      const matchesCategory = fpcCategoryFilter === 'ALL' || fpc.category === fpcCategoryFilter;
+      const matchesSearch =
+        fpc.id.toLowerCase().includes(lowerQuery) ||
+        fpc.address.toLowerCase().includes(lowerQuery) ||
+        fpc.label.toLowerCase().includes(lowerQuery) ||
+        fpc.location.toLowerCase().includes(lowerQuery) ||
+        (fpc.comment && fpc.comment.toLowerCase().includes(lowerQuery));
+      return matchesCategory && matchesSearch;
+    });
+  }, [fpcItems, fpcCategoryFilter, fpcSearchQuery]);
 
-  // Calculate stats for Audit tab
-  const totalCount = logs.length;
-  const loginCount = logs.filter(l => l.eventType === 'LOGIN').length;
-  const taskSubmitCount = logs.filter(l => l.eventType === 'TASK_SUBMIT').length;
-  const stateChangeCount = logs.filter(l => l.eventType === 'STATE_CHANGE').length;
+  // Calculate stats for Audit tab (optimized to run in a single-pass O(N) loop and memoized)
+  const { totalCount, loginCount, taskSubmitCount, stateChangeCount } = useMemo(() => {
+    const total = logs.length;
+    let logins = 0;
+    let taskSubmits = 0;
+    let stateChanges = 0;
+
+    for (let i = 0; i < logs.length; i++) {
+      const type = logs[i].eventType;
+      if (type === 'LOGIN') logins++;
+      else if (type === 'TASK_SUBMIT') taskSubmits++;
+      else if (type === 'STATE_CHANGE') stateChanges++;
+    }
+
+    return {
+      totalCount: total,
+      loginCount: logins,
+      taskSubmitCount: taskSubmits,
+      stateChangeCount: stateChanges
+    };
+  }, [logs]);
 
   const getEventBadgeClass = (type: AuditLog['eventType']) => {
     switch (type) {
@@ -327,8 +349,8 @@ export function AdminLogsPage({ employeeId, userRole, language, onBack }: AdminL
 
   // Save location edit
   const handleSaveEdit = async () => {
-    if (!selectedFpc || !editValidation.isValid) return;
-
+    if (!selectedFpc || !editValidation.isValid || isUpdating) return;
+    setIsUpdating(true);
     try {
       if (newLocationType === 'storage') {
         await updateFPCLocation(employeeId, selectedFpc.id, 'Smart Storage', targetSlot.trim());
@@ -358,26 +380,38 @@ export function AdminLogsPage({ employeeId, userRole, language, onBack }: AdminL
       fetchData();
     } catch (err) {
       setErrorMsg(err instanceof Error ? err.message : 'Error updating location');
+    } finally {
+      setIsUpdating(false);
     }
   };
 
   // Clear audit logs (Admin only)
   const handleClearLogs = () => {
-    clearAuditLogs(employeeId);
-    setIsClearLogsConfirmOpen(false);
-    setSuccessMsg(language === 'th' ? 'ล้างบันทึกประวัติการทำงานสำเร็จ' : 'Logs cleared successfully');
-    fetchData();
+    if (isUpdating) return;
+    setIsUpdating(true);
+    try {
+      clearAuditLogs(employeeId);
+      setIsClearLogsConfirmOpen(false);
+      setSuccessMsg(language === 'th' ? 'ล้างบันทึกประวัติการทำงานสำเร็จ' : 'Logs cleared successfully');
+      fetchData();
+    } catch {
+      setErrorMsg('Error clearing logs');
+    } finally {
+      setIsUpdating(false);
+    }
   };
 
   // Add user (Admin only)
   const handleAddUser = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (isUpdating) return;
     setErrorMsg('');
     setSuccessMsg('');
     if (!newEmployeeId.trim() || !newPassword.trim()) {
       setErrorMsg(t.error_validation);
       return;
     }
+    setIsUpdating(true);
     try {
       await addUser(employeeId, newEmployeeId.trim(), newPassword.trim(), newRole);
       setSuccessMsg(t.userAddedSuccessfully);
@@ -387,6 +421,8 @@ export function AdminLogsPage({ employeeId, userRole, language, onBack }: AdminL
       fetchUsersList();
     } catch (err) {
       setErrorMsg(err instanceof Error ? err.message : 'Error adding user');
+    } finally {
+      setIsUpdating(false);
     }
   };
 
@@ -402,9 +438,10 @@ export function AdminLogsPage({ employeeId, userRole, language, onBack }: AdminL
 
   // Confirm delete user
   const handleConfirmDeleteUser = async () => {
-    if (!userToDelete) return;
+    if (!userToDelete || isUpdating) return;
     setErrorMsg('');
     setSuccessMsg('');
+    setIsUpdating(true);
     try {
       await deleteUser(employeeId, userToDelete);
       setSuccessMsg(t.userDeletedSuccessfully);
@@ -413,6 +450,8 @@ export function AdminLogsPage({ employeeId, userRole, language, onBack }: AdminL
       fetchUsersList();
     } catch (err) {
       setErrorMsg(err instanceof Error ? err.message : 'Error deleting user');
+    } finally {
+      setIsUpdating(false);
     }
   };
 
@@ -427,6 +466,7 @@ export function AdminLogsPage({ employeeId, userRole, language, onBack }: AdminL
 
   const handleSaveEditUser = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (isUpdating) return;
     setErrorMsg('');
     setSuccessMsg('');
     const currentUser = usersList.find(u => u.employeeId === editEmployeeId);
@@ -436,6 +476,7 @@ export function AdminLogsPage({ employeeId, userRole, language, onBack }: AdminL
     }
     const finalPassword = editPassword.trim() || currentUser.passwordHash;
     const finalRole = editEmployeeId === employeeId ? currentUser.role : editRole;
+    setIsUpdating(true);
     try {
       await updateUser(employeeId, editEmployeeId, finalPassword, finalRole);
       setSuccessMsg(t.userUpdatedSuccessfully);
@@ -443,6 +484,8 @@ export function AdminLogsPage({ employeeId, userRole, language, onBack }: AdminL
       fetchUsersList();
     } catch (err) {
       setErrorMsg(err instanceof Error ? err.message : 'Error updating user');
+    } finally {
+      setIsUpdating(false);
     }
   };
 
@@ -455,13 +498,16 @@ export function AdminLogsPage({ employeeId, userRole, language, onBack }: AdminL
     <div className="flex flex-col h-full gap-6 overflow-hidden">
       {/* Page Title Panel */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-        <div className="flex items-center gap-4">
-          <button
+        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 w-full sm:w-auto">
+          <Button
+            startIcon={<ArrowLeft className="w-6 h-6" />}
             onClick={onBack}
-            className="p-3 text-muted-foreground hover:text-foreground bg-card border border-border hover:border-muted-foreground rounded-xl transition-all shadow-sm flex items-center justify-center"
+            variant="outlined"
+            size="large"
+            className="!px-6 !py-3 !text-lg w-full sm:w-auto shrink-0"
           >
-            <ArrowLeft className="w-6 h-6" />
-          </button>
+            {t.back}
+          </Button>
           <div>
             <div className="flex items-center gap-2">
               <Shield className="w-8 h-8 text-primary" />
@@ -824,6 +870,7 @@ export function AdminLogsPage({ employeeId, userRole, language, onBack }: AdminL
                   value={newEmployeeId}
                   onChange={(e) => setNewEmployeeId(e.target.value)}
                   variant="outlined"
+                  disabled={isUpdating}
                   InputProps={{ className: '!text-lg' }}
                   InputLabelProps={{ className: '!text-md' }}
                 />
@@ -835,11 +882,12 @@ export function AdminLogsPage({ employeeId, userRole, language, onBack }: AdminL
                   value={newPassword}
                   onChange={(e) => setNewPassword(e.target.value)}
                   variant="outlined"
+                  disabled={isUpdating}
                   InputProps={{ className: '!text-lg' }}
                   InputLabelProps={{ className: '!text-md' }}
                 />
 
-                <FormControl fullWidth variant="outlined">
+                <FormControl fullWidth variant="outlined" disabled={isUpdating}>
                   <InputLabel className="!text-md">{t.selectRole}</InputLabel>
                   <Select
                     value={newRole}
@@ -858,9 +906,10 @@ export function AdminLogsPage({ employeeId, userRole, language, onBack }: AdminL
                   type="submit"
                   variant="contained"
                   size="large"
-                  className="!py-4 !text-base !font-semibold !bg-primary hover:!bg-primary/90 text-primary-foreground"
+                  disabled={isUpdating}
+                  className="!py-4 !text-base !font-semibold !bg-primary hover:!bg-primary/90 text-primary-foreground disabled:opacity-50"
                 >
-                  {t.addUser}
+                  {isUpdating ? t.processing : t.addUser}
                 </Button>
               </form>
             </CardContent>
@@ -951,13 +1000,13 @@ export function AdminLogsPage({ employeeId, userRole, language, onBack }: AdminL
             >
               <FormControlLabel
                 value="storage"
-                control={<Radio sx={{ '& .MuiSvgIcon-root': { fontSize: 28 } }} />}
+                control={<Radio sx={{ '& .MuiSvgIcon-root': { fontSize: 28 } }} disabled={isUpdating} />}
                 label={<span className="text-base font-medium">{t.smartStorageOption}</span>}
                 className="!mr-8"
               />
               <FormControlLabel
                 value="machine"
-                control={<Radio sx={{ '& .MuiSvgIcon-root': { fontSize: 28 } }} />}
+                control={<Radio sx={{ '& .MuiSvgIcon-root': { fontSize: 28 } }} disabled={isUpdating} />}
                 label={<span className="text-base font-medium">{t.machineOption}</span>}
               />
             </RadioGroup>
@@ -973,6 +1022,7 @@ export function AdminLogsPage({ employeeId, userRole, language, onBack }: AdminL
                 value={targetSlot}
                 onChange={(e) => setTargetSlot(e.target.value)}
                 variant="outlined"
+                disabled={isUpdating}
                 error={!editValidation.isValid && targetSlot.trim() !== ''}
                 helperText={!editValidation.isValid && targetSlot.trim() !== '' ? editValidation.error : ''}
                 InputProps={{ className: '!text-lg' }}
@@ -981,7 +1031,7 @@ export function AdminLogsPage({ employeeId, userRole, language, onBack }: AdminL
             </div>
           ) : (
             <div className="space-y-6">
-              <FormControl fullWidth variant="outlined">
+              <FormControl fullWidth variant="outlined" disabled={isUpdating}>
                 <InputLabel className="!text-md">{t.selectMachine}</InputLabel>
                 <Select
                   value={targetMachine}
@@ -1019,7 +1069,7 @@ export function AdminLogsPage({ employeeId, userRole, language, onBack }: AdminL
                   >
                     <FormControlLabel
                       value="swap"
-                      control={<Radio size="small" />}
+                      control={<Radio size="small" disabled={isUpdating} />}
                       label={
                         <span className="text-sm font-medium text-foreground">
                           {t.swapWithOccupant} ({selectedFpc?.id} ↔ {targetMachineOccupant.id})
@@ -1028,7 +1078,7 @@ export function AdminLogsPage({ employeeId, userRole, language, onBack }: AdminL
                     />
                     <FormControlLabel
                       value="evict"
-                      control={<Radio size="small" />}
+                      control={<Radio size="small" disabled={isUpdating} />}
                       label={
                         <span className="text-sm font-medium text-foreground">
                           {t.moveDisplacedToStorage}
@@ -1048,6 +1098,7 @@ export function AdminLogsPage({ employeeId, userRole, language, onBack }: AdminL
                         value={evictSlot}
                         onChange={(e) => setEvictSlot(e.target.value)}
                         variant="outlined"
+                        disabled={isUpdating}
                         error={!editValidation.isValid && evictSlot.trim() !== ''}
                         helperText={!editValidation.isValid && evictSlot.trim() !== '' ? editValidation.error : ''}
                         InputProps={{ className: '!text-base' }}
@@ -1071,6 +1122,7 @@ export function AdminLogsPage({ employeeId, userRole, language, onBack }: AdminL
             onClick={() => setIsEditOpen(false)}
             variant="outlined"
             size="large"
+            disabled={isUpdating}
             className="!py-2.5 !px-6 !text-base !font-semibold !rounded-xl"
           >
             {t.cancel}
@@ -1079,10 +1131,10 @@ export function AdminLogsPage({ employeeId, userRole, language, onBack }: AdminL
             onClick={handleSaveEdit}
             variant="contained"
             size="large"
-            disabled={!editValidation.isValid}
+            disabled={!editValidation.isValid || isUpdating}
             className="!py-2.5 !px-6 !text-base !font-semibold !rounded-xl !bg-primary hover:!bg-primary/90 text-primary-foreground disabled:opacity-50"
           >
-            {t.save}
+            {isUpdating ? t.processing : t.save}
           </Button>
         </DialogActions>
       </Dialog>
@@ -1106,6 +1158,7 @@ export function AdminLogsPage({ employeeId, userRole, language, onBack }: AdminL
             onClick={() => setIsClearLogsConfirmOpen(false)}
             variant="outlined"
             size="large"
+            disabled={isUpdating}
             className="!py-2.5 !px-6 !text-base !font-semibold !rounded-xl"
           >
             {t.cancel}
@@ -1115,9 +1168,10 @@ export function AdminLogsPage({ employeeId, userRole, language, onBack }: AdminL
             variant="contained"
             color="error"
             size="large"
-            className="!py-2.5 !px-6 !text-base !font-semibold !rounded-xl"
+            disabled={isUpdating}
+            className="!py-2.5 !px-6 !text-base !font-semibold !rounded-xl disabled:opacity-50"
           >
-            {t.confirm}
+            {isUpdating ? t.processing : t.confirm}
           </Button>
         </DialogActions>
       </Dialog>
@@ -1141,6 +1195,7 @@ export function AdminLogsPage({ employeeId, userRole, language, onBack }: AdminL
             onClick={() => setIsUserDeleteConfirmOpen(false)}
             variant="outlined"
             size="large"
+            disabled={isUpdating}
             className="!py-2.5 !px-6 !text-base !font-semibold !rounded-xl"
           >
             {t.cancel}
@@ -1150,9 +1205,10 @@ export function AdminLogsPage({ employeeId, userRole, language, onBack }: AdminL
             variant="contained"
             color="error"
             size="large"
-            className="!py-2.5 !px-6 !text-base !font-semibold !rounded-xl"
+            disabled={isUpdating}
+            className="!py-2.5 !px-6 !text-base !font-semibold !rounded-xl disabled:opacity-50"
           >
-            {language === 'th' ? 'ยืนยันการลบ' : 'Confirm Delete'}
+            {isUpdating ? t.processing : (language === 'th' ? 'ยืนยันการลบ' : 'Confirm Delete')}
           </Button>
         </DialogActions>
       </Dialog>
@@ -1188,11 +1244,12 @@ export function AdminLogsPage({ employeeId, userRole, language, onBack }: AdminL
               value={editPassword}
               onChange={(e) => setEditPassword(e.target.value)}
               variant="outlined"
+              disabled={isUpdating}
               InputProps={{ className: '!text-lg' }}
               InputLabelProps={{ className: '!text-md' }}
             />
 
-            <FormControl fullWidth variant="outlined" disabled={editEmployeeId === employeeId}>
+            <FormControl fullWidth variant="outlined" disabled={editEmployeeId === employeeId || isUpdating}>
               <InputLabel className="!text-md">{t.selectRole}</InputLabel>
               <Select
                 value={editRole}
@@ -1211,6 +1268,7 @@ export function AdminLogsPage({ employeeId, userRole, language, onBack }: AdminL
               onClick={() => setIsEditUserOpen(false)}
               variant="outlined"
               size="large"
+              disabled={isUpdating}
               className="!py-2.5 !px-6 !text-base !font-semibold !rounded-xl"
             >
               {t.cancel}
@@ -1219,9 +1277,10 @@ export function AdminLogsPage({ employeeId, userRole, language, onBack }: AdminL
               type="submit"
               variant="contained"
               size="large"
-              className="!py-2.5 !px-6 !text-base !font-semibold !rounded-xl !bg-primary hover:!bg-primary/90 text-primary-foreground"
+              disabled={isUpdating}
+              className="!py-2.5 !px-6 !text-base !font-semibold !rounded-xl !bg-primary hover:!bg-primary/90 text-primary-foreground disabled:opacity-50"
             >
-              {t.save}
+              {isUpdating ? t.processing : t.save}
             </Button>
           </DialogActions>
         </form>
