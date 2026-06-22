@@ -516,7 +516,11 @@ export function AdminLogsPage({ employeeId, userRole, language, onBack }: AdminL
             <div className="flex items-center gap-2">
               <Shield className="w-8 h-8 text-primary" />
               <h2 className="text-3xl font-bold text-foreground">
-                {userRole === 'admin' ? t.adminPanel : t.managementPanel}
+                {userRole === 'admin' 
+                  ? t.adminPanel 
+                  : userRole === 'store' 
+                    ? t.managementPanel 
+                    : t.adminLogsTab}
               </h2>
             </div>
             <p className="text-muted-foreground text-base mt-1">

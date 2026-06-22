@@ -22,9 +22,11 @@ export const translations = {
     returnFPC: 'LOAD (คืน FPC)',
     requestFPC: 'UNLOAD (เบิก FPC)',
     swapFPC: 'Swap FPC',
+    unloadLoadFPC: 'UNLOAD & LOAD',
     returnFPCDesc: 'Pick up FPC from machine and return to Smart Storage',
     requestFPCDesc: 'Request FPC from Smart Storage and deliver to machine',
     swapFPCDesc: 'Transfer FPC directly from source machine to destination machine',
+    unloadLoadFPCDesc: 'Unload old FPC from machine and load new FPC from Smart Storage',
 
     // Machine Selection
     selectMachine: 'Select Machine',
@@ -107,6 +109,7 @@ export const translations = {
     error_validation: 'Validation error. Please check your input.',
     selectMachineFirst: 'Please select a machine first',
     selectFPCFirst: 'Please select an FPC first',
+    errorNoFpcOnMachine: 'No Probecard on this machine. Cannot perform swap operation.',
 
     // Workflow
     currentTask: 'Current Task',
@@ -221,9 +224,11 @@ export const translations = {
     returnFPC: 'LOAD (คืน FPC)',
     requestFPC: 'UNLOAD (เบิก FPC)',
     swapFPC: 'สลับ FPC',
+    unloadLoadFPC: 'UNLOAD & LOAD (เปลี่ยน FPC)',
     returnFPCDesc: 'รับ FPC จากเครื่องจักรและส่งคืนไปที่คลังสมาร์ท',
     requestFPCDesc: 'ขอ FPC จากคลังสมาร์ทและส่งไปยังเครื่องจักร',
     swapFPCDesc: 'โอนย้าย FPC ระหว่างเครื่องจักรโดยตรง',
+    unloadLoadFPCDesc: 'ถอด FPC ตัวเดิมออกจากเครื่องจักร และติดตั้ง FPC ตัวใหม่จากคลังสมาร์ทแทนที่',
 
     // Machine Selection
     selectMachine: 'เลือกเครื่องจักร',
@@ -306,6 +311,7 @@ export const translations = {
     error_validation: 'ข้อผิดพลาดการตรวจสอบ กรุณาตรวจสอบข้อมูลของคุณ',
     selectMachineFirst: 'กรุณาเลือกเครื่องจักรก่อน',
     selectFPCFirst: 'กรุณาเลือก FPC ก่อน',
+    errorNoFpcOnMachine: 'ไม่มี Probecard บนเครื่องจักรนี้ ไม่สามารถทำรายการสลับเปลี่ยนได้',
 
     // Workflow
     currentTask: 'งานปัจจุบัน',

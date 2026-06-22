@@ -47,13 +47,14 @@ export interface TaskResponse {
     | 'error';
   message: string;
   employeeId: string;
-  type: 'return' | 'request' | 'swap';
+  type: 'return' | 'request' | 'swap' | 'unload_load';
   sourceMachine?: string;
   destinationMachine?: string;
   fpcId?: string;
   createdAt: string;
   coverHeadInstalledConfirmed?: boolean;
   agvId?: string;
+  currentStepIndex?: number;
 }
 
 // In-memory task queue (replace with API call)
@@ -286,7 +287,7 @@ const mockFPCDatabase: FPCItem[] = [
   { id: 'P15450-FHH-2685', address: '009', functionName: 'PM Load', label: 'P15450-FHH-2685', comment: '', category: 'Deposit Production', location: 'Smart Storage' },
   { id: 'PIR011-TBB-0594', address: '010', functionName: 'PM Load', label: 'PIR011-TBB-0594', comment: '', category: 'Storage', location: 'Smart Storage' },
   { id: '2IE075TV001B', address: '011', functionName: 'PM Load', label: '2IE075TV001B', comment: '', category: 'Service', location: 'Smart Storage' },
-  { id: '2ID021FV003B', address: '013', functionName: 'PM Load', label: '2ID021FV003B', comment: '', category: 'Deposit PM', location: 'Smart Storage' },
+  { id: '2ID021FV003B', address: '-', functionName: 'PM Load', label: '2ID021FV003B', comment: '', category: 'Deposit PM', location: 'AVT_001' },
   { id: 'P15700-FBB-0707', address: '014', functionName: 'PM Load', label: 'P15700-FBB-0707', comment: '', category: 'Deposit Production', location: 'Smart Storage' },
 ];
 
@@ -365,6 +366,22 @@ const SWAP_STEPS: TaskResponse['status'][] = [
   'queued', 'starting', 'moving_to_source', 'arrived_at_source',
   'picking_up_fpc', 'waiting_cover_head_install'
 ];
+const UNLOAD_LOAD_STEPS: TaskResponse['status'][] = [
+  'queued',
+  'starting',
+  'moving_to_source',
+  'arrived_at_source',
+  'picking_up_fpc',
+  'moving_to_destination',
+  'arrived_at_destination',
+  'waiting_cover_head_install',
+  'waiting_cover_head_remove',
+  'placing_fpc',
+  'moving_to_destination',
+  'arrived_at_destination',
+  'placing_fpc',
+  'completed'
+];
 
 const STEP_DELAYS: Record<string, number> = {
   queued: 1500,
@@ -387,6 +404,7 @@ const pausedNextStep = new Map<string, TaskResponse['status']>();
 function getStepsForType(type: TaskResponse['type']): TaskResponse['status'][] {
   if (type === 'return') return RETURN_STEPS;
   if (type === 'request') return REQUEST_STEPS;
+  if (type === 'unload_load') return UNLOAD_LOAD_STEPS;
   return SWAP_STEPS;
 }
 
@@ -665,6 +683,42 @@ export async function submitSwapFPCJob(
   return task;
 }
 
+/** Submit an Unload & Load FPC job */
+export async function submitUnloadLoadFPCJob(
+  employeeId: string,
+  fpcId: string,
+  destinationMachineId: string
+): Promise<TaskResponse> {
+  await delay(1000);
+
+  const taskId = `TASK-${Date.now()}`;
+  const jobId = generateJobId();
+  const machine = mockMachines.find(m => m.id === destinationMachineId);
+
+  const task: TaskResponse = {
+    taskId,
+    jobId,
+    status: 'submitted',
+    message: 'Job submitted successfully',
+    employeeId,
+    type: 'unload_load',
+    sourceMachine: 'Smart Storage',
+    destinationMachine: machine?.name || destinationMachineId,
+    fpcId,
+    createdAt: new Date().toISOString(),
+    coverHeadInstalledConfirmed: false,
+    currentStepIndex: 0,
+  };
+
+  mockTaskQueue.push(task);
+  addAuditLog('TASK_SUBMIT', employeeId, `Submitted Unload & Load FPC job (Job: ${jobId}). FPC: ${fpcId}, Destination: ${machine?.name || destinationMachineId}`);
+
+  // Step-based progression
+  startProgression(taskId, 'unload_load');
+
+  return task;
+}
+
 /** Confirm Cover Head installed (Return FPC workflow step, or Swap first stage) */
 export async function confirmCoverHeadInstalled(taskId: string): Promise<TaskResponse> {
   await delay(500);
@@ -685,6 +739,18 @@ export async function confirmCoverHeadInstalled(taskId: string): Promise<TaskRes
       setTimeout(() => updateTaskStatus(taskId, 'arrived_at_destination'), 3000);
       setTimeout(() => updateTaskStatus(taskId, 'placing_fpc'), 6500);
       setTimeout(() => updateTaskStatus(taskId, 'waiting_cover_head_remove'), 10000);
+    } else if (task.type === 'unload_load') {
+      task.coverHeadInstalledConfirmed = true;
+      task.status = 'waiting_cover_head_remove';
+      task.currentStepIndex = 8; // Index of 'waiting_cover_head_remove' in UNLOAD_LOAD_STEPS
+      task.message = 'Cover Head installation confirmed, preparing to install new FPC';
+
+      addAuditLog('STATE_CHANGE', task.employeeId, `Job ${task.jobId} status updated to waiting_cover_head_remove`);
+
+      // Simulate AGV physical button confirmation after 5 seconds
+      setTimeout(() => {
+        confirmCoverHeadRemoved(taskId);
+      }, 5000);
     } else {
       task.status = 'moving_to_destination';
       task.message = 'Cover Head installation confirmed, AGV proceeding to Smart Storage';
@@ -717,10 +783,24 @@ export async function confirmCoverHeadRemoved(taskId: string): Promise<TaskRespo
     
     addAuditLog('CONFIRMATION', task.employeeId, `Confirmed Cover Head Removed for ${task.type.toUpperCase()} job (Job: ${task.jobId})`);
     
-    task.status = 'completed';
-    task.message = 'Cover Head removal confirmed, job completed';
+    if (task.type === 'unload_load') {
+      task.status = 'placing_fpc';
+      task.currentStepIndex = 9; // Index of first 'placing_fpc' in UNLOAD_LOAD_STEPS
+      task.message = 'Cover Head removal confirmed, placing new FPC';
 
-    addAuditLog('STATE_CHANGE', task.employeeId, `Job ${task.jobId} status updated to completed`);
+      addAuditLog('STATE_CHANGE', task.employeeId, `Job ${task.jobId} status updated to placing_fpc`);
+
+      // Custom timeout progression for the return leg
+      setTimeout(() => {
+        task.currentStepIndex = 10;
+        updateTaskStatus(taskId, 'moving_to_destination');
+      }, 3500);
+    } else {
+      task.status = 'completed';
+      task.message = 'Cover Head removal confirmed, job completed';
+
+      addAuditLog('STATE_CHANGE', task.employeeId, `Job ${task.jobId} status updated to completed`);
+    }
   }
   return task || {
     taskId,
@@ -778,12 +858,45 @@ export function updateTaskStatus(taskId: string, status: TaskResponse['status'])
         confirmCoverHeadRemoved(taskId);
       }, 5000);
     } else {
-      // Schedule next step in progression (for non-waiting statuses)
-      const steps = getStepsForType(task.type);
-      const currentIdx = steps.indexOf(status);
-      if (currentIdx >= 0 && currentIdx < steps.length - 1) {
-        const nextStatus = steps[currentIdx + 1];
-        scheduleNextStep(taskId, nextStatus);
+      if (task.type === 'unload_load') {
+        const currentIndex = task.currentStepIndex ?? 0;
+        if (currentIndex < UNLOAD_LOAD_STEPS.length - 1) {
+          const nextIndex = currentIndex + 1;
+          task.currentStepIndex = nextIndex;
+          const nextStatus = UNLOAD_LOAD_STEPS[nextIndex];
+          scheduleNextStep(taskId, nextStatus);
+        } else if (status === 'completed') {
+          // Perform location swapping in in-memory database
+          const newFpc = mockFPCDatabase.find(f => f.id === task.fpcId);
+          const oldFpc = mockFPCDatabase.find(f => f.location === task.destinationMachine);
+          if (newFpc && oldFpc) {
+            const originalNewFpcAddress = newFpc.address;
+            const originalNewFpcLocation = newFpc.location;
+            const originalOldFpcLocation = oldFpc.location;
+
+            // 1. Move new FPC to target machine
+            newFpc.location = originalOldFpcLocation;
+            newFpc.address = '-';
+
+            // 2. Move old FPC to storage slot vacated by new FPC
+            oldFpc.location = originalNewFpcLocation; // 'Smart Storage'
+            oldFpc.address = originalNewFpcAddress;
+
+            addAuditLog(
+              'STATE_CHANGE',
+              'SYSTEM',
+              `Swapped FPC locations: New FPC ${newFpc.id} is now on Machine ${newFpc.location}. Old FPC ${oldFpc.id} returned to Smart Storage Slot ${oldFpc.address}`
+            );
+          }
+        }
+      } else {
+        // Schedule next step in progression (for non-waiting statuses)
+        const steps = getStepsForType(task.type);
+        const currentIdx = steps.indexOf(status);
+        if (currentIdx >= 0 && currentIdx < steps.length - 1) {
+          const nextStatus = steps[currentIdx + 1];
+          scheduleNextStep(taskId, nextStatus);
+        }
       }
     }
   }

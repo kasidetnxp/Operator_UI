@@ -1,5 +1,5 @@
 import { Card, CardActionArea } from '@mui/material';
-import { ArrowDownCircle, ArrowUpCircle, ArrowLeftRight } from 'lucide-react';
+import { ArrowDownCircle, ArrowUpCircle, ArrowLeftRight, RefreshCw } from 'lucide-react';
 import { translations } from '@/shared/utils/translations';
 import type { Language, OperationMode } from '@/shared/types';
 
@@ -17,15 +17,15 @@ export function ModeSelection({ onSelectMode, language }: ModeSelectionProps) {
         {t.selectMode}
       </h2>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl w-full px-8">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 max-w-7xl w-full px-8">
         <Card className="hover:shadow-xl transition-shadow bg-card border border-border">
-          <CardActionArea onClick={() => onSelectMode('return')} className="!p-12">
-            <div className="flex flex-col items-center text-center space-y-6">
-              <ArrowDownCircle className="w-28 h-28 text-info" />
-              <h3 className="text-4xl font-bold text-foreground">
+          <CardActionArea onClick={() => onSelectMode('return')} className="!p-8 h-full flex flex-col justify-between">
+            <div className="flex flex-col items-center text-center space-y-4">
+              <ArrowDownCircle className="w-20 h-20 text-info" />
+              <h3 className="text-3xl font-bold text-foreground">
                 {t.returnFPC}
               </h3>
-              <p className="text-xl text-muted-foreground">
+              <p className="text-lg text-muted-foreground">
                 {t.returnFPCDesc}
               </p>
             </div>
@@ -33,13 +33,13 @@ export function ModeSelection({ onSelectMode, language }: ModeSelectionProps) {
         </Card>
 
         <Card className="hover:shadow-xl transition-shadow bg-card border border-border">
-          <CardActionArea onClick={() => onSelectMode('request')} className="!p-12">
-            <div className="flex flex-col items-center text-center space-y-6">
-              <ArrowUpCircle className="w-28 h-28 text-success" />
-              <h3 className="text-4xl font-bold text-foreground">
+          <CardActionArea onClick={() => onSelectMode('request')} className="!p-8 h-full flex flex-col justify-between">
+            <div className="flex flex-col items-center text-center space-y-4">
+              <ArrowUpCircle className="w-20 h-20 text-success" />
+              <h3 className="text-3xl font-bold text-foreground">
                 {t.requestFPC}
               </h3>
-              <p className="text-xl text-muted-foreground">
+              <p className="text-lg text-muted-foreground">
                 {t.requestFPCDesc}
               </p>
             </div>
@@ -47,14 +47,28 @@ export function ModeSelection({ onSelectMode, language }: ModeSelectionProps) {
         </Card>
 
         <Card className="hover:shadow-xl transition-shadow bg-card border border-border">
-          <CardActionArea onClick={() => onSelectMode('swap')} className="!p-12">
-            <div className="flex flex-col items-center text-center space-y-6">
-              <ArrowLeftRight className="w-28 h-28 text-primary" />
-              <h3 className="text-4xl font-bold text-foreground">
+          <CardActionArea onClick={() => onSelectMode('swap')} className="!p-8 h-full flex flex-col justify-between">
+            <div className="flex flex-col items-center text-center space-y-4">
+              <ArrowLeftRight className="w-20 h-20 text-primary" />
+              <h3 className="text-3xl font-bold text-foreground">
                 {t.swapFPC}
               </h3>
-              <p className="text-xl text-muted-foreground">
+              <p className="text-lg text-muted-foreground">
                 {t.swapFPCDesc}
+              </p>
+            </div>
+          </CardActionArea>
+        </Card>
+
+        <Card className="hover:shadow-xl transition-shadow bg-card border border-border">
+          <CardActionArea onClick={() => onSelectMode('unload_load')} className="!p-8 h-full flex flex-col justify-between">
+            <div className="flex flex-col items-center text-center space-y-4">
+              <RefreshCw className="w-20 h-20 text-warning" />
+              <h3 className="text-3xl font-bold text-foreground">
+                {t.unloadLoadFPC}
+              </h3>
+              <p className="text-lg text-muted-foreground">
+                {t.unloadLoadFPCDesc}
               </p>
             </div>
           </CardActionArea>

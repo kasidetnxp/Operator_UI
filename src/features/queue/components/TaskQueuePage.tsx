@@ -199,7 +199,7 @@ export function TaskQueuePage({ employeeId, language, onBack, onNewTask }: TaskQ
                             {task.jobId}
                           </div>
                           <div className="text-sm text-muted-foreground">
-                            {task.type === 'return' ? t.returnFPC : task.type === 'request' ? t.requestFPC : t.swapFPC}
+                            {task.type === 'return' ? t.returnFPC : task.type === 'request' ? t.requestFPC : task.type === 'unload_load' ? t.unloadLoadFPC : t.swapFPC}
                           </div>
                           <div className="text-sm text-muted-foreground font-semibold mt-1">
                             {t.assignedAGV}: {task.agvId ? task.agvId : t.notAssigned}
@@ -250,7 +250,7 @@ export function TaskQueuePage({ employeeId, language, onBack, onNewTask }: TaskQ
                     <div className="flex justify-between text-xl border-b border-border pb-3">
                       <span className="text-muted-foreground font-semibold">{t.type}:</span>
                       <span className="font-bold text-foreground">
-                        {selectedTask.type === 'return' ? t.returnFPC : selectedTask.type === 'request' ? t.requestFPC : t.swapFPC}
+                        {selectedTask.type === 'return' ? t.returnFPC : selectedTask.type === 'request' ? t.requestFPC : selectedTask.type === 'unload_load' ? t.unloadLoadFPC : t.swapFPC}
                       </span>
                     </div>
                     {selectedTask.fpcId && (
@@ -351,7 +351,7 @@ export function TaskQueuePage({ employeeId, language, onBack, onNewTask }: TaskQ
                 <div className="flex justify-between text-xl">
                   <span className="text-muted-foreground">{t.type}:</span>
                   <span className="font-bold text-foreground">
-                    {selectedTask.type === 'return' ? t.returnFPC : selectedTask.type === 'request' ? t.requestFPC : t.swapFPC}
+                    {selectedTask.type === 'return' ? t.returnFPC : selectedTask.type === 'request' ? t.requestFPC : selectedTask.type === 'unload_load' ? t.unloadLoadFPC : t.swapFPC}
                   </span>
                 </div>
               </div>
