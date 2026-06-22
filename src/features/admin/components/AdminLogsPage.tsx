@@ -888,42 +888,48 @@ export function AdminLogsPage({ employeeId, userRole, language, onBack }: AdminL
             <CardContent className="p-6 space-y-6">
               <h3 className="text-xl font-semibold text-foreground">{t.addUser}</h3>
               <form onSubmit={handleAddUser} className="space-y-6">
-                <TextField
-                  fullWidth
-                  label={t.enterNewEmployeeId}
-                  value={newEmployeeId}
-                  onChange={(e) => setNewEmployeeId(e.target.value)}
-                  variant="outlined"
-                  disabled={isUpdating}
-                  InputProps={{ className: '!text-lg' }}
-                  InputLabelProps={{ className: '!text-md' }}
-                />
+                <div>
+                  <TextField
+                    fullWidth
+                    label={t.enterNewEmployeeId}
+                    value={newEmployeeId}
+                    onChange={(e) => setNewEmployeeId(e.target.value)}
+                    variant="outlined"
+                    disabled={isUpdating}
+                    InputProps={{ className: '!text-lg' }}
+                    InputLabelProps={{ className: '!text-md' }}
+                  />
+                </div>
                 
-                <TextField
-                  fullWidth
-                  type="password"
-                  label={t.enterNewPassword}
-                  value={newPassword}
-                  onChange={(e) => setNewPassword(e.target.value)}
-                  variant="outlined"
-                  disabled={isUpdating}
-                  InputProps={{ className: '!text-lg' }}
-                  InputLabelProps={{ className: '!text-md' }}
-                />
+                <div>
+                  <TextField
+                    fullWidth
+                    type="password"
+                    label={t.enterNewPassword}
+                    value={newPassword}
+                    onChange={(e) => setNewPassword(e.target.value)}
+                    variant="outlined"
+                    disabled={isUpdating}
+                    InputProps={{ className: '!text-lg' }}
+                    InputLabelProps={{ className: '!text-md' }}
+                  />
+                </div>
 
-                <FormControl fullWidth variant="outlined" disabled={isUpdating}>
-                  <InputLabel className="!text-md">{t.selectRole}</InputLabel>
-                  <Select
-                    value={newRole}
-                    onChange={(e) => setNewRole(e.target.value as 'admin' | 'store' | 'operator')}
-                    label={t.selectRole}
-                    className="text-lg"
-                  >
-                    <MenuItem value="admin" className="!text-lg">{t.admin}</MenuItem>
-                    <MenuItem value="store" className="!text-lg">{t.store}</MenuItem>
-                    <MenuItem value="operator" className="!text-lg">{t.operatorRole}</MenuItem>
-                  </Select>
-                </FormControl>
+                <div>
+                  <FormControl fullWidth variant="outlined" disabled={isUpdating}>
+                    <InputLabel className="!text-md">{t.selectRole}</InputLabel>
+                    <Select
+                      value={newRole}
+                      onChange={(e) => setNewRole(e.target.value as 'admin' | 'store' | 'operator')}
+                      label={t.selectRole}
+                      className="text-lg"
+                    >
+                      <MenuItem value="admin" className="!text-lg">{t.admin}</MenuItem>
+                      <MenuItem value="store" className="!text-lg">{t.store}</MenuItem>
+                      <MenuItem value="operator" className="!text-lg">{t.operatorRole}</MenuItem>
+                    </Select>
+                  </FormControl>
+                </div>
 
                 <Button
                   fullWidth
@@ -1250,42 +1256,48 @@ export function AdminLogsPage({ employeeId, userRole, language, onBack }: AdminL
         </DialogTitle>
         <form onSubmit={handleSaveEditUser}>
           <DialogContent className="!pt-4 space-y-6">
-            <TextField
-              fullWidth
-              disabled
-              label={t.employeeId}
-              value={editEmployeeId}
-              variant="outlined"
-              InputProps={{ className: '!text-lg' }}
-              InputLabelProps={{ className: '!text-md' }}
-            />
+            <div>
+              <TextField
+                fullWidth
+                disabled
+                label={t.employeeId}
+                value={editEmployeeId}
+                variant="outlined"
+                InputProps={{ className: '!text-lg' }}
+                InputLabelProps={{ className: '!text-md' }}
+              />
+            </div>
             
-            <TextField
-              fullWidth
-              type="password"
-              label={t.password}
-              placeholder={t.enterNewPasswordPlaceholder}
-              value={editPassword}
-              onChange={(e) => setEditPassword(e.target.value)}
-              variant="outlined"
-              disabled={isUpdating}
-              InputProps={{ className: '!text-lg' }}
-              InputLabelProps={{ className: '!text-md' }}
-            />
+            <div>
+              <TextField
+                fullWidth
+                type="password"
+                label={t.password}
+                placeholder={t.enterNewPasswordPlaceholder}
+                value={editPassword}
+                onChange={(e) => setEditPassword(e.target.value)}
+                variant="outlined"
+                disabled={isUpdating}
+                InputProps={{ className: '!text-lg' }}
+                InputLabelProps={{ className: '!text-md' }}
+              />
+            </div>
 
-            <FormControl fullWidth variant="outlined" disabled={editEmployeeId === employeeId || isUpdating}>
-              <InputLabel className="!text-md">{t.selectRole}</InputLabel>
-              <Select
-                value={editRole}
-                onChange={(e) => setEditRole(e.target.value as 'admin' | 'store' | 'operator')}
-                label={t.selectRole}
-                className="text-lg"
-              >
-                <MenuItem value="admin" className="!text-lg">{t.admin}</MenuItem>
-                <MenuItem value="store" className="!text-lg">{t.store}</MenuItem>
-                <MenuItem value="operator" className="!text-lg">{t.operatorRole}</MenuItem>
-              </Select>
-            </FormControl>
+            <div>
+              <FormControl fullWidth variant="outlined" disabled={editEmployeeId === employeeId || isUpdating}>
+                <InputLabel className="!text-md">{t.selectRole}</InputLabel>
+                <Select
+                  value={editRole}
+                  onChange={(e) => setEditRole(e.target.value as 'admin' | 'store' | 'operator')}
+                  label={t.selectRole}
+                  className="text-lg"
+                >
+                  <MenuItem value="admin" className="!text-lg">{t.admin}</MenuItem>
+                  <MenuItem value="store" className="!text-lg">{t.store}</MenuItem>
+                  <MenuItem value="operator" className="!text-lg">{t.operatorRole}</MenuItem>
+                </Select>
+              </FormControl>
+            </div>
           </DialogContent>
           <DialogActions className="!p-6 !pt-2">
             <Button
