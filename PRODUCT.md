@@ -5,12 +5,12 @@
 product
 
 ## Users
-* **Operators (Shift Workers)**: Work on the cleanroom factory floor. They use touch screen tablets or terminal monitors to load, unload, and swap FPCs. They often wear gloves, work under bright fluorescent lights, and require quick, unambiguous status updates with large, easy-to-tap interactive elements.
+* **Operators (Shift Workers)**: Work on the cleanroom factory floor. They use touch screen tablets or terminal monitors to load, unload, swap, and change (UNLOAD & LOAD) FPCs. They often wear gloves, work under bright fluorescent lights, and require quick, unambiguous status updates with large, easy-to-tap interactive elements.
 * **Store Personnel (Support)**: Provide backend support for production, handling process data updates, and resolving FPC mismatches and manual location overrides.
 * **Admins (Managers)**: Manage user roles, passwords, view comprehensive audit logs, and approve exception operations.
 
 ## Product Purpose
-The NXP WT FPC Management System is an operator user interface designed for requesting, returning, and swapping Front Opening Pod Carriers (FPCs) between Smart Storage and factory workstations/machines via Automated Guided Vehicles (AGVs). It serves to coordinate automated transport workflows, trace carrier locations, minimize manual errors, and provide real-time task status telemetry to ensure manufacturing safety and efficiency.
+The NXP WT FPC Management System is an operator user interface designed for requesting, returning, swapping, and changing (UNLOAD & LOAD) Front Opening Pod Carriers (FPCs) between Smart Storage and factory workstations/machines via Automated Guided Vehicles (AGVs). It serves to coordinate automated transport workflows, trace carrier locations, minimize manual errors, and provide real-time task status telemetry to ensure manufacturing safety and efficiency.
 
 ## Brand Personality
 * **Keywords**: Precise, Industrial, High-Reliability, Cleanroom, Safety-Critical.

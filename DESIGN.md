@@ -70,7 +70,7 @@ These map to the 16 backend task states:
 ---
 
 ## 🏗️ Layout Patterns
-* **Mode Selection Screen**: Three large, equal-weight tiles (LOAD, UNLOAD, สลับ FPC) displayed centrally.
+* **Mode Selection Screen**: Four large, equal-weight tiles (LOAD, UNLOAD, สลับ FPC, เปลี่ยน FPC) displayed centrally.
 * **Task Queue**: Two-pane list+detail layout (List on the left pane, Selected Task details on the right pane).
 * **Header / Navigation Bar**: Includes the company logo, a link button to FPC Search, and a role-aware employee profile dropdown.
 * **Header Constraints**: Operators (Employee ID `operator` / role Operator) must NOT have a "Main Menu" button in the header. They rely solely on the sub-page's internal back button to return.
@@ -122,3 +122,4 @@ Primary language: **Thai (TH)**, Secondary language: **English (EN)**.
   * `"LOAD (คืน FPC)"`
   * `"UNLOAD (เบิก FPC)"`
   * `"สลับ FPC"`
+  * `"เปลี่ยน FPC (UNLOAD & LOAD)"`
