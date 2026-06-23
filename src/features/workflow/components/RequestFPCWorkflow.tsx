@@ -121,7 +121,11 @@ export function RequestFPCWorkflow({ employeeId, language, onBack, onTaskSubmitt
               variant="outlined"
               className="!mb-6"
               InputProps={{ className: '!text-2xl !py-4' }}
-              inputProps={{ style: { fontSize: '1.5rem', padding: '1rem' } }}
+              inputProps={{
+                style: { fontSize: '1.5rem', padding: '1rem' },
+                'aria-label': t.searchFPC,
+                maxLength: 100
+              }}
             />
 
             {isLoading ? (
@@ -150,8 +154,15 @@ export function RequestFPCWorkflow({ employeeId, language, onBack, onTaskSubmitt
                         key={fpc.id}
                         hover
                         onClick={() => setSelectedFPC(fpc)}
-                        className="cursor-pointer"
+                        className="cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-info focus-visible:ring-inset"
                         selected={selectedFPC?.id === fpc.id}
+                        tabIndex={0}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter' || e.key === ' ') {
+                            e.preventDefault();
+                            setSelectedFPC(fpc);
+                          }
+                        }}
                         sx={{
                           '&.Mui-selected': { backgroundColor: 'var(--info-background)' },
                           '&.Mui-selected:hover': { backgroundColor: 'var(--info-background)' },
@@ -160,12 +171,14 @@ export function RequestFPCWorkflow({ employeeId, language, onBack, onTaskSubmitt
                         <TableCell padding="checkbox" className="!py-4">
                           <Radio
                             checked={selectedFPC?.id === fpc.id}
+                            onChange={() => setSelectedFPC(fpc)}
+                            inputProps={{ 'aria-label': fpc.label, tabIndex: -1 }}
                             sx={{ '& .MuiSvgIcon-root': { fontSize: 32 } }}
                           />
                         </TableCell>
-                        <TableCell className="!text-xl !py-4 text-foreground">{fpc.address}</TableCell>
+                        <TableCell className="!text-xl !py-4 text-foreground font-mono">{fpc.address}</TableCell>
                         <TableCell className="!text-xl !py-4 text-foreground">{fpc.functionName}</TableCell>
-                        <TableCell className="!text-xl !py-4 text-info">{fpc.label}</TableCell>
+                        <TableCell className="!text-xl !py-4 text-info font-mono">{fpc.label}</TableCell>
                         <TableCell className="!text-xl !py-4 text-muted-foreground">{fpc.comment || '-'}</TableCell>
                       </TableRow>
                     ))}
@@ -213,7 +226,7 @@ export function RequestFPCWorkflow({ employeeId, language, onBack, onTaskSubmitt
       {/* Confirmation Dialog */}
       <Dialog
         open={showConfirmDialog}
-        onClose={() => setShowConfirmDialog(false)}
+        onClose={() => !isSubmitting && setShowConfirmDialog(false)}
         maxWidth="sm"
         fullWidth
         PaperProps={{ className: '!p-4 !bg-card !text-foreground' }}
@@ -248,6 +261,7 @@ export function RequestFPCWorkflow({ employeeId, language, onBack, onTaskSubmitt
             variant="outlined"
             size="large"
             className="!py-4 !px-10 !text-xl !min-w-[140px]"
+            disabled={isSubmitting}
           >
             {t.no}
           </Button>
@@ -257,8 +271,9 @@ export function RequestFPCWorkflow({ employeeId, language, onBack, onTaskSubmitt
             size="large"
             autoFocus
             className="!py-4 !px-10 !text-xl !min-w-[140px]"
+            disabled={isSubmitting}
           >
-            {t.yes}
+            {isSubmitting ? t.processing : t.yes}
           </Button>
         </DialogActions>
       </Dialog>

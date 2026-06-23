@@ -111,7 +111,6 @@ export function FPCSearchPage({ language, onBack }: FPCSearchPageProps) {
             </Tabs>
           </div>
  
-          {/* Search bar */}
           <TextField
             fullWidth
             placeholder={t.searchPlaceholder}
@@ -120,7 +119,11 @@ export function FPCSearchPage({ language, onBack }: FPCSearchPageProps) {
             variant="outlined"
             className="!mb-6"
             InputProps={{ className: '!text-2xl !py-4' }}
-            inputProps={{ style: { fontSize: '1.5rem', padding: '1rem' } }}
+            inputProps={{
+              style: { fontSize: '1.5rem', padding: '1rem' },
+              'aria-label': t.searchFPC,
+              maxLength: 100
+            }}
           />
  
           {error && (
@@ -155,7 +158,7 @@ export function FPCSearchPage({ language, onBack }: FPCSearchPageProps) {
                       hover
                       className="transition-colors"
                     >
-                      <TableCell className="!text-xl !py-5 !pl-8 font-medium text-foreground">{fpc.address}</TableCell>
+                      <TableCell className="!text-xl !py-5 !pl-8 font-medium text-foreground font-mono">{fpc.address}</TableCell>
                       <TableCell className="!text-xl !py-5 font-semibold text-foreground">{fpc.functionName}</TableCell>
                       <TableCell className="!text-xl !py-5 font-mono text-info">{fpc.label}</TableCell>
                       <TableCell className="!text-xl !py-5 !pr-8 text-muted-foreground">{fpc.comment || '-'}</TableCell>

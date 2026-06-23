@@ -11,6 +11,7 @@ export default function App() {
   const [language] = useState<Language>('th');
   const [employeeId, setEmployeeId] = useState<string>(() => localStorage.getItem('nxp_employee_id') || '');
   const [role, setRole] = useState<Role | null>(() => localStorage.getItem('nxp_role') as Role | null);
+  const [floor, setFloor] = useState<string>(() => localStorage.getItem('nxp_floor') || 'E4');
   const [currentPage, setCurrentPage] = useState<Page>(() => {
     const savedRole = localStorage.getItem('nxp_role');
     if (savedRole === 'admin' || savedRole === 'store') {
@@ -31,12 +32,14 @@ export default function App() {
     return () => clearInterval(interval);
   }, []);
 
-  const handleLogin = (id: string, userRole: Role) => {
+  const handleLogin = (id: string, userRole: Role, selectedFloor: string) => {
     setEmployeeId(id);
     setRole(userRole);
+    setFloor(selectedFloor);
     localStorage.setItem('nxp_employee_id', id);
     localStorage.setItem('nxp_role', userRole);
-    addAuditLog('LOGIN', id, `Employee logged in successfully as ${userRole}`);
+    localStorage.setItem('nxp_floor', selectedFloor);
+    addAuditLog('LOGIN', id, `Employee logged in successfully as ${userRole} on Floor ${selectedFloor}`);
     if (userRole === 'admin' || userRole === 'store') {
       setCurrentPage('admin');
     } else {
@@ -50,8 +53,10 @@ export default function App() {
     }
     setEmployeeId('');
     setRole(null);
+    setFloor('E4');
     localStorage.removeItem('nxp_employee_id');
     localStorage.removeItem('nxp_role');
+    localStorage.removeItem('nxp_floor');
     setCurrentPage('mode-selection');
   };
 
@@ -117,6 +122,13 @@ export default function App() {
                     }`}
                   />
                   AGV 2: {agv2Status}
+                </span>
+                {/* Floor Badge */}
+                <span
+                  className="px-4 py-2 text-lg font-black rounded-full flex items-center gap-2 border shadow-sm bg-info-background text-info-foreground border-info"
+                >
+                  <span className="w-3 h-3 rounded-full bg-info" />
+                  {translations[language].floor}: {floor}
                 </span>
               </div>
             )}

@@ -53,7 +53,9 @@ export function MachineSelector({
           className: '!text-2xl !py-4',
         }}
         inputProps={{
-          style: { fontSize: '1.5rem', padding: '1rem' }
+          style: { fontSize: '1.5rem', padding: '1rem' },
+          'aria-label': t.searchMachine,
+          maxLength: 100
         }}
       />
 
@@ -64,8 +66,9 @@ export function MachineSelector({
               key={machine.id}
               onClick={() => machine.available && onSelectMachine(machine.id)}
               disabled={!machine.available}
+              aria-pressed={selectedMachine === machine.id}
               className={`
-                relative p-6 rounded-lg border-2 transition-all
+                relative p-6 rounded-lg border-2 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-info focus-visible:ring-inset
                 ${!machine.available
                   ? 'bg-muted border-border opacity-50 cursor-not-allowed'
                   : selectedMachine === machine.id
@@ -78,7 +81,7 @@ export function MachineSelector({
                 <div className="text-2xl font-bold text-foreground">
                   {machine.name}
                 </div>
-                <div className="text-lg text-muted-foreground">
+                <div className="text-lg text-muted-foreground font-mono">
                   {machine.id}
                 </div>
                 <div
