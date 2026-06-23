@@ -21,11 +21,11 @@ export const translations = {
     selectMode: 'Select Operation Mode',
     returnFPC: 'LOAD\n(คืน FPC)',
     requestFPC: 'UNLOAD\n(เบิก FPC)',
-    swapFPC: 'Swap FPC',
+    moveFPC: 'Move FPC',
     unloadLoadFPC: 'UNLOAD & LOAD',
     returnFPCDesc: 'Pick up FPC from machine and return to Smart Storage',
     requestFPCDesc: 'Request FPC from Smart Storage and deliver to machine',
-    swapFPCDesc: 'Transfer FPC directly from source machine to destination machine',
+    moveFPCDesc: 'Move FPC directly from source machine to destination machine',
     unloadLoadFPCDesc: 'Unload old FPC from machine and load new FPC from Smart Storage',
 
     // Machine Selection
@@ -110,6 +110,8 @@ export const translations = {
     selectMachineFirst: 'Please select a machine first',
     selectFPCFirst: 'Please select an FPC first',
     errorNoFpcOnMachine: 'No Probecard on this machine. Cannot perform swap operation.',
+    errorMachineAlreadyHasFPC: 'Destination machine already has a Probecard.',
+    errorMachineHasNoFPC: 'Source machine does not have a Probecard.',
 
     // Workflow
     currentTask: 'Current Task',
@@ -139,6 +141,8 @@ export const translations = {
     probecardToSend: 'Probecard ID (Load)',
     probecardToSendFromSource: 'Probecard ID (Send)',
     probecardToReceiveFromDest: 'Probecard ID (Receive)',
+    probecardToLoad: 'Probecard ID (Send)',
+    probecardToUnload: 'Probecard ID (Receive)',
     noProbecardOnMachine: 'No Probecard on this machine',
     adminPanel: 'Admin Panel',
     systemLogs: 'System Audit Logs',
@@ -226,11 +230,11 @@ export const translations = {
     selectMode: 'เลือกโหมดการทำงาน',
     returnFPC: 'LOAD\n(คืน FPC)',
     requestFPC: 'UNLOAD\n(เบิก FPC)',
-    swapFPC: 'สลับ FPC',
+    moveFPC: 'ย้าย FPC',
     unloadLoadFPC: 'UNLOAD & LOAD\n(เปลี่ยน FPC)',
     returnFPCDesc: 'รับ FPC จากเครื่องจักรและส่งคืนไปที่ Smart Store',
     requestFPCDesc: 'ขอ FPC จาก Smart Store และส่งไปยังเครื่องจักร',
-    swapFPCDesc: 'โอนย้าย FPC ระหว่างเครื่องจักรโดยตรง',
+    moveFPCDesc: 'โอนย้าย FPC ระหว่างเครื่องจักรโดยตรง',
     unloadLoadFPCDesc: 'ถอด FPC ตัวเดิมออกจากเครื่องจักร และติดตั้ง FPC ตัวใหม่จาก Smart Store แทนที่',
 
     // Machine Selection
@@ -315,6 +319,8 @@ export const translations = {
     selectMachineFirst: 'กรุณาเลือกเครื่องจักรก่อน',
     selectFPCFirst: 'กรุณาเลือก FPC ก่อน',
     errorNoFpcOnMachine: 'ไม่มี Probecard บนเครื่องจักรนี้ ไม่สามารถทำรายการสลับเปลี่ยนได้',
+    errorMachineAlreadyHasFPC: 'เครื่องจักรปลายทางมี Probecard อยู่แล้ว',
+    errorMachineHasNoFPC: 'เครื่องจักรต้นทางไม่มี Probecard',
 
     // Workflow
     currentTask: 'งานปัจจุบัน',
@@ -344,6 +350,8 @@ export const translations = {
     probecardToSend: 'Probecard ID (คืน)',
     probecardToSendFromSource: 'Probecard ID (ส่ง)',
     probecardToReceiveFromDest: 'Probecard ID (รับ)',
+    probecardToLoad: 'Probecard ID (ส่ง)',
+    probecardToUnload: 'Probecard ID (รับ)',
     noProbecardOnMachine: 'ไม่มี Probecard บนเครื่องจักรนี้',
     adminPanel: 'หน้า Admin',
     systemLogs: 'บันทึกประวัติการทำงานของระบบ',

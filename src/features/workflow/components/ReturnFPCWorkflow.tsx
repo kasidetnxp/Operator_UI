@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Button, Card, CardContent, Alert, Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material';
 import { ArrowLeft } from 'lucide-react';
 import { MachineSelector } from './MachineSelector';
@@ -37,9 +37,21 @@ export function ReturnFPCWorkflow({ employeeId, language, onBack, onTaskSubmitte
 
   const t = translations[language];
 
+  // Dynamic validation warning/error
+  const validationError = useMemo(() => {
+    if (selectedMachine && !currentFPC) {
+      return t.errorMachineHasNoFPC;
+    }
+    return '';
+  }, [selectedMachine, currentFPC, t.errorMachineHasNoFPC]);
+
   const handleSubmitClick = () => {
     if (!selectedMachine) {
       setError(t.selectMachineFirst);
+      return;
+    }
+    if (!currentFPC) {
+      setError(t.errorMachineHasNoFPC);
       return;
     }
     setShowConfirmDialog(true);
@@ -93,6 +105,9 @@ export function ReturnFPCWorkflow({ employeeId, language, onBack, onTaskSubmitte
           </div>
 
           <div className="space-y-4 mt-6">
+            {validationError && (
+              <Alert severity="error" className="!text-xl !py-4">{validationError}</Alert>
+            )}
             {error && (
               <Alert severity="error" className="!text-xl !py-4">{error}</Alert>
             )}
@@ -101,7 +116,7 @@ export function ReturnFPCWorkflow({ employeeId, language, onBack, onTaskSubmitte
                 variant="contained"
                 size="large"
                 onClick={handleSubmitClick}
-                disabled={!selectedMachine || isSubmitting}
+                disabled={!selectedMachine || !!validationError || isSubmitting}
                 className="!py-6 !text-2xl !font-bold"
               >
                 {isSubmitting ? t.processing : t.submit}

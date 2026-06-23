@@ -266,11 +266,11 @@ export function UnloadLoadWorkflow({ employeeId, language, onBack, onTaskSubmitt
             </p>
             <div className="bg-background rounded-lg p-6 space-y-3 border border-border">
               <div className="flex justify-between text-xl">
-                <span className="text-muted-foreground">{t.probecardToSend}:</span>
+                <span className="text-muted-foreground">{t.probecardToLoad}:</span>
                 <span className="font-bold text-success">{selectedFPC?.id}</span>
               </div>
               <div className="flex justify-between text-xl">
-                <span className="text-muted-foreground">{t.probecardToReceive}:</span>
+                <span className="text-muted-foreground">{t.probecardToUnload}:</span>
                 <span className="font-bold text-info">{oldFPC?.id || '-'}</span>
               </div>
               <div className="flex justify-between text-xl border-t border-border pt-3">

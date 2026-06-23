@@ -47,7 +47,7 @@ export interface TaskResponse {
     | 'error';
   message: string;
   employeeId: string;
-  type: 'return' | 'request' | 'swap' | 'unload_load';
+  type: 'return' | 'request' | 'move' | 'unload_load';
   sourceMachine?: string;
   destinationMachine?: string;
   fpcId?: string;
@@ -294,11 +294,31 @@ const mockFPCDatabase: FPCItem[] = [
 // Simulate network delay (remove when connecting to real API)
 const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
-// Generate unique Job ID
+// Generate unique Job ID: JOB_YYMMDD_counter (resets daily, persists on refresh)
 function generateJobId(): string {
-  const timestamp = Date.now();
-  const random = Math.floor(Math.random() * 1000).toString().padStart(3, '0');
-  return `JOB-${timestamp}-${random}`;
+  const now = new Date();
+  const yy = now.getFullYear().toString().slice(-2);
+  const mm = String(now.getMonth() + 1).padStart(2, '0');
+  const dd = String(now.getDate()).padStart(2, '0');
+  const dateStr = `${yy}${mm}${dd}`;
+
+  let count = 1;
+  const rawCounter = localStorage.getItem('nxp_job_counter');
+  if (rawCounter) {
+    try {
+      const parsed = JSON.parse(rawCounter);
+      if (parsed && parsed.date === dateStr) {
+        count = (parsed.count || 0) + 1;
+      }
+    } catch (e) {
+      console.error('Failed to parse nxp_job_counter', e);
+    }
+  }
+
+  localStorage.setItem('nxp_job_counter', JSON.stringify({ date: dateStr, count }));
+
+  const counterStr = count.toString().padStart(3, '0');
+  return `JOB_${dateStr}_${counterStr}`;
 }
 
 // ─── Dual AGV Status ───
@@ -362,7 +382,7 @@ const REQUEST_STEPS: TaskResponse['status'][] = [
   'picking_up_fpc', 'moving_to_destination', 'arrived_at_destination',
   'placing_fpc', 'waiting_cover_head_remove'
 ];
-const SWAP_STEPS: TaskResponse['status'][] = [
+const MOVE_STEPS: TaskResponse['status'][] = [
   'queued', 'starting', 'moving_to_source', 'arrived_at_source',
   'picking_up_fpc', 'waiting_cover_head_install'
 ];
@@ -405,7 +425,7 @@ function getStepsForType(type: TaskResponse['type']): TaskResponse['status'][] {
   if (type === 'return') return RETURN_STEPS;
   if (type === 'request') return REQUEST_STEPS;
   if (type === 'unload_load') return UNLOAD_LOAD_STEPS;
-  return SWAP_STEPS;
+  return MOVE_STEPS;
 }
 
 function scheduleNextStep(taskId: string, nextStatus: TaskResponse['status']): void {
@@ -589,6 +609,11 @@ export async function submitReturnFPCJob(
 ): Promise<TaskResponse> {
   await delay(1000);
 
+  const hasFPC = mockFPCDatabase.some(f => f.location === sourceMachineId);
+  if (!hasFPC) {
+    throw new Error('Source machine does not have a Probecard');
+  }
+
   const taskId = `TASK-${Date.now()}`;
   const jobId = generateJobId();
   const machine = mockMachines.find(m => m.id === sourceMachineId);
@@ -622,6 +647,11 @@ export async function submitRequestFPCJob(
 ): Promise<TaskResponse> {
   await delay(1000);
 
+  const isOccupied = mockFPCDatabase.some(f => f.location === destinationMachineId);
+  if (isOccupied) {
+    throw new Error('Destination machine already has a Probecard');
+  }
+
   const taskId = `TASK-${Date.now()}`;
   const jobId = generateJobId();
   const machine = mockMachines.find(m => m.id === destinationMachineId);
@@ -648,13 +678,22 @@ export async function submitRequestFPCJob(
   return task;
 }
 
-/** Submit a Swap FPC job */
-export async function submitSwapFPCJob(
+/** Submit a Move FPC job */
+export async function submitMoveFPCJob(
   employeeId: string,
   sourceMachineId: string,
   destinationMachineId: string
 ): Promise<TaskResponse> {
   await delay(1000);
+
+  const hasSourceFPC = mockFPCDatabase.some(f => f.location === sourceMachineId);
+  if (!hasSourceFPC) {
+    throw new Error('Source machine does not have a Probecard');
+  }
+  const hasDestFPC = mockFPCDatabase.some(f => f.location === destinationMachineId);
+  if (hasDestFPC) {
+    throw new Error('Destination machine already has a Probecard');
+  }
 
   const taskId = `TASK-${Date.now()}`;
   const jobId = generateJobId();
@@ -667,7 +706,7 @@ export async function submitSwapFPCJob(
     status: 'submitted',
     message: 'Job submitted successfully',
     employeeId,
-    type: 'swap',
+    type: 'move',
     sourceMachine: srcMachine?.name || sourceMachineId,
     destinationMachine: destMachine?.name || destinationMachineId,
     createdAt: new Date().toISOString(),
@@ -675,10 +714,10 @@ export async function submitSwapFPCJob(
   };
 
   mockTaskQueue.push(task);
-  addAuditLog('TASK_SUBMIT', employeeId, `Submitted Swap FPC job (Job: ${jobId}). Source: ${srcMachine?.name || sourceMachineId}, Destination: ${destMachine?.name || destinationMachineId}`);
+  addAuditLog('TASK_SUBMIT', employeeId, `Submitted Move FPC job (Job: ${jobId}). Source: ${srcMachine?.name || sourceMachineId}, Destination: ${destMachine?.name || destinationMachineId}`);
 
   // Step-based progression
-  startProgression(taskId, 'swap');
+  startProgression(taskId, 'move');
 
   return task;
 }
@@ -728,7 +767,7 @@ export async function confirmCoverHeadInstalled(taskId: string): Promise<TaskRes
 
     addAuditLog('CONFIRMATION', task.employeeId, `Confirmed Cover Head Installed for ${task.type.toUpperCase()} job (Job: ${task.jobId})`);
 
-    if (task.type === 'swap') {
+    if (task.type === 'move') {
       task.coverHeadInstalledConfirmed = true;
       task.status = 'moving_to_destination';
       task.message = 'Cover Head installation confirmed, AGV proceeding to destination';

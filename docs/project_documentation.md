@@ -1,6 +1,6 @@
 # FPC Management System — Project Documentation
 
-Welcome to the **FPC Management System (NXP WT)** documentation. This application is a modern, responsive Operator User Interface designed for requesting, returning, and swapping **Front Opening Pod Carriers (FPCs)** between **Smart Storage** and factory workstations/machines via **Automated Guided Vehicles (AGVs)**.
+Welcome to the **FPC Management System (NXP WT)** documentation. This application is a modern, responsive Operator User Interface designed for requesting, returning, swapping, and changing (UNLOAD & LOAD) **Front Opening Pod Carriers (FPCs)** between **Smart Storage** and factory workstations/machines via **Automated Guided Vehicles (AGVs)**.
 
 ---
 
@@ -83,8 +83,8 @@ src/
 *   Once logged in, the system maintains their active session.
 *   Operators can log out at any time from the header menu.
 
-### 2. Three-Mode Transfer Workflows
-Operators can trigger three operations from the **Mode Selection** screen:
+### 2. Four-Mode Transfer Workflows
+Operators can trigger four operations from the **Mode Selection** screen:
 
 #### A. LOAD (คืน FPC) — Return FPC Workflow
 *   **Goal**: Pick up an empty or processed FPC from a machine and return it to **Smart Storage**.
@@ -105,6 +105,13 @@ Operators can trigger three operations from the **Mode Selection** screen:
 *   **Flow**:
     1.  Select the **Source Machine**.
     2.  Select the **Destination Machine** (the selected source machine is automatically disabled in this view).
+    3.  Confirm and submit the job.
+
+#### D. เปลี่ยน FPC — Unload & Load FPC Workflow
+*   **Goal**: Unload an existing FPC from a workstation and return it to Smart Storage, then load a new selected FPC from Smart Storage onto the same workstation.
+*   **Flow**:
+    1.  Search and select the **New FPC** from Smart Storage.
+    2.  Select the **Workstation / Destination Machine** (system validates if there is a running FPC on the selected machine to be replaced).
     3.  Confirm and submit the job.
 
 ### 3. Task Queue & AGV Progress Tracking
@@ -159,13 +166,13 @@ type Language = 'en' | 'th';
 ### `OperationMode`
 Defines active workflows:
 ```typescript
-type OperationMode = 'return' | 'request' | 'swap';
+type OperationMode = 'return' | 'request' | 'swap' | 'unload_load';
 ```
 
 ### `Page`
 Defines navigable application pages:
 ```typescript
-type Page = 'mode-selection' | 'return' | 'request' | 'swap' | 'queue' | 'fpc-search' | 'admin';
+type Page = 'mode-selection' | 'return' | 'request' | 'swap' | 'unload_load' | 'queue' | 'fpc-search' | 'admin';
 ```
 
 ### `Role`

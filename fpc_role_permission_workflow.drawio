@@ -1,0 +1,454 @@
+<mxfile host="Electron">
+  <diagram name="Role-Based Permission Workflow" id="role-perm-workflow">
+    <mxGraphModel dx="3364" dy="1682" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="3400" pageHeight="3500" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="50" parent="1" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontSize=26;fontStyle=1;fontColor=#1a1a2e;fontFamily=Segoe UI;" value="FPC Management System — Role-Based Permission Workflow (Onion Model)" vertex="1">
+          <mxGeometry height="60" width="2500" x="40" y="20" as="geometry" />
+        </mxCell>
+        <mxCell id="55" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#999999;strokeWidth=2;fontSize=13;fontFamily=Segoe UI;align=left;verticalAlign=top;spacingLeft=15;spacingTop=10;spacingRight=15;shadow=1;" value="&lt;b&gt;📋 Permission Hierarchy&lt;/b&gt;&lt;hr&gt;&lt;br&gt;สิทธิ์ที่สูงกว่าสามารถทำ&lt;br&gt;ของคนที่ต่ำกว่าได้ทั้งหมด&lt;br&gt;&lt;br&gt;&lt;b&gt;Admin &amp;gt; Store &amp;gt; Operator&lt;/b&gt;&lt;br&gt;&lt;br&gt;🔵 Operator = สิทธิ์พื้นฐาน&lt;br&gt;🟡 Store = สิทธิ์ระดับกลาง&lt;br&gt;🔴 Admin = สิทธิ์สูงสุด&lt;br&gt;&lt;br&gt;&lt;i&gt;แต่ละชั้นนอก &amp;quot;ห่อ&amp;quot; ชั้นใน&lt;br&gt;เหมือนหัวหอม (Onion Model)&lt;/i&gt;" vertex="1">
+          <mxGeometry height="380" width="380" x="2620" y="100" as="geometry" />
+        </mxCell>
+        <mxCell id="2" parent="1" style="swimlane;startSize=60;fillColor=#f8cecc;strokeColor=#b85450;strokeWidth=3;rounded=1;arcSize=8;html=1;fontSize=18;fontStyle=1;fontColor=#b85450;fontFamily=Segoe UI;shadow=1;swimlaneLine=1;collapsible=0;" value="🔴 ADMIN LAYER — สิทธิ์สูงสุด (Full System Control)" vertex="1">
+          <mxGeometry height="1440" width="2520" x="40" y="100" as="geometry" />
+        </mxCell>
+        <mxCell id="3" parent="2" style="swimlane;startSize=55;fillColor=#fff2cc;strokeColor=#d6b656;strokeWidth=3;rounded=1;arcSize=8;html=1;fontSize=16;fontStyle=1;fontColor=#b88a00;fontFamily=Segoe UI;shadow=1;swimlaneLine=1;collapsible=0;" value="🟡 STORE LAYER — สิทธิ์ระดับกลาง (Elevated Access)" vertex="1">
+          <mxGeometry height="1070" width="2440" x="40" y="100" as="geometry" />
+        </mxCell>
+        <mxCell id="4" parent="3" style="swimlane;startSize=50;fillColor=#dae8fc;strokeColor=#6c8ebf;strokeWidth=3;rounded=1;arcSize=8;html=1;fontSize=16;fontStyle=1;fontColor=#3a6ea5;fontFamily=Segoe UI;shadow=1;swimlaneLine=1;collapsible=0;" value="🔵 OPERATOR LAYER — สิทธิ์พื้นฐาน (Basic Operations)" vertex="1">
+          <mxGeometry height="680" width="2360" x="40" y="100" as="geometry" />
+        </mxCell>
+        <mxCell id="5" parent="4" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#6c8ebf;strokeWidth=2;fontSize=13;fontFamily=Segoe UI;shadow=1;" value="&lt;b&gt;Login / Logout&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:11px&quot;&gt;เข้าสู่ระบบ / ออกจากระบบ&lt;/font&gt;" vertex="1">
+          <mxGeometry height="80" width="240" x="60" y="280" as="geometry" />
+        </mxCell>
+        <mxCell id="6" parent="4" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#6c8ebf;strokeWidth=2;fontSize=13;fontFamily=Segoe UI;shadow=1;" value="&lt;b&gt;Mode Selection&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:11px&quot;&gt;เลือกโหมดงาน&lt;/font&gt;" vertex="1">
+          <mxGeometry height="80" width="260" x="420" y="280" as="geometry" />
+        </mxCell>
+        <mxCell id="7" parent="4" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E3F2FD;strokeColor=#42A5F5;strokeWidth=2;fontSize=12;fontFamily=Segoe UI;shadow=1;" value="&lt;b&gt;LOAD (คืน FPC)&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:10px&quot;&gt;Return FPC to Smart Storage&lt;/font&gt;" vertex="1">
+          <mxGeometry height="70" width="340" x="860" y="100" as="geometry" />
+        </mxCell>
+        <mxCell id="8" parent="4" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E8F5E9;strokeColor=#66BB6A;strokeWidth=2;fontSize=12;fontFamily=Segoe UI;shadow=1;" value="&lt;b&gt;UNLOAD (เบิก FPC)&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:10px&quot;&gt;Request FPC from Smart Storage&lt;/font&gt;" vertex="1">
+          <mxGeometry height="70" width="340" x="860" y="220" as="geometry" />
+        </mxCell>
+        <mxCell id="9" parent="4" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF3E0;strokeColor=#FFA726;strokeWidth=2;fontSize=12;fontFamily=Segoe UI;shadow=1;" value="&lt;b&gt;สลับ FPC&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:10px&quot;&gt;Swap FPC Between Machines&lt;/font&gt;" vertex="1">
+          <mxGeometry height="70" width="340" x="860" y="340" as="geometry" />
+        </mxCell>
+        <mxCell id="10" parent="4" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F3E5F5;strokeColor=#AB47BC;strokeWidth=2;fontSize=12;fontFamily=Segoe UI;shadow=1;" value="&lt;b&gt;เปลี่ยน FPC (UNLOAD &amp;amp; LOAD)&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:10px&quot;&gt;Replace FPC on Machine&lt;/font&gt;" vertex="1">
+          <mxGeometry height="70" width="380" x="860" y="460" as="geometry" />
+        </mxCell>
+        <mxCell id="11" parent="4" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#6c8ebf;strokeWidth=2;fontSize=13;fontFamily=Segoe UI;shadow=1;" value="&lt;b&gt;Task Queue&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:11px&quot;&gt;คิวงาน&lt;/font&gt;&lt;br&gt;&lt;font style=&quot;font-size:10px;color:#666&quot;&gt;&amp;amp; Cancel Own Tasks&lt;/font&gt;" vertex="1">
+          <mxGeometry height="150" width="260" x="1420" y="230" as="geometry" />
+        </mxCell>
+        <mxCell id="15" parent="4" style="swimlane;startSize=40;fillColor=#E8EEF7;strokeColor=#6c8ebf;strokeWidth=2;rounded=1;arcSize=10;html=1;fontSize=13;fontStyle=1;fontColor=#3a6ea5;fontFamily=Segoe UI;dashed=1;dashPattern=8 4;collapsible=0;" value="📌 Header Navigation" vertex="1">
+          <mxGeometry height="420" width="400" x="1860" y="100" as="geometry" />
+        </mxCell>
+        <mxCell id="13" parent="15" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#6c8ebf;strokeWidth=2;fontSize=12;fontFamily=Segoe UI;shadow=1;" value="&lt;b&gt;FPC Search (View-only)&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:10px&quot;&gt;ค้นหา FPC&lt;/font&gt;" vertex="1">
+          <mxGeometry height="70" width="340" x="30" y="70" as="geometry" />
+        </mxCell>
+        <mxCell id="14" parent="15" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#6c8ebf;strokeWidth=2;fontSize=12;fontFamily=Segoe UI;shadow=1;" value="&lt;b&gt;AGV Log View (View-only)&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:10px&quot;&gt;ดูบันทึก AGV&lt;/font&gt;" vertex="1">
+          <mxGeometry height="70" width="340" x="30" y="200" as="geometry" />
+        </mxCell>
+        <mxCell id="56" parent="4" style="text;html=1;align=left;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontSize=11;fontColor=#3a6ea5;fontFamily=Segoe UI;" value="&lt;i&gt;✅ ทุก Role (Operator, Store, Admin) สามารถใช้งาน features ในชั้นนี้ได้ทั้งหมด&lt;/i&gt;" vertex="1">
+          <mxGeometry height="40" width="600" x="60" y="600" as="geometry" />
+        </mxCell>
+        <mxCell id="30" edge="1" parent="4" source="5" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#3a6ea5;strokeWidth=2;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="6" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="31" edge="1" parent="4" source="6" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#42A5F5;strokeWidth=2;exitX=1;exitY=0.15;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="7" value="">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="750" y="292" />
+              <mxPoint x="750" y="135" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="32" edge="1" parent="4" source="6" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#66BB6A;strokeWidth=2;exitX=1;exitY=0.38;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="8" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="33" edge="1" parent="4" source="6" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#FFA726;strokeWidth=2;exitX=1;exitY=0.62;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="9" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="34" edge="1" parent="4" source="6" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#AB47BC;strokeWidth=2;exitX=1;exitY=0.85;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="10" value="">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="750" y="348" />
+              <mxPoint x="750" y="495" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="35" edge="1" parent="4" source="7" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#42A5F5;strokeWidth=2;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.13;entryDx=0;entryDy=0;" target="11" value="">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1330" y="135" />
+              <mxPoint x="1330" y="250" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="36" edge="1" parent="4" source="8" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#66BB6A;strokeWidth=2;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.37;entryDx=0;entryDy=0;" target="11" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="37" edge="1" parent="4" source="9" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#FFA726;strokeWidth=2;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.63;entryDx=0;entryDy=0;" target="11" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="38" edge="1" parent="4" source="10" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#AB47BC;strokeWidth=2;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.87;entryDx=0;entryDy=0;" target="11" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="23" parent="3" style="swimlane;startSize=40;fillColor=#FFF9E6;strokeColor=#d6b656;strokeWidth=2;rounded=1;arcSize=10;html=1;fontSize=13;fontStyle=1;fontColor=#b88a00;fontFamily=Segoe UI;dashed=1;dashPattern=8 4;collapsible=0;" value="🔓 Store Exclusive Features — เฉพาะ Store &amp; Admin เท่านั้น" vertex="1">
+          <mxGeometry height="170" width="2100" x="80" y="820" as="geometry" />
+        </mxCell>
+        <mxCell id="20" parent="23" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#d6b656;strokeWidth=2;fontSize=12;fontFamily=Segoe UI;shadow=1;" value="&lt;b&gt;Admin/Management Panel&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:10px&quot;&gt;แผงควบคุม (Land on Login)&lt;/font&gt;" vertex="1">
+          <mxGeometry height="70" width="380" x="40" y="60" as="geometry" />
+        </mxCell>
+        <mxCell id="21" parent="23" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#d6b656;strokeWidth=2;fontSize=12;fontFamily=Segoe UI;shadow=1;" value="&lt;b&gt;FPC Location Corrections&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:10px&quot;&gt;แก้ไขตำแหน่ง FPC / สลับตำแหน่ง&lt;/font&gt;" vertex="1">
+          <mxGeometry height="70" width="420" x="560" y="60" as="geometry" />
+        </mxCell>
+        <mxCell id="22" parent="23" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#d6b656;strokeWidth=2;fontSize=12;fontFamily=Segoe UI;shadow=1;" value="&lt;b&gt;View Audit Logs&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:10px&quot;&gt;ดูบันทึกการใช้งานระบบ&lt;/font&gt;" vertex="1">
+          <mxGeometry height="70" width="360" x="1120" y="60" as="geometry" />
+        </mxCell>
+        <mxCell id="41" edge="1" parent="23" source="20" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#d6b656;strokeWidth=2;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="21" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="42" edge="1" parent="23" source="21" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#d6b656;strokeWidth=2;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="22" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="27" parent="2" style="swimlane;startSize=40;fillColor=#FCEAEA;strokeColor=#b85450;strokeWidth=2;rounded=1;arcSize=10;html=1;fontSize=13;fontStyle=1;fontColor=#b85450;fontFamily=Segoe UI;dashed=1;dashPattern=8 4;collapsible=0;" value="🔒 Admin Exclusive Features — เฉพาะ Admin เท่านั้น" vertex="1">
+          <mxGeometry height="170" width="2100" x="80" y="1220" as="geometry" />
+        </mxCell>
+        <mxCell id="25" parent="27" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#b85450;strokeWidth=2;fontSize=12;fontFamily=Segoe UI;shadow=1;" value="&lt;b&gt;User Management (CRUD)&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:10px&quot;&gt;จัดการบัญชีผู้ใช้ (เพิ่ม/ลบ/แก้ไข)&lt;/font&gt;" vertex="1">
+          <mxGeometry height="70" width="420" x="40" y="60" as="geometry" />
+        </mxCell>
+        <mxCell id="26" parent="27" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#b85450;strokeWidth=2;fontSize=12;fontFamily=Segoe UI;shadow=1;" value="&lt;b&gt;Clear Audit Logs&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:10px&quot;&gt;ล้างบันทึกการใช้งานระบบ&lt;/font&gt;" vertex="1">
+          <mxGeometry height="70" width="400" x="600" y="60" as="geometry" />
+        </mxCell>
+        <mxCell id="43" edge="1" parent="27" source="25" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#b85450;strokeWidth=2;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="26" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="99" parent="1" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontSize=16;fontStyle=3;fontColor=#424242;fontFamily=Segoe UI;" value="⬇️ Task Status Flow Detail — แต่ละโหมดมีลำดับ Status ที่แตกต่างกัน (ดูรายละเอียดด้านล่าง)" vertex="1">
+          <mxGeometry height="50" width="2520" x="40" y="1570" as="geometry" />
+        </mxCell>
+        <mxCell id="100" parent="1" style="swimlane;startSize=50;fillColor=#FAFAFA;strokeColor=#757575;strokeWidth=3;rounded=1;arcSize=6;html=1;fontSize=18;fontStyle=1;fontColor=#424242;fontFamily=Segoe UI;shadow=1;collapsible=0;" value="📊 Task Status Flow Detail — Status Transitions per Mode" vertex="1">
+          <mxGeometry height="1650" width="2520" x="40" y="1640" as="geometry" />
+        </mxCell>
+        <mxCell id="110" parent="100" style="swimlane;startSize=45;fillColor=#E3F2FD;strokeColor=#42A5F5;strokeWidth=2;rounded=1;arcSize=8;html=1;fontSize=14;fontStyle=1;fontColor=#1565C0;fontFamily=Segoe UI;collapsible=0;" value="LOAD (คืน FPC)" vertex="1">
+          <mxGeometry height="1350" width="580" x="20" y="70" as="geometry" />
+        </mxCell>
+        <mxCell id="111" parent="110" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#42A5F5;strokeWidth=1.5;fontSize=11;fontFamily=Segoe UI;" value="&lt;b&gt;submitted&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:10px&quot;&gt;ส่งคำขอแล้ว&lt;/font&gt;" vertex="1">
+          <mxGeometry height="55" width="490" x="45" y="65" as="geometry" />
+        </mxCell>
+        <mxCell id="112" parent="110" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#42A5F5;strokeWidth=1.5;fontSize=11;fontFamily=Segoe UI;" value="&lt;b&gt;queued&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:10px&quot;&gt;รอคิว&lt;/font&gt;" vertex="1">
+          <mxGeometry height="55" width="490" x="45" y="145" as="geometry" />
+        </mxCell>
+        <mxCell id="113" parent="110" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#42A5F5;strokeWidth=1.5;fontSize=11;fontFamily=Segoe UI;" value="&lt;b&gt;starting&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:10px&quot;&gt;กำลังเริ่มภารกิจ AGV&lt;/font&gt;" vertex="1">
+          <mxGeometry height="55" width="490" x="45" y="225" as="geometry" />
+        </mxCell>
+        <mxCell id="114" parent="110" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#42A5F5;strokeWidth=1.5;fontSize=11;fontFamily=Segoe UI;" value="&lt;b&gt;moving_to_source&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:10px&quot;&gt;AGV กำลังไปเครื่องต้นทาง (Source Machine)&lt;/font&gt;" vertex="1">
+          <mxGeometry height="55" width="490" x="45" y="305" as="geometry" />
+        </mxCell>
+        <mxCell id="115" parent="110" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#42A5F5;strokeWidth=1.5;fontSize=11;fontFamily=Segoe UI;" value="&lt;b&gt;arrived_at_source&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:10px&quot;&gt;AGV ถึงเครื่องต้นทางแล้ว&lt;/font&gt;" vertex="1">
+          <mxGeometry height="55" width="490" x="45" y="385" as="geometry" />
+        </mxCell>
+        <mxCell id="116" parent="110" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#42A5F5;strokeWidth=1.5;fontSize=11;fontFamily=Segoe UI;" value="&lt;b&gt;picking_up_fpc&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:10px&quot;&gt;AGV กำลังหยิบ FPC จากเครื่อง&lt;/font&gt;" vertex="1">
+          <mxGeometry height="55" width="490" x="45" y="465" as="geometry" />
+        </mxCell>
+        <mxCell id="117" parent="110" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF9C4;strokeColor=#F9A825;strokeWidth=2;fontSize=11;fontFamily=Segoe UI;shadow=1;" value="⚠️ &lt;b&gt;waiting_cover_head_install&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:10px&quot;&gt;รอยืนยันติดตั้ง Cover Head (กดปุ่ม AGV)&lt;/font&gt;" vertex="1">
+          <mxGeometry height="55" width="490" x="45" y="545" as="geometry" />
+        </mxCell>
+        <mxCell id="118" parent="110" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#42A5F5;strokeWidth=1.5;fontSize=11;fontFamily=Segoe UI;" value="&lt;b&gt;moving_to_destination&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:10px&quot;&gt;AGV กำลังไป Smart Storage&lt;/font&gt;" vertex="1">
+          <mxGeometry height="55" width="490" x="45" y="625" as="geometry" />
+        </mxCell>
+        <mxCell id="119" parent="110" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#42A5F5;strokeWidth=1.5;fontSize=11;fontFamily=Segoe UI;" value="&lt;b&gt;arrived_at_destination&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:10px&quot;&gt;AGV ถึง Smart Storage แล้ว&lt;/font&gt;" vertex="1">
+          <mxGeometry height="55" width="490" x="45" y="705" as="geometry" />
+        </mxCell>
+        <mxCell id="120" parent="110" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#42A5F5;strokeWidth=1.5;fontSize=11;fontFamily=Segoe UI;" value="&lt;b&gt;placing_fpc&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:10px&quot;&gt;AGV กำลังวาง FPC ใน Smart Storage&lt;/font&gt;" vertex="1">
+          <mxGeometry height="55" width="490" x="45" y="785" as="geometry" />
+        </mxCell>
+        <mxCell id="121" parent="110" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#C8E6C9;strokeColor=#2E7D32;strokeWidth=2;fontSize=11;fontFamily=Segoe UI;shadow=1;" value="✅ &lt;b&gt;completed&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:10px&quot;&gt;เสร็จสิ้น&lt;/font&gt;" vertex="1">
+          <mxGeometry height="55" width="490" x="45" y="865" as="geometry" />
+        </mxCell>
+        <mxCell id="131" edge="1" parent="110" source="111" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#42A5F5;strokeWidth=2;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="112">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="132" edge="1" parent="110" source="112" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#42A5F5;strokeWidth=2;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="113">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="133" edge="1" parent="110" source="113" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#42A5F5;strokeWidth=2;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="114">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="134" edge="1" parent="110" source="114" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#42A5F5;strokeWidth=2;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="115">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="135" edge="1" parent="110" source="115" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#42A5F5;strokeWidth=2;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="116">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="136" edge="1" parent="110" source="116" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#F9A825;strokeWidth=2;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="117">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="137" edge="1" parent="110" source="117" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#42A5F5;strokeWidth=2;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="118">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="138" edge="1" parent="110" source="118" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#42A5F5;strokeWidth=2;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="119">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="139" edge="1" parent="110" source="119" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#42A5F5;strokeWidth=2;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="120">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="140" edge="1" parent="110" source="120" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#2E7D32;strokeWidth=2;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="121">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="200" parent="100" style="swimlane;startSize=45;fillColor=#E8F5E9;strokeColor=#66BB6A;strokeWidth=2;rounded=1;arcSize=8;html=1;fontSize=14;fontStyle=1;fontColor=#2E7D32;fontFamily=Segoe UI;collapsible=0;" value="UNLOAD (เบิก FPC)" vertex="1">
+          <mxGeometry height="1350" width="580" x="620" y="70" as="geometry" />
+        </mxCell>
+        <mxCell id="201" parent="200" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#66BB6A;strokeWidth=1.5;fontSize=11;fontFamily=Segoe UI;" value="&lt;b&gt;submitted&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:10px&quot;&gt;ส่งคำขอแล้ว&lt;/font&gt;" vertex="1">
+          <mxGeometry height="55" width="490" x="45" y="65" as="geometry" />
+        </mxCell>
+        <mxCell id="202" parent="200" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#66BB6A;strokeWidth=1.5;fontSize=11;fontFamily=Segoe UI;" value="&lt;b&gt;queued&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:10px&quot;&gt;รอคิว&lt;/font&gt;" vertex="1">
+          <mxGeometry height="55" width="490" x="45" y="145" as="geometry" />
+        </mxCell>
+        <mxCell id="203" parent="200" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#66BB6A;strokeWidth=1.5;fontSize=11;fontFamily=Segoe UI;" value="&lt;b&gt;starting&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:10px&quot;&gt;กำลังเริ่มภารกิจ AGV&lt;/font&gt;" vertex="1">
+          <mxGeometry height="55" width="490" x="45" y="225" as="geometry" />
+        </mxCell>
+        <mxCell id="204" parent="200" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#66BB6A;strokeWidth=1.5;fontSize=11;fontFamily=Segoe UI;" value="&lt;b&gt;moving_to_source&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:10px&quot;&gt;AGV กำลังไป Smart Storage (หยิบ FPC)&lt;/font&gt;" vertex="1">
+          <mxGeometry height="55" width="490" x="45" y="305" as="geometry" />
+        </mxCell>
+        <mxCell id="205" parent="200" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#66BB6A;strokeWidth=1.5;fontSize=11;fontFamily=Segoe UI;" value="&lt;b&gt;arrived_at_source&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:10px&quot;&gt;AGV ถึง Smart Storage แล้ว&lt;/font&gt;" vertex="1">
+          <mxGeometry height="55" width="490" x="45" y="385" as="geometry" />
+        </mxCell>
+        <mxCell id="206" parent="200" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#66BB6A;strokeWidth=1.5;fontSize=11;fontFamily=Segoe UI;" value="&lt;b&gt;picking_up_fpc&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:10px&quot;&gt;AGV กำลังหยิบ FPC จาก Smart Storage&lt;/font&gt;" vertex="1">
+          <mxGeometry height="55" width="490" x="45" y="465" as="geometry" />
+        </mxCell>
+        <mxCell id="207" parent="200" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#66BB6A;strokeWidth=1.5;fontSize=11;fontFamily=Segoe UI;" value="&lt;b&gt;moving_to_destination&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:10px&quot;&gt;AGV กำลังไปเครื่องปลายทาง&lt;/font&gt;" vertex="1">
+          <mxGeometry height="55" width="490" x="45" y="545" as="geometry" />
+        </mxCell>
+        <mxCell id="208" parent="200" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#66BB6A;strokeWidth=1.5;fontSize=11;fontFamily=Segoe UI;" value="&lt;b&gt;arrived_at_destination&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:10px&quot;&gt;AGV ถึงเครื่องปลายทางแล้ว&lt;/font&gt;" vertex="1">
+          <mxGeometry height="55" width="490" x="45" y="625" as="geometry" />
+        </mxCell>
+        <mxCell id="209" parent="200" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#66BB6A;strokeWidth=1.5;fontSize=11;fontFamily=Segoe UI;" value="&lt;b&gt;placing_fpc&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:10px&quot;&gt;AGV กำลังวาง FPC บนเครื่อง&lt;/font&gt;" vertex="1">
+          <mxGeometry height="55" width="490" x="45" y="705" as="geometry" />
+        </mxCell>
+        <mxCell id="210" parent="200" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF9C4;strokeColor=#F9A825;strokeWidth=2;fontSize=11;fontFamily=Segoe UI;shadow=1;" value="⚠️ &lt;b&gt;waiting_cover_head_remove&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:10px&quot;&gt;รอยืนยันถอด Cover Head (กดปุ่ม AGV)&lt;/font&gt;" vertex="1">
+          <mxGeometry height="55" width="490" x="45" y="785" as="geometry" />
+        </mxCell>
+        <mxCell id="211" parent="200" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#C8E6C9;strokeColor=#2E7D32;strokeWidth=2;fontSize=11;fontFamily=Segoe UI;shadow=1;" value="✅ &lt;b&gt;completed&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:10px&quot;&gt;เสร็จสิ้น&lt;/font&gt;" vertex="1">
+          <mxGeometry height="55" width="490" x="45" y="865" as="geometry" />
+        </mxCell>
+        <mxCell id="231" edge="1" parent="200" source="201" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#66BB6A;strokeWidth=2;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="202">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="232" edge="1" parent="200" source="202" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#66BB6A;strokeWidth=2;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="203">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="233" edge="1" parent="200" source="203" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#66BB6A;strokeWidth=2;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="204">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="234" edge="1" parent="200" source="204" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#66BB6A;strokeWidth=2;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="205">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="235" edge="1" parent="200" source="205" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#66BB6A;strokeWidth=2;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="206">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="236" edge="1" parent="200" source="206" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#66BB6A;strokeWidth=2;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="207">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="237" edge="1" parent="200" source="207" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#66BB6A;strokeWidth=2;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="208">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="238" edge="1" parent="200" source="208" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#66BB6A;strokeWidth=2;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="209">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="239" edge="1" parent="200" source="209" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#F9A825;strokeWidth=2;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="210">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="240" edge="1" parent="200" source="210" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#2E7D32;strokeWidth=2;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="211">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="300" parent="100" style="swimlane;startSize=45;fillColor=#FFF3E0;strokeColor=#FFA726;strokeWidth=2;rounded=1;arcSize=8;html=1;fontSize=14;fontStyle=1;fontColor=#E65100;fontFamily=Segoe UI;collapsible=0;" value="สลับ FPC" vertex="1">
+          <mxGeometry height="1350" width="580" x="1220" y="70" as="geometry" />
+        </mxCell>
+        <mxCell id="301" parent="300" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#FFA726;strokeWidth=1.5;fontSize=11;fontFamily=Segoe UI;" value="&lt;b&gt;submitted&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:10px&quot;&gt;ส่งคำขอแล้ว&lt;/font&gt;" vertex="1">
+          <mxGeometry height="55" width="490" x="45" y="65" as="geometry" />
+        </mxCell>
+        <mxCell id="302" parent="300" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#FFA726;strokeWidth=1.5;fontSize=11;fontFamily=Segoe UI;" value="&lt;b&gt;queued&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:10px&quot;&gt;รอคิว&lt;/font&gt;" vertex="1">
+          <mxGeometry height="55" width="490" x="45" y="140" as="geometry" />
+        </mxCell>
+        <mxCell id="303" parent="300" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#FFA726;strokeWidth=1.5;fontSize=11;fontFamily=Segoe UI;" value="&lt;b&gt;starting&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:10px&quot;&gt;กำลังเริ่มภารกิจ AGV&lt;/font&gt;" vertex="1">
+          <mxGeometry height="55" width="490" x="45" y="215" as="geometry" />
+        </mxCell>
+        <mxCell id="304" parent="300" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#FFA726;strokeWidth=1.5;fontSize=11;fontFamily=Segoe UI;" value="&lt;b&gt;moving_to_source&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:10px&quot;&gt;AGV กำลังไปเครื่องต้นทาง (Source Machine)&lt;/font&gt;" vertex="1">
+          <mxGeometry height="55" width="490" x="45" y="290" as="geometry" />
+        </mxCell>
+        <mxCell id="305" parent="300" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#FFA726;strokeWidth=1.5;fontSize=11;fontFamily=Segoe UI;" value="&lt;b&gt;arrived_at_source&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:10px&quot;&gt;AGV ถึงเครื่องต้นทางแล้ว&lt;/font&gt;" vertex="1">
+          <mxGeometry height="55" width="490" x="45" y="365" as="geometry" />
+        </mxCell>
+        <mxCell id="306" parent="300" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#FFA726;strokeWidth=1.5;fontSize=11;fontFamily=Segoe UI;" value="&lt;b&gt;picking_up_fpc&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:10px&quot;&gt;AGV กำลังหยิบ FPC จากเครื่องต้นทาง&lt;/font&gt;" vertex="1">
+          <mxGeometry height="55" width="490" x="45" y="440" as="geometry" />
+        </mxCell>
+        <mxCell id="307" parent="300" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF9C4;strokeColor=#F9A825;strokeWidth=2;fontSize=11;fontFamily=Segoe UI;shadow=1;" value="⚠️ &lt;b&gt;waiting_cover_head_install&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:10px&quot;&gt;รอยืนยันติดตั้ง Cover Head (กดปุ่ม AGV)&lt;/font&gt;" vertex="1">
+          <mxGeometry height="55" width="490" x="45" y="515" as="geometry" />
+        </mxCell>
+        <mxCell id="308" parent="300" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#FFA726;strokeWidth=1.5;fontSize=11;fontFamily=Segoe UI;" value="&lt;b&gt;moving_to_destination&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:10px&quot;&gt;AGV กำลังไปเครื่องปลายทาง (Dest Machine)&lt;/font&gt;" vertex="1">
+          <mxGeometry height="55" width="490" x="45" y="590" as="geometry" />
+        </mxCell>
+        <mxCell id="309" parent="300" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#FFA726;strokeWidth=1.5;fontSize=11;fontFamily=Segoe UI;" value="&lt;b&gt;arrived_at_destination&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:10px&quot;&gt;AGV ถึงเครื่องปลายทางแล้ว&lt;/font&gt;" vertex="1">
+          <mxGeometry height="55" width="490" x="45" y="665" as="geometry" />
+        </mxCell>
+        <mxCell id="310" parent="300" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#FFA726;strokeWidth=1.5;fontSize=11;fontFamily=Segoe UI;" value="&lt;b&gt;placing_fpc&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:10px&quot;&gt;AGV กำลังวาง FPC บนเครื่องปลายทาง&lt;/font&gt;" vertex="1">
+          <mxGeometry height="55" width="490" x="45" y="740" as="geometry" />
+        </mxCell>
+        <mxCell id="311" parent="300" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF9C4;strokeColor=#F9A825;strokeWidth=2;fontSize=11;fontFamily=Segoe UI;shadow=1;" value="⚠️ &lt;b&gt;waiting_cover_head_remove&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:10px&quot;&gt;รอยืนยันถอด Cover Head (กดปุ่ม AGV)&lt;/font&gt;" vertex="1">
+          <mxGeometry height="55" width="490" x="45" y="815" as="geometry" />
+        </mxCell>
+        <mxCell id="312" parent="300" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#C8E6C9;strokeColor=#2E7D32;strokeWidth=2;fontSize=11;fontFamily=Segoe UI;shadow=1;" value="✅ &lt;b&gt;completed&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:10px&quot;&gt;เสร็จสิ้น&lt;/font&gt;" vertex="1">
+          <mxGeometry height="55" width="490" x="45" y="890" as="geometry" />
+        </mxCell>
+        <mxCell id="331" edge="1" parent="300" source="301" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#FFA726;strokeWidth=2;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="302">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="332" edge="1" parent="300" source="302" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#FFA726;strokeWidth=2;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="303">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="333" edge="1" parent="300" source="303" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#FFA726;strokeWidth=2;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="304">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="334" edge="1" parent="300" source="304" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#FFA726;strokeWidth=2;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="305">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="335" edge="1" parent="300" source="305" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#FFA726;strokeWidth=2;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="306">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="336" edge="1" parent="300" source="306" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#F9A825;strokeWidth=2;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="307">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="337" edge="1" parent="300" source="307" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#FFA726;strokeWidth=2;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="308">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="338" edge="1" parent="300" source="308" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#FFA726;strokeWidth=2;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="309">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="339" edge="1" parent="300" source="309" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#FFA726;strokeWidth=2;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="310">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="340" edge="1" parent="300" source="310" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#F9A825;strokeWidth=2;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="311">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="341" edge="1" parent="300" source="311" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#2E7D32;strokeWidth=2;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="312">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="400" parent="100" style="swimlane;startSize=45;fillColor=#F3E5F5;strokeColor=#AB47BC;strokeWidth=2;rounded=1;arcSize=8;html=1;fontSize=14;fontStyle=1;fontColor=#6A1B9A;fontFamily=Segoe UI;collapsible=0;" value="เปลี่ยน FPC (UNLOAD &amp; LOAD)" vertex="1">
+          <mxGeometry height="1350" width="680" x="1820" y="70" as="geometry" />
+        </mxCell>
+        <mxCell id="401" parent="400" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#AB47BC;strokeWidth=1.5;fontSize=11;fontFamily=Segoe UI;" value="&lt;b&gt;submitted&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:10px&quot;&gt;ส่งคำขอแล้ว&lt;/font&gt;" vertex="1">
+          <mxGeometry height="50" width="590" x="45" y="60" as="geometry" />
+        </mxCell>
+        <mxCell id="402" parent="400" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#AB47BC;strokeWidth=1.5;fontSize=11;fontFamily=Segoe UI;" value="&lt;b&gt;queued&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:10px&quot;&gt;รอคิว&lt;/font&gt;" vertex="1">
+          <mxGeometry height="50" width="590" x="45" y="130" as="geometry" />
+        </mxCell>
+        <mxCell id="403" parent="400" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#AB47BC;strokeWidth=1.5;fontSize=11;fontFamily=Segoe UI;" value="&lt;b&gt;starting&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:10px&quot;&gt;กำลังเริ่มภารกิจ AGV&lt;/font&gt;" vertex="1">
+          <mxGeometry height="50" width="590" x="45" y="200" as="geometry" />
+        </mxCell>
+        <mxCell id="404" parent="400" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#AB47BC;strokeWidth=1.5;fontSize=11;fontFamily=Segoe UI;" value="&lt;b&gt;moving_to_source&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:10px&quot;&gt;AGV ไป Smart Storage (รับ FPC ใหม่)&lt;/font&gt;" vertex="1">
+          <mxGeometry height="50" width="590" x="45" y="270" as="geometry" />
+        </mxCell>
+        <mxCell id="405" parent="400" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#AB47BC;strokeWidth=1.5;fontSize=11;fontFamily=Segoe UI;" value="&lt;b&gt;arrived_at_source&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:10px&quot;&gt;AGV ถึง Smart Storage&lt;/font&gt;" vertex="1">
+          <mxGeometry height="50" width="590" x="45" y="340" as="geometry" />
+        </mxCell>
+        <mxCell id="406" parent="400" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#AB47BC;strokeWidth=1.5;fontSize=11;fontFamily=Segoe UI;" value="&lt;b&gt;picking_up_fpc&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:10px&quot;&gt;AGV หยิบ FPC ใหม่จาก Smart Storage&lt;/font&gt;" vertex="1">
+          <mxGeometry height="50" width="590" x="45" y="410" as="geometry" />
+        </mxCell>
+        <mxCell id="407" parent="400" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#AB47BC;strokeWidth=1.5;fontSize=11;fontFamily=Segoe UI;" value="&lt;b&gt;moving_to_destination&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:10px&quot;&gt;AGV กำลังไปเครื่องปลายทาง (พร้อม FPC ใหม่)&lt;/font&gt;" vertex="1">
+          <mxGeometry height="50" width="590" x="45" y="480" as="geometry" />
+        </mxCell>
+        <mxCell id="408" parent="400" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#AB47BC;strokeWidth=1.5;fontSize=11;fontFamily=Segoe UI;" value="&lt;b&gt;arrived_at_destination&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:10px&quot;&gt;AGV ถึงเครื่องปลายทาง&lt;/font&gt;" vertex="1">
+          <mxGeometry height="50" width="590" x="45" y="550" as="geometry" />
+        </mxCell>
+        <mxCell id="409" parent="400" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#AB47BC;strokeWidth=1.5;fontSize=11;fontFamily=Segoe UI;" value="&lt;b&gt;picking_up_fpc&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:10px&quot;&gt;AGV หยิบ FPC เก่าออกจากเครื่อง&lt;/font&gt;" vertex="1">
+          <mxGeometry height="50" width="590" x="45" y="620" as="geometry" />
+        </mxCell>
+        <mxCell id="410" parent="400" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF9C4;strokeColor=#F9A825;strokeWidth=2;fontSize=11;fontFamily=Segoe UI;shadow=1;" value="⚠️ &lt;b&gt;waiting_cover_head_install&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:10px&quot;&gt;ยืนยันติดตั้ง Cover Head บน FPC เก่า (กดปุ่ม AGV)&lt;/font&gt;" vertex="1">
+          <mxGeometry height="50" width="590" x="45" y="690" as="geometry" />
+        </mxCell>
+        <mxCell id="411" parent="400" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF9C4;strokeColor=#F9A825;strokeWidth=2;fontSize=11;fontFamily=Segoe UI;shadow=1;" value="⚠️ &lt;b&gt;waiting_cover_head_remove&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:10px&quot;&gt;ยืนยันถอด Cover Head จาก FPC ใหม่ (กดปุ่ม AGV)&lt;/font&gt;" vertex="1">
+          <mxGeometry height="50" width="590" x="45" y="760" as="geometry" />
+        </mxCell>
+        <mxCell id="412" parent="400" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#AB47BC;strokeWidth=1.5;fontSize=11;fontFamily=Segoe UI;" value="&lt;b&gt;placing_fpc&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:10px&quot;&gt;วาง FPC ใหม่บนเครื่องปลายทาง&lt;/font&gt;" vertex="1">
+          <mxGeometry height="50" width="590" x="45" y="830" as="geometry" />
+        </mxCell>
+        <mxCell id="413" parent="400" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#AB47BC;strokeWidth=1.5;fontSize=11;fontFamily=Segoe UI;" value="&lt;b&gt;moving_to_source&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:10px&quot;&gt;AGV กลับ Smart Storage (พร้อม FPC เก่า)&lt;/font&gt;" vertex="1">
+          <mxGeometry height="50" width="590" x="45" y="900" as="geometry" />
+        </mxCell>
+        <mxCell id="414" parent="400" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#AB47BC;strokeWidth=1.5;fontSize=11;fontFamily=Segoe UI;" value="&lt;b&gt;placing_fpc&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:10px&quot;&gt;วาง FPC เก่าใน Smart Storage&lt;/font&gt;" vertex="1">
+          <mxGeometry height="50" width="590" x="45" y="970" as="geometry" />
+        </mxCell>
+        <mxCell id="415" parent="400" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#C8E6C9;strokeColor=#2E7D32;strokeWidth=2;fontSize=11;fontFamily=Segoe UI;shadow=1;" value="✅ &lt;b&gt;completed&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:10px&quot;&gt;เสร็จสิ้น (สลับตำแหน่ง FPC ในระบบ)&lt;/font&gt;" vertex="1">
+          <mxGeometry height="50" width="590" x="45" y="1040" as="geometry" />
+        </mxCell>
+        <mxCell id="431" edge="1" parent="400" source="401" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#AB47BC;strokeWidth=2;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="402">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="432" edge="1" parent="400" source="402" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#AB47BC;strokeWidth=2;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="403">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="433" edge="1" parent="400" source="403" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#AB47BC;strokeWidth=2;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="404">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="434" edge="1" parent="400" source="404" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#AB47BC;strokeWidth=2;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="405">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="435" edge="1" parent="400" source="405" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#AB47BC;strokeWidth=2;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="406">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="436" edge="1" parent="400" source="406" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#AB47BC;strokeWidth=2;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="407">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="437" edge="1" parent="400" source="407" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#AB47BC;strokeWidth=2;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="408">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="438" edge="1" parent="400" source="408" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#AB47BC;strokeWidth=2;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="409">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="439" edge="1" parent="400" source="409" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#F9A825;strokeWidth=2;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="410">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="440" edge="1" parent="400" source="410" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#F9A825;strokeWidth=2;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="411">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="441" edge="1" parent="400" source="411" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#AB47BC;strokeWidth=2;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="412">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="442" edge="1" parent="400" source="412" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#AB47BC;strokeWidth=2;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="413">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="443" edge="1" parent="400" source="413" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#AB47BC;strokeWidth=2;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="414">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="444" edge="1" parent="400" source="414" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#2E7D32;strokeWidth=2;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="415">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="500" parent="100" style="swimlane;startSize=40;fillColor=#FFF5F5;strokeColor=#C62828;strokeWidth=2;rounded=1;arcSize=8;html=1;fontSize=13;fontStyle=1;fontColor=#C62828;fontFamily=Segoe UI;dashed=1;dashPattern=8 4;collapsible=0;" value="❌ Terminal States — สถานะสิ้นสุด (จากทุก active status สามารถเปลี่ยนมาได้)" vertex="1">
+          <mxGeometry height="150" width="2480" x="20" y="1460" as="geometry" />
+        </mxCell>
+        <mxCell id="501" parent="500" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFCDD2;strokeColor=#C62828;strokeWidth=2;fontSize=11;fontFamily=Segoe UI;shadow=1;" value="&lt;b&gt;rejected&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:9px&quot;&gt;Backend ปฏิเสธคำขอ&lt;/font&gt;" vertex="1">
+          <mxGeometry height="55" width="300" x="30" y="60" as="geometry" />
+        </mxCell>
+        <mxCell id="502" parent="500" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFCDD2;strokeColor=#C62828;strokeWidth=2;fontSize=11;fontFamily=Segoe UI;shadow=1;" value="&lt;b&gt;blocked&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:9px&quot;&gt;ถูกบล็อกจากเงื่อนไขภายนอก&lt;/font&gt;" vertex="1">
+          <mxGeometry height="55" width="300" x="370" y="60" as="geometry" />
+        </mxCell>
+        <mxCell id="503" parent="500" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFCDD2;strokeColor=#C62828;strokeWidth=2;fontSize=11;fontFamily=Segoe UI;shadow=1;" value="&lt;b&gt;failed&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:9px&quot;&gt;เกิดข้อผิดพลาดระหว่างทำงาน&lt;/font&gt;" vertex="1">
+          <mxGeometry height="55" width="300" x="710" y="60" as="geometry" />
+        </mxCell>
+        <mxCell id="504" parent="500" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFCDD2;strokeColor=#C62828;strokeWidth=2;fontSize=11;fontFamily=Segoe UI;shadow=1;" value="&lt;b&gt;canceled&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:9px&quot;&gt;Operator ยกเลิกงาน&lt;/font&gt;" vertex="1">
+          <mxGeometry height="55" width="300" x="1050" y="60" as="geometry" />
+        </mxCell>
+        <mxCell id="505" parent="500" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFCDD2;strokeColor=#C62828;strokeWidth=2;fontSize=11;fontFamily=Segoe UI;shadow=1;" value="&lt;b&gt;error&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:9px&quot;&gt;ข้อผิดพลาดของระบบ&lt;/font&gt;" vertex="1">
+          <mxGeometry height="55" width="300" x="1390" y="60" as="geometry" />
+        </mxCell>
+        <mxCell id="506" parent="500" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontSize=11;fontColor=#C62828;fontFamily=Segoe UI;" value="&lt;i&gt;ทุก active status ด้านบน&lt;br&gt;สามารถเปลี่ยนเป็นสถานะ&lt;br&gt;เหล่านี้ได้ทุกเมื่อ&lt;/i&gt;" vertex="1">
+          <mxGeometry height="65" width="700" x="1750" y="55" as="geometry" />
+        </mxCell>
+        <mxCell id="599" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#999999;strokeWidth=2;fontSize=12;fontFamily=Segoe UI;align=left;verticalAlign=top;spacingLeft=15;spacingTop=10;spacingRight=15;shadow=1;" value="&lt;b&gt;📊 Status Box Legend&lt;/b&gt;&lt;hr&gt;&lt;br&gt;⬜ White = Normal Progress&lt;br&gt;&lt;br&gt;🟨 Yellow ⚠️ = Operator&lt;br&gt;Confirmation Required&lt;br&gt;(กดปุ่มบน AGV)&lt;br&gt;&lt;br&gt;🟩 Green ✅ = Completed&lt;br&gt;(เสร็จสิ้น)&lt;br&gt;&lt;br&gt;🟥 Red ❌ = Terminal/Error&lt;br&gt;(สถานะสิ้นสุด)" vertex="1">
+          <mxGeometry height="380" width="380" x="2620" y="1640" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

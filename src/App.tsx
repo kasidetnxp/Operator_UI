@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { EmployeeLogin, EmployeeMenu } from '@/features/auth';
-import { ModeSelection, ReturnFPCWorkflow, RequestFPCWorkflow, SwapFPCWorkflow, FPCSearchPage, UnloadLoadWorkflow } from '@/features/workflow';
+import { ModeSelection, ReturnFPCWorkflow, RequestFPCWorkflow, MoveFPCWorkflow, FPCSearchPage, UnloadLoadWorkflow } from '@/features/workflow';
 import { TaskQueuePage } from '@/features/queue';
 import { AdminLogsPage } from '@/features/admin';
 import { addAuditLog, getAGV1Status, getAGV2Status } from '@/shared/utils/mockApi';
@@ -215,8 +215,8 @@ export default function App() {
             onBack={handleBackToModeSelection}
             onTaskSubmitted={handleGoToQueue}
           />
-        ) : currentPage === 'swap' ? (
-          <SwapFPCWorkflow
+        ) : currentPage === 'move' ? (
+          <MoveFPCWorkflow
             employeeId={employeeId}
             language={language}
             onBack={handleBackToModeSelection}

@@ -4,17 +4,17 @@ import { ArrowLeft } from 'lucide-react';
 import { MachineSelector } from './MachineSelector';
 import { translations } from '@/shared/utils/translations';
 import type { Language } from '@/shared/types';
-import { mockMachines, submitSwapFPCJob, getAllFPCs } from '@/shared/utils/mockApi';
+import { mockMachines, submitMoveFPCJob, getAllFPCs } from '@/shared/utils/mockApi';
 import type { FPCItem } from '@/shared/utils/mockApi';
 
-interface SwapFPCWorkflowProps {
+interface MoveFPCWorkflowProps {
   employeeId: string;
   language: Language;
   onBack: () => void;
   onTaskSubmitted: () => void;
 }
 
-export function SwapFPCWorkflow({ employeeId, language, onBack, onTaskSubmitted }: SwapFPCWorkflowProps) {
+export function MoveFPCWorkflow({ employeeId, language, onBack, onTaskSubmitted }: MoveFPCWorkflowProps) {
   const [selectedSourceMachine, setSelectedSourceMachine] = useState<string | null>(null);
   const [selectedDestinationMachine, setSelectedDestinationMachine] = useState<string | null>(null);
   const [error, setError] = useState<string>('');
@@ -28,7 +28,7 @@ export function SwapFPCWorkflow({ employeeId, language, onBack, onTaskSubmitted 
         const items = await getAllFPCs();
         setAllFPCs(items);
       } catch (err) {
-        console.error('Failed to load FPCs for Swap workflow', err);
+        console.error('Failed to load FPCs for Move workflow', err);
       }
     };
     loadFPCs();
@@ -49,17 +49,31 @@ export function SwapFPCWorkflow({ employeeId, language, onBack, onTaskSubmitted 
     });
   }, [selectedSourceMachine]);
 
+  // Dynamic validation warning/error
+  const validationError = useMemo(() => {
+    if (selectedSourceMachine && !sourceFPC) {
+      return t.errorMachineHasNoFPC;
+    }
+    if (selectedDestinationMachine && destFPC) {
+      return t.errorMachineAlreadyHasFPC;
+    }
+    if (selectedSourceMachine && selectedDestinationMachine && selectedSourceMachine === selectedDestinationMachine) {
+      return language === 'th' ? 'กรุณาเลือกเครื่องจักรต้นทางและปลายทางที่ต่างกัน' : 'Source and destination machines must be different';
+    }
+    return '';
+  }, [selectedSourceMachine, selectedDestinationMachine, sourceFPC, destFPC, language, t.errorMachineHasNoFPC, t.errorMachineAlreadyHasFPC]);
+
   const handleSubmitClick = () => {
     if (!selectedSourceMachine) {
-      setError(t.selectMachineFirst); // Or custom source machine validation message
+      setError(t.selectMachineFirst);
       return;
     }
     if (!selectedDestinationMachine) {
-      setError(t.selectMachineFirst); // Or custom destination machine validation message
+      setError(t.selectMachineFirst);
       return;
     }
-    if (selectedSourceMachine === selectedDestinationMachine) {
-      setError(language === 'th' ? 'กรุณาเลือกเครื่องจักรต้นทางและปลายทางที่ต่างกัน' : 'Source and destination machines must be different');
+    if (validationError) {
+      setError(validationError);
       return;
     }
     setShowConfirmDialog(true);
@@ -71,7 +85,7 @@ export function SwapFPCWorkflow({ employeeId, language, onBack, onTaskSubmitted 
     setError('');
 
     try {
-      await submitSwapFPCJob(employeeId, selectedSourceMachine!, selectedDestinationMachine!);
+      await submitMoveFPCJob(employeeId, selectedSourceMachine!, selectedDestinationMachine!);
       onTaskSubmitted();
     } catch {
       setError(t.error_network);
@@ -97,7 +111,7 @@ export function SwapFPCWorkflow({ employeeId, language, onBack, onTaskSubmitted 
           {t.back}
         </Button>
         <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-foreground text-center truncate">
-          {t.swapFPC}
+          {t.moveFPC}
         </h2>
         <div className="hidden sm:block w-24 sm:w-32 md:w-40 shrink-0" />
       </div>
@@ -133,6 +147,11 @@ export function SwapFPCWorkflow({ employeeId, language, onBack, onTaskSubmitted 
             </div>
 
             <div className="space-y-4 mt-6">
+              {validationError && (
+                <Alert severity="error" className="!text-xl !py-4">
+                  {validationError}
+                </Alert>
+              )}
               {error && (
                 <Alert severity="error" className="!text-xl !py-4">
                   {error}
@@ -143,7 +162,7 @@ export function SwapFPCWorkflow({ employeeId, language, onBack, onTaskSubmitted 
                 variant="contained"
                 size="large"
                 onClick={handleSubmitClick}
-                disabled={!selectedSourceMachine || !selectedDestinationMachine || isSubmitting}
+                disabled={!selectedSourceMachine || !selectedDestinationMachine || !!validationError || isSubmitting}
                 className="!py-6 !text-2xl !font-bold"
               >
                 {isSubmitting ? t.processing : t.submit}

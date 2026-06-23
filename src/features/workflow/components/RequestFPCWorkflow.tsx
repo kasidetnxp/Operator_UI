@@ -2,7 +2,7 @@ import { useState, useMemo, useEffect } from 'react';
 import { Button, Card, CardContent, TextField, Alert, Table, TableBody, TableCell, TableHead, TableRow, Radio, Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material';
 import { ArrowLeft } from 'lucide-react';
 import { MachineSelector } from './MachineSelector';
-import { mockMachines, searchFPC, submitRequestFPCJob } from '@/shared/utils/mockApi';
+import { mockMachines, submitRequestFPCJob, getAllFPCs } from '@/shared/utils/mockApi';
 import type { FPCItem } from '@/shared/utils/mockApi';
 import { translations } from '@/shared/utils/translations';
 import type { Language } from '@/shared/types';
@@ -23,6 +23,7 @@ export function RequestFPCWorkflow({ employeeId, language, onBack, onTaskSubmitt
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [fullFPCList, setFullFPCList] = useState<FPCItem[]>([]);
 
   const t = translations[language];
 
@@ -31,7 +32,8 @@ export function RequestFPCWorkflow({ employeeId, language, onBack, onTaskSubmitt
     const loadAllFPC = async () => {
       setIsLoading(true);
       try {
-        const results = await searchFPC('');
+        const results = await getAllFPCs();
+        setFullFPCList(results);
         const inStorageItems = results.filter(
           item => item.location === 'Smart Storage' && item.address && item.address !== '-'
         );
@@ -58,6 +60,20 @@ export function RequestFPCWorkflow({ employeeId, language, onBack, onTaskSubmitt
     );
   }, [searchQuery, allFPCItems]);
 
+  // Check if destination machine has an FPC already
+  const isMachineOccupied = useMemo(() => {
+    if (!selectedMachine) return false;
+    return fullFPCList.some(fpc => fpc.location === selectedMachine);
+  }, [selectedMachine, fullFPCList]);
+
+  // Dynamic validation warning/error
+  const validationError = useMemo(() => {
+    if (selectedMachine && isMachineOccupied) {
+      return t.errorMachineAlreadyHasFPC;
+    }
+    return '';
+  }, [selectedMachine, isMachineOccupied, t.errorMachineAlreadyHasFPC]);
+
   const handleSubmitClick = () => {
     if (!selectedFPC) {
       setError(t.selectFPCFirst);
@@ -65,6 +81,10 @@ export function RequestFPCWorkflow({ employeeId, language, onBack, onTaskSubmitt
     }
     if (!selectedMachine) {
       setError(t.selectMachineFirst);
+      return;
+    }
+    if (isMachineOccupied) {
+      setError(t.errorMachineAlreadyHasFPC);
       return;
     }
     setShowConfirmDialog(true);
@@ -203,6 +223,11 @@ export function RequestFPCWorkflow({ employeeId, language, onBack, onTaskSubmitt
             </div>
 
             <div className="space-y-4 mt-6">
+              {validationError && (
+                <Alert severity="error" className="!text-xl !py-4">
+                  {validationError}
+                </Alert>
+              )}
               {error && (
                 <Alert severity="error" className="!text-xl !py-4">
                   {error}
@@ -213,7 +238,7 @@ export function RequestFPCWorkflow({ employeeId, language, onBack, onTaskSubmitt
                 variant="contained"
                 size="large"
                 onClick={handleSubmitClick}
-                disabled={!selectedFPC || !selectedMachine || isSubmitting}
+                disabled={!selectedFPC || !selectedMachine || !!validationError || isSubmitting}
                 className="!py-6 !text-2xl !font-bold"
               >
                 {isSubmitting ? t.processing : t.submit}

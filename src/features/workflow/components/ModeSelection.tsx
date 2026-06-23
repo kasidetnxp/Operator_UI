@@ -1,5 +1,5 @@
 import { Card, CardActionArea } from '@mui/material';
-import { ArrowDownCircle, ArrowUpCircle, ArrowLeftRight, RefreshCw } from 'lucide-react';
+import { ArrowDownCircle, ArrowUpCircle, ArrowRight, RefreshCw } from 'lucide-react';
 import { translations } from '@/shared/utils/translations';
 import type { Language, OperationMode } from '@/shared/types';
 
@@ -33,16 +33,16 @@ export function ModeSelection({ onSelectMode, language }: ModeSelectionProps) {
           </CardActionArea>
         </Card>
 
-        {/* Row 1 - Col 2: สลับ FPC */}
+        {/* Row 1 - Col 2: ย้าย FPC */}
         <Card className="hover:shadow-xl transition-shadow bg-card border border-border">
-          <CardActionArea onClick={() => onSelectMode('swap')} className="!p-8 h-full flex flex-col justify-between">
+          <CardActionArea onClick={() => onSelectMode('move')} className="!p-8 h-full flex flex-col justify-between">
             <div className="flex flex-col items-center text-center space-y-4">
-              <ArrowLeftRight className="w-20 h-20 text-primary" />
+              <ArrowRight className="w-20 h-20 text-primary" />
               <h3 className="text-3xl font-bold text-foreground whitespace-pre-line">
-                {t.swapFPC}
+                {t.moveFPC}
               </h3>
               <p className="text-lg text-muted-foreground">
-                {t.swapFPCDesc}
+                {t.moveFPCDesc}
               </p>
             </div>
           </CardActionArea>
