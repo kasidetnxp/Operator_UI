@@ -314,20 +314,18 @@ export function TaskQueuePage({ employeeId, language, onBack, onNewTask }: TaskQ
                               <input
                                 type="checkbox"
                                 checked={!!selectedTask.trayOpenedConfirmed}
-                                disabled={!!selectedTask.trayOpenedConfirmed}
-                                onChange={async () => {
-                                  if (!selectedTask.trayOpenedConfirmed) {
-                                    try {
-                                      await confirmTrayOpened(selectedTask.taskId);
-                                      // Reload tasks immediately to update UI
-                                      const allTasks = await getAllTasks();
-                                      setTasks(sortTasks(allTasks));
-                                    } catch (err) {
-                                      console.error("Failed to confirm tray opened:", err);
-                                    }
+                                onChange={async (e) => {
+                                  const targetChecked = e.target.checked;
+                                  try {
+                                    await confirmTrayOpened(selectedTask.taskId, targetChecked);
+                                    // Reload tasks immediately to update UI
+                                    const allTasks = await getAllTasks();
+                                    setTasks(sortTasks(allTasks));
+                                  } catch (err) {
+                                    console.error("Failed to update tray opened:", err);
                                   }
                                 }}
-                                className="w-6 h-6 accent-info cursor-pointer disabled:cursor-not-allowed"
+                                className="w-6 h-6 accent-info cursor-pointer"
                               />
                               <span className="text-lg font-bold text-foreground">
                                 {t.trayOpenedChecklist}

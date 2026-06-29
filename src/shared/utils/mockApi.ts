@@ -763,13 +763,13 @@ export async function submitUnloadLoadFPCJob(
   return task;
 }
 
-/** Confirm Tray Opened manually by Operator from screen UI */
-export async function confirmTrayOpened(taskId: string): Promise<TaskResponse> {
+/** Confirm or unconfirm Tray Opened manually by Operator from screen UI */
+export async function confirmTrayOpened(taskId: string, confirmed: boolean): Promise<TaskResponse> {
   await delay(300);
   const task = mockTaskQueue.find(t => t.taskId === taskId);
   if (task) {
-    task.trayOpenedConfirmed = true;
-    addAuditLog('CONFIRMATION', task.employeeId, `Confirmed Tray Opened for job (Job: ${task.jobId})`);
+    task.trayOpenedConfirmed = confirmed;
+    addAuditLog('CONFIRMATION', task.employeeId, `${confirmed ? 'Confirmed' : 'Unconfirmed'} Tray Opened for job (Job: ${task.jobId})`);
   }
   return task || {
     taskId,
