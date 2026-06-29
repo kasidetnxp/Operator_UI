@@ -40,7 +40,10 @@ The destination shall be fixed as Smart Storage in the current scope.
 
 The frontend shall display the instruction details when the backend reports the status indicating that pickup has been completed and operator confirmation is required for cover head installation.
 
-The confirmation is completed by the operator pressing a physical button on the AGV machine, which sends the confirmation signal to the backend to proceed to the next step. No interactive confirmation button is displayed in the web UI.
+The confirmation requires a dual-verification safety checklist:
+1. The operator shall manually check "Tray is opened" on the Operator UI.
+2. The operator shall verify the cover head is installed and confirm by pressing a physical button on the AGV (which registers as "AGV physical button confirmed" automatically after a simulated 5-second delay).
+The task will proceed only when both checklists are verified. No screen-based bypass confirmation button is displayed in the web UI.
 
 ### UNLOAD (เบิก FPC) Mode
 
@@ -56,7 +59,10 @@ Machines marked as Unavailable shall not be selectable.
 
 After the AGV arrives at the selected destination machine and the backend reports the status indicating that operator confirmation is required, the frontend shall display instructions for the operator to verify that the cover head has been removed.
 
-The confirmation is completed by the operator pressing a physical button on the AGV machine, which sends the confirmation signal to the backend to complete the workflow. No interactive confirmation button is displayed in the web UI.
+The confirmation requires a dual-verification safety checklist:
+1. The operator shall manually check "Tray is opened" on the Operator UI.
+2. The operator shall verify the cover head is removed and confirm by pressing a physical button on the AGV (which registers as "AGV physical button confirmed" automatically after a simulated 5-second delay).
+The task will complete only when both checklists are verified. No screen-based bypass confirmation button is displayed in the web UI.
 
 ### สลับ FPC Mode
 
@@ -78,8 +84,8 @@ When the job is submitted and starts, the AGV shall perform the following operat
 1. Retrieve the new FPC from Smart Storage.
 2. Move to the destination machine.
 3. Retrieve the old FPC from the destination machine.
-4. Wait for the operator to verify that the cover head has been installed on the old FPC, then confirm via the physical button on the AGV.
-5. Wait for the operator to verify that the cover head has been removed from the new FPC, then confirm via the physical button on the AGV.
+4. Wait for the operator to complete the dual-verification safety checklist (tick "Tray is opened" on screen, and confirm cover head installation via the physical button on the AGV).
+5. Wait for the operator to complete the dual-verification safety checklist (tick "Tray is opened" on screen, and confirm cover head removal via the physical button on the AGV).
 6. Install the new FPC onto the destination machine.
 7. Return to Smart Storage with the old FPC.
 8. Place the old FPC into the Smart Storage slot vacated by the new FPC.
@@ -201,6 +207,16 @@ Not assigned yet
 The frontend shall not independently select or determine which AGV is responsible for the task.
 
 AGV assignment shall be managed and reported by the backend.
+
+### AGV Statuses & Edit Permissions
+
+The system shall support four AGV status states:
+- `Ok` (Normal operational state)
+- `Engineering Use` (Unavailable for tasks; active tasks assigned to this AGV are blocked)
+- `PM` (Preventative Maintenance; active tasks assigned to this AGV are blocked)
+- `Error` (Fault state; active tasks assigned to this AGV are blocked)
+
+Only users with the `Admin` role shall have permission to edit/change the AGV status. The Admin Panel shall feature locked-width (`210px`) dropdown selections for editing AGV statuses. Non-admin roles (Store and Operator) shall be restricted to viewing AGV statuses in the header badges.
 
 ### Button State and Error Handling
 

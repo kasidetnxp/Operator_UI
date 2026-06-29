@@ -41,6 +41,12 @@ These map to the 16 backend task states:
   → Tailwind `text-zinc-500` / `bg-zinc-100`
 * **Disabled / Unavailable Machines** 
   → Tailwind `bg-zinc-100` / `text-zinc-300` / `border-zinc-200`
+* **AGV Detailed Status Colors**
+  * `'Ok'` → Tailwind `text-emerald-600` / `bg-emerald-50` / `border-emerald-200`
+  * `'Engineering Use'` → Tailwind `text-blue-600` / `bg-blue-50` / `border-blue-200`
+  * `'PM'` → Tailwind `text-amber-600` / `bg-amber-50` / `border-amber-200`
+  * `'Error'` → Tailwind `text-red-600` / `bg-red-50` / `border-red-200` with pulse animation
+
 
 ### Forbidden Palettes & Styles
 * Gradient text backgrounds (`background-clip: text`)
@@ -85,7 +91,11 @@ These map to the 16 backend task states:
 
 ### 1. Confirmation Instruction Pattern (Safety-Critical)
 When a task status is `waiting_cover_head_install` or `waiting_cover_head_remove`, the right detail pane must display a high-prominence amber instruction card. 
-* **CRITICAL**: The UI card must NOT contain any clickable "Confirm" or "Complete" buttons. Operators confirm the action strictly by pressing the physical buttons mounted on the AGV machine. The web interface serves purely to display instructions and read the status updates reported by the backend.
+* **CRITICAL**: The UI card must NOT contain any clickable "Confirm" or "Complete" buttons to bypass physical confirmations. Operators confirm the action strictly by pressing the physical buttons mounted on the AGV machine.
+* **Safety Checklist**: The detail pane must display a safety checklist containing:
+  1. `Tray is opened` (checked manually on screen by the operator).
+  2. `AGV physical button confirmed` (checked automatically by the system when the physical confirmation is registered).
+  The workflow will not progress until both conditions are met.
 
 ### 2. Machine Selection Availability
 Machines with `available: false` must be displayed in `zinc-300`, must be unselectable/unclickable, and must never be included in the form payload submitted to the backend.

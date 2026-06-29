@@ -36,14 +36,16 @@ A modern, responsive Operator User Interface for requesting, returning, and swap
 
 4. **Task Queue & AGV Status Tracking**
    - Real-time progress monitoring through detailed statuses: `Submitted` → `Queued` → `Starting` → `Moving to Source` → `Arrived at Source` → `Picking Up FPC` → `Waiting for Cover Head Installation` → `Moving to Destination` → `Arrived at Destination` → `Placing FPC` → `Waiting for Cover Head Removal` → `Completed`.
-   - Simulates physical workflow interactions requiring operator feedback:
-     - **Confirm Cover Head Installed**: Safety confirmation via physical button on the AGV when the FPC is picked up.
-     - **Confirm Cover Head Removed**: Confirmation via physical button on the AGV when the FPC is placed.
+   - **Safety Checklist**: Implements a dual-verification safety checklist requiring:
+     - Operator manually ticks "Tray is opened" on screen.
+     - Simulates physical confirmation via a button on the AGV machine (checked automatically after a 5-second delay).
+     - The task status progresses only after both conditions are satisfied.
 
 5. **Admin Panel & Audit Logs**
    - System audit log viewing and management.
    - User management (Admin role only).
    - FPC location corrections (Admin & Store roles).
+   - **AGV Status Controls**: Supports 4 detailed AGV statuses (`Ok`, `Engineering Use`, `PM`, `Error`) editable only by the `Admin` role via locked `210px` dropdown selections. Non-Ok statuses automatically block assigned tasks.
 
 ---
 

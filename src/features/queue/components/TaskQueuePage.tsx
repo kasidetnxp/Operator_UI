@@ -5,7 +5,7 @@ import { TaskStatus } from './TaskStatus';
 import type { TaskStatusType } from './TaskStatus';
 import { translations } from '@/shared/utils/translations';
 import type { Language } from '@/shared/types';
-import { getAllTasks, cancelTask } from '@/shared/utils/mockApi';
+import { getAllTasks, cancelTask, confirmTrayOpened } from '@/shared/utils/mockApi';
 import type { TaskResponse } from '@/shared/utils/mockApi';
 
 interface TaskQueuePageProps {
@@ -289,17 +289,67 @@ export function TaskQueuePage({ employeeId, language, onBack, onNewTask }: TaskQ
                   />
 
                   {canConfirm(selectedTask) && (
-                    <Alert severity="warning" className="!items-start !text-xl !py-6">
-                      <p className="text-xl">
-                        {selectedTask.type === 'return'
-                          ? t.coverHeadInstallationConfirm
-                          : selectedTask.type === 'request'
-                            ? t.coverHeadRemovalConfirm
-                            : !selectedTask.coverHeadInstalledConfirmed
-                              ? t.coverHeadInstallationConfirm
-                              : t.coverHeadRemovalConfirm}
-                      </p>
-                    </Alert>
+                    <div className="space-y-4">
+                      <Alert severity="warning" className="!items-start !text-xl !py-6">
+                        <p className="text-xl">
+                          {selectedTask.type === 'return'
+                            ? t.coverHeadInstallationConfirm
+                            : selectedTask.type === 'request'
+                              ? t.coverHeadRemovalConfirm
+                              : !selectedTask.coverHeadInstalledConfirmed
+                                ? t.coverHeadInstallationConfirm
+                                : t.coverHeadRemovalConfirm}
+                        </p>
+                      </Alert>
+
+                      {/* Safety Checklist Card */}
+                      <Card className="border border-warning bg-warning-background/10">
+                        <CardContent className="p-6 space-y-4">
+                          <h4 className="text-xl font-bold text-warning-foreground flex items-center gap-2">
+                            {t.safetyChecklist}
+                          </h4>
+                          <div className="flex flex-col gap-3">
+                            {/* Checkbox 1: Tray Opened */}
+                            <label className="flex items-center gap-4 p-4 rounded-lg bg-card border border-border cursor-pointer hover:bg-muted/30 transition-all select-none min-h-[48px]">
+                              <input
+                                type="checkbox"
+                                checked={!!selectedTask.trayOpenedConfirmed}
+                                disabled={!!selectedTask.trayOpenedConfirmed}
+                                onChange={async () => {
+                                  if (!selectedTask.trayOpenedConfirmed) {
+                                    try {
+                                      await confirmTrayOpened(selectedTask.taskId);
+                                      // Reload tasks immediately to update UI
+                                      const allTasks = await getAllTasks();
+                                      setTasks(sortTasks(allTasks));
+                                    } catch (err) {
+                                      console.error("Failed to confirm tray opened:", err);
+                                    }
+                                  }
+                                }}
+                                className="w-6 h-6 accent-info cursor-pointer disabled:cursor-not-allowed"
+                              />
+                              <span className="text-lg font-bold text-foreground">
+                                {t.trayOpenedChecklist}
+                              </span>
+                            </label>
+
+                            {/* Checkbox 2: AGV Button Confirmation */}
+                            <label className="flex items-center gap-4 p-4 rounded-lg bg-zinc-100 border border-zinc-200 cursor-not-allowed select-none min-h-[48px]">
+                              <input
+                                type="checkbox"
+                                checked={!!selectedTask.coverHeadPhysicalConfirmed}
+                                disabled
+                                className="w-6 h-6 accent-success cursor-not-allowed"
+                              />
+                              <span className="text-lg font-bold text-zinc-500">
+                                {t.agvPhysicalButtonChecklist}
+                              </span>
+                            </label>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    </div>
                   )}
 
                   {isCancelable(selectedTask) && (

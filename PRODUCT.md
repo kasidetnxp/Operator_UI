@@ -25,7 +25,7 @@ The NXP WT FPC Management System is an operator user interface designed for requ
 * **Inspirational imagery**: Stock cleanroom photos or generic corporate graphics.
 
 ## Design Principles
-1. **Safety First through Action Control**: The interface must physically and visually separate screen commands from real-world physical confirmations (e.g. cover head confirmation is physical-only on the AGV; no screen bypass buttons).
+1. **Safety First through Action Control**: The interface must physically and visually separate screen commands from real-world physical confirmations. For cover head operations, operators must verify a screen-based safety checklist (e.g., verifying that the tray is open) before the real-world physical confirmation (pressing the button on the AGV) can finalize the workflow; no screen-based bypass buttons for physical steps are allowed.
 2. **Gloved Touch-First Layouts**: Every clickable area must accommodate cleanroom operators wearing gloves, ensuring high spacing and touch target clearance.
 3. **No Decorative Ambiguity**: Every visual state, status color, or transition must serve a direct information-delivery purpose. Statuses are never conveyed by color alone.
 4. **Restrained Semantic Accents**: Use clean, neutral surfaces (white/zinc) punctuated only by strict semantic indicators for active, warning, action, error, and success states.

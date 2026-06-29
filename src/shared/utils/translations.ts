@@ -84,6 +84,9 @@ export const translations = {
     agvStatusEngineering: 'Engineering Use',
     agvStatusPM: 'PM',
     agvStatusError: 'Error',
+    safetyChecklist: 'Safety Checklist',
+    trayOpenedChecklist: 'Tray is opened',
+    agvPhysicalButtonChecklist: 'AGV physical button confirmed',
 
 
     // Actions
@@ -298,6 +301,9 @@ export const translations = {
     agvStatusEngineering: 'Engineering Use',
     agvStatusPM: 'PM',
     agvStatusError: 'Error',
+    safetyChecklist: 'เช็คลิสต์ความปลอดภัย',
+    trayOpenedChecklist: 'เปิด Tray เรียบร้อยแล้ว',
+    agvPhysicalButtonChecklist: 'ยืนยันที่หน้าเครื่อง AGV เรียบร้อยแล้ว',
 
 
     // Actions

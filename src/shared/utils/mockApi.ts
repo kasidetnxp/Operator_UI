@@ -55,6 +55,8 @@ export interface TaskResponse {
   coverHeadInstalledConfirmed?: boolean;
   agvId?: string;
   currentStepIndex?: number;
+  trayOpenedConfirmed?: boolean;
+  coverHeadPhysicalConfirmed?: boolean;
 }
 
 // In-memory task queue (replace with API call)
@@ -761,98 +763,125 @@ export async function submitUnloadLoadFPCJob(
   return task;
 }
 
-/** Confirm Cover Head installed (Return FPC workflow step, or Swap first stage) */
-export async function confirmCoverHeadInstalled(taskId: string): Promise<TaskResponse> {
-  await delay(500);
+/** Confirm Tray Opened manually by Operator from screen UI */
+export async function confirmTrayOpened(taskId: string): Promise<TaskResponse> {
+  await delay(300);
   const task = mockTaskQueue.find(t => t.taskId === taskId);
   if (task) {
-    if (task.status === 'canceled') return task;
-
-    addAuditLog('CONFIRMATION', task.employeeId, `Confirmed Cover Head Installed for ${task.type.toUpperCase()} job (Job: ${task.jobId})`);
-
-    if (task.type === 'move') {
-      task.coverHeadInstalledConfirmed = true;
-      task.status = 'moving_to_destination';
-      task.message = 'Cover Head installation confirmed, AGV proceeding to destination';
-      
-      addAuditLog('STATE_CHANGE', task.employeeId, `Job ${task.jobId} status updated to moving_to_destination`);
-
-      // Simulate transit to destination machine
-      setTimeout(() => updateTaskStatus(taskId, 'arrived_at_destination'), 3000);
-      setTimeout(() => updateTaskStatus(taskId, 'placing_fpc'), 6500);
-      setTimeout(() => updateTaskStatus(taskId, 'waiting_cover_head_remove'), 10000);
-    } else if (task.type === 'unload_load') {
-      task.coverHeadInstalledConfirmed = true;
-      task.status = 'waiting_cover_head_remove';
-      task.currentStepIndex = 8; // Index of 'waiting_cover_head_remove' in UNLOAD_LOAD_STEPS
-      task.message = 'Cover Head installation confirmed, preparing to install new FPC';
-
-      addAuditLog('STATE_CHANGE', task.employeeId, `Job ${task.jobId} status updated to waiting_cover_head_remove`);
-
-      // Simulate AGV physical button confirmation after 5 seconds
-      setTimeout(() => {
-        confirmCoverHeadRemoved(taskId);
-      }, 5000);
-    } else {
-      task.status = 'moving_to_destination';
-      task.message = 'Cover Head installation confirmed, AGV proceeding to Smart Storage';
-
-      addAuditLog('STATE_CHANGE', task.employeeId, `Job ${task.jobId} status updated to moving_to_destination`);
-
-      // Simulate transit to Smart Storage
-      setTimeout(() => updateTaskStatus(taskId, 'arrived_at_destination'), 3000);
-      setTimeout(() => updateTaskStatus(taskId, 'placing_fpc'), 6500);
-      setTimeout(() => updateTaskStatus(taskId, 'completed'), 10000);
+    task.trayOpenedConfirmed = true;
+    addAuditLog('CONFIRMATION', task.employeeId, `Confirmed Tray Opened for job (Job: ${task.jobId})`);
+    
+    // If physical button is also confirmed, proceed with task status update
+    if (task.coverHeadPhysicalConfirmed) {
+      if (task.status === 'waiting_cover_head_install') {
+        executeCoverHeadInstalledProgression(task);
+      } else if (task.status === 'waiting_cover_head_remove') {
+        executeCoverHeadRemovedProgression(task);
+      }
     }
   }
   return task || {
     taskId,
     jobId: 'UNKNOWN',
     status: 'completed',
-    message: 'Cover Head installation confirmed, AGV proceeding',
+    message: 'Tray opened confirmed',
     employeeId: '',
     type: 'return',
     createdAt: new Date().toISOString(),
   };
 }
 
-/** Confirm Cover Head removed (Request FPC workflow step, or Swap second stage) */
-export async function confirmCoverHeadRemoved(taskId: string): Promise<TaskResponse> {
-  await delay(500);
+/** Execute status progression for Cover Head Installed */
+export function executeCoverHeadInstalledProgression(task: TaskResponse): void {
+  if (task.status === 'canceled') return;
+
+  addAuditLog('CONFIRMATION', task.employeeId, `Confirmed Cover Head Installed for ${task.type.toUpperCase()} job (Job: ${task.jobId})`);
+
+  if (task.type === 'move') {
+    task.coverHeadInstalledConfirmed = true;
+    task.status = 'moving_to_destination';
+    task.message = 'Cover Head installation confirmed, AGV proceeding to destination';
+    
+    addAuditLog('STATE_CHANGE', task.employeeId, `Job ${task.jobId} status updated to moving_to_destination`);
+
+    // Simulate transit to destination machine
+    setTimeout(() => updateTaskStatus(task.taskId, 'arrived_at_destination'), 3000);
+    setTimeout(() => updateTaskStatus(task.taskId, 'placing_fpc'), 6500);
+    setTimeout(() => updateTaskStatus(task.taskId, 'waiting_cover_head_remove'), 10000);
+  } else if (task.type === 'unload_load') {
+    task.coverHeadInstalledConfirmed = true;
+    task.status = 'waiting_cover_head_remove';
+    task.trayOpenedConfirmed = false;
+    task.coverHeadPhysicalConfirmed = false;
+    task.currentStepIndex = 8; // Index of 'waiting_cover_head_remove' in UNLOAD_LOAD_STEPS
+    task.message = 'Cover Head installation confirmed, preparing to install new FPC';
+
+    addAuditLog('STATE_CHANGE', task.employeeId, `Job ${task.jobId} status updated to waiting_cover_head_remove`);
+
+    // Simulate AGV physical button confirmation after 5 seconds
+    setTimeout(() => {
+      const t = mockTaskQueue.find(tk => tk.taskId === task.taskId);
+      if (t && t.status === 'waiting_cover_head_remove') {
+        t.coverHeadPhysicalConfirmed = true;
+        addAuditLog('CONFIRMATION', t.employeeId, `Physical Cover Head Removal button confirmed on AGV (Job: ${t.jobId})`);
+        if (t.trayOpenedConfirmed) {
+          executeCoverHeadRemovedProgression(t);
+        }
+      }
+    }, 5000);
+  } else {
+    task.status = 'moving_to_destination';
+    task.message = 'Cover Head installation confirmed, AGV proceeding to Smart Storage';
+
+    addAuditLog('STATE_CHANGE', task.employeeId, `Job ${task.jobId} status updated to moving_to_destination`);
+
+    // Simulate transit to Smart Storage
+    setTimeout(() => updateTaskStatus(task.taskId, 'arrived_at_destination'), 3000);
+    setTimeout(() => updateTaskStatus(task.taskId, 'placing_fpc'), 6500);
+    setTimeout(() => updateTaskStatus(task.taskId, 'completed'), 10000);
+  }
+}
+
+/** Execute status progression for Cover Head Removed */
+export function executeCoverHeadRemovedProgression(task: TaskResponse): void {
+  if (task.status === 'canceled') return;
+  
+  addAuditLog('CONFIRMATION', task.employeeId, `Confirmed Cover Head Removed for ${task.type.toUpperCase()} job (Job: ${task.jobId})`);
+  
+  if (task.type === 'unload_load') {
+    task.status = 'placing_fpc';
+    task.currentStepIndex = 9; // Index of first 'placing_fpc' in UNLOAD_LOAD_STEPS
+    task.message = 'Cover Head removal confirmed, placing new FPC';
+
+    addAuditLog('STATE_CHANGE', task.employeeId, `Job ${task.jobId} status updated to placing_fpc`);
+
+    // Custom timeout progression for the return leg
+    setTimeout(() => {
+      task.currentStepIndex = 10;
+      updateTaskStatus(task.taskId, 'moving_to_destination');
+    }, 3500);
+  } else {
+    task.status = 'completed';
+    task.message = 'Cover Head removal confirmed, job completed';
+
+    addAuditLog('STATE_CHANGE', task.employeeId, `Job ${task.jobId} status updated to completed`);
+  }
+}
+
+// Legacy wrappers (for compatibility if needed, though not used externally)
+export async function confirmCoverHeadInstalled(taskId: string): Promise<TaskResponse> {
   const task = mockTaskQueue.find(t => t.taskId === taskId);
   if (task) {
-    if (task.status === 'canceled') return task;
-    
-    addAuditLog('CONFIRMATION', task.employeeId, `Confirmed Cover Head Removed for ${task.type.toUpperCase()} job (Job: ${task.jobId})`);
-    
-    if (task.type === 'unload_load') {
-      task.status = 'placing_fpc';
-      task.currentStepIndex = 9; // Index of first 'placing_fpc' in UNLOAD_LOAD_STEPS
-      task.message = 'Cover Head removal confirmed, placing new FPC';
-
-      addAuditLog('STATE_CHANGE', task.employeeId, `Job ${task.jobId} status updated to placing_fpc`);
-
-      // Custom timeout progression for the return leg
-      setTimeout(() => {
-        task.currentStepIndex = 10;
-        updateTaskStatus(taskId, 'moving_to_destination');
-      }, 3500);
-    } else {
-      task.status = 'completed';
-      task.message = 'Cover Head removal confirmed, job completed';
-
-      addAuditLog('STATE_CHANGE', task.employeeId, `Job ${task.jobId} status updated to completed`);
-    }
+    executeCoverHeadInstalledProgression(task);
   }
-  return task || {
-    taskId,
-    jobId: 'UNKNOWN',
-    status: 'completed',
-    message: 'Cover Head removal confirmed, AGV proceeding',
-    employeeId: '',
-    type: 'request',
-    createdAt: new Date().toISOString(),
-  };
+  return task || { taskId, jobId: 'UNKNOWN', status: 'completed', message: '', employeeId: '', type: 'return', createdAt: '' };
+}
+export async function confirmCoverHeadRemoved(taskId: string): Promise<TaskResponse> {
+  const task = mockTaskQueue.find(t => t.taskId === taskId);
+  if (task) {
+    executeCoverHeadRemovedProgression(task);
+  }
+  return task || { taskId, jobId: 'UNKNOWN', status: 'completed', message: '', employeeId: '', type: 'return', createdAt: '' };
 }
 
 /** Get task status by ID */
@@ -892,12 +921,30 @@ export function updateTaskStatus(taskId: string, status: TaskResponse['status'])
 
     // Simulate AGV physical button confirmation after 5 seconds
     if (status === 'waiting_cover_head_install') {
+      task.trayOpenedConfirmed = false;
+      task.coverHeadPhysicalConfirmed = false;
       setTimeout(() => {
-        confirmCoverHeadInstalled(taskId);
+        const t = mockTaskQueue.find(tk => tk.taskId === taskId);
+        if (t && t.status === 'waiting_cover_head_install') {
+          t.coverHeadPhysicalConfirmed = true;
+          addAuditLog('CONFIRMATION', t.employeeId, `Physical Cover Head Installation button confirmed on AGV (Job: ${t.jobId})`);
+          if (t.trayOpenedConfirmed) {
+            executeCoverHeadInstalledProgression(t);
+          }
+        }
       }, 5000);
     } else if (status === 'waiting_cover_head_remove') {
+      task.trayOpenedConfirmed = false;
+      task.coverHeadPhysicalConfirmed = false;
       setTimeout(() => {
-        confirmCoverHeadRemoved(taskId);
+        const t = mockTaskQueue.find(tk => tk.taskId === taskId);
+        if (t && t.status === 'waiting_cover_head_remove') {
+          t.coverHeadPhysicalConfirmed = true;
+          addAuditLog('CONFIRMATION', t.employeeId, `Physical Cover Head Removal button confirmed on AGV (Job: ${t.jobId})`);
+          if (t.trayOpenedConfirmed) {
+            executeCoverHeadRemovedProgression(t);
+          }
+        }
       }, 5000);
     } else {
       if (task.type === 'unload_load') {
