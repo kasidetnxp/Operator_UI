@@ -91,11 +91,11 @@ These map to the 16 backend task states:
 
 ### 1. Confirmation Instruction Pattern (Safety-Critical)
 When a task status is `waiting_cover_head_install` or `waiting_cover_head_remove`, the right detail pane must display a high-prominence amber instruction card. 
-* **CRITICAL**: The UI card must NOT contain any clickable "Confirm" or "Complete" buttons to bypass physical confirmations. Operators confirm the action strictly by pressing the physical buttons mounted on the AGV machine.
+* **CRITICAL**: The UI card must NOT contain any clickable "Confirm" or "Complete" buttons to bypass physical confirmations.
 * **Safety Checklist**: The detail pane must display a safety checklist containing:
   1. `Tray is opened` (checked manually on screen by the operator).
   2. `AGV physical button confirmed` (checked automatically by the system when the physical confirmation is registered).
-  The workflow will not progress until both conditions are met.
+* **Confirm Button**: A manual "Confirm" button on screen will be displayed below the checklist. It remains disabled until both checklist items are checked. Clicking this button executes the final status progression.
 
 ### 2. Machine Selection Availability
 Machines with `available: false` must be displayed in `zinc-300`, must be unselectable/unclickable, and must never be included in the form payload submitted to the backend.

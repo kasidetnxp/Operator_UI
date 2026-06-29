@@ -122,11 +122,11 @@ The **Task Queue** displays all active and historical transport jobs. It simulat
 4.  `moving_to_source`: AGV is moving to the source machine.
 5.  `arrived_at_source`: AGV has arrived at the source.
 6.  `picking_up_fpc`: AGV is picking up the FPC.
-7.  `waiting_cover_head_install`: Operator must satisfy the dual-verification safety checklist (tick "Tray is opened" on screen, and verify that the cover head is installed and press the physical button on the AGV).
+7.  `waiting_cover_head_install`: Operator must satisfy the dual-verification safety checklist (tick "Tray is opened" on screen, and verify that the cover head is installed and press the physical button on the AGV), and then click the screen "Confirm" button to proceed.
 8.  `moving_to_destination`: AGV is in transit to destination.
 9.  `arrived_at_destination`: AGV has arrived at destination.
 10. `placing_fpc`: AGV is placing the FPC.
-11. `waiting_cover_head_remove`: Operator must satisfy the dual-verification safety checklist (tick "Tray is opened" on screen, and verify that the cover head is removed and press the physical button on the AGV).
+11. `waiting_cover_head_remove`: Operator must satisfy the dual-verification safety checklist (tick "Tray is opened" on screen, and verify that the cover head is removed and press the physical button on the AGV), and then click the screen "Confirm" button to proceed.
 12. `completed` / `failed` / `rejected` / `blocked` / `canceled` / `error`: Terminal states.
 
 *   **Task Queue Sorting**: Active tasks (not finished) are automatically sorted by creation time (newest first) and kept at the top of the queue. Finished/completed/canceled tasks are automatically pushed to the bottom of the list.

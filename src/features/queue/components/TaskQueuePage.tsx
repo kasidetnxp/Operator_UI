@@ -5,7 +5,7 @@ import { TaskStatus } from './TaskStatus';
 import type { TaskStatusType } from './TaskStatus';
 import { translations } from '@/shared/utils/translations';
 import type { Language } from '@/shared/types';
-import { getAllTasks, cancelTask, confirmTrayOpened } from '@/shared/utils/mockApi';
+import { getAllTasks, cancelTask, confirmTrayOpened, confirmCoverHeadInstalled, confirmCoverHeadRemoved } from '@/shared/utils/mockApi';
 import type { TaskResponse } from '@/shared/utils/mockApi';
 
 interface TaskQueuePageProps {
@@ -346,6 +346,32 @@ export function TaskQueuePage({ employeeId, language, onBack, onNewTask }: TaskQ
                                 {t.agvPhysicalButtonChecklist}
                               </span>
                             </label>
+                          </div>
+
+                          {/* Confirm Button */}
+                          <div className="pt-2 flex justify-end">
+                            <Button
+                              variant="contained"
+                              color="primary"
+                              disabled={!selectedTask.trayOpenedConfirmed || !selectedTask.coverHeadPhysicalConfirmed}
+                              onClick={async () => {
+                                try {
+                                  if (selectedTask.status === 'waiting_cover_head_install') {
+                                    await confirmCoverHeadInstalled(selectedTask.taskId);
+                                  } else if (selectedTask.status === 'waiting_cover_head_remove') {
+                                    await confirmCoverHeadRemoved(selectedTask.taskId);
+                                  }
+                                  // Reload tasks immediately to update UI
+                                  const allTasks = await getAllTasks();
+                                  setTasks(sortTasks(allTasks));
+                                } catch (err) {
+                                  console.error("Failed to confirm checklist progress:", err);
+                                }
+                              }}
+                              className="!py-3 !px-6 !text-lg !font-bold"
+                            >
+                              {t.confirm}
+                            </Button>
                           </div>
                         </CardContent>
                       </Card>

@@ -770,15 +770,6 @@ export async function confirmTrayOpened(taskId: string): Promise<TaskResponse> {
   if (task) {
     task.trayOpenedConfirmed = true;
     addAuditLog('CONFIRMATION', task.employeeId, `Confirmed Tray Opened for job (Job: ${task.jobId})`);
-    
-    // If physical button is also confirmed, proceed with task status update
-    if (task.coverHeadPhysicalConfirmed) {
-      if (task.status === 'waiting_cover_head_install') {
-        executeCoverHeadInstalledProgression(task);
-      } else if (task.status === 'waiting_cover_head_remove') {
-        executeCoverHeadRemovedProgression(task);
-      }
-    }
   }
   return task || {
     taskId,
@@ -824,9 +815,6 @@ export function executeCoverHeadInstalledProgression(task: TaskResponse): void {
       if (t && t.status === 'waiting_cover_head_remove') {
         t.coverHeadPhysicalConfirmed = true;
         addAuditLog('CONFIRMATION', t.employeeId, `Physical Cover Head Removal button confirmed on AGV (Job: ${t.jobId})`);
-        if (t.trayOpenedConfirmed) {
-          executeCoverHeadRemovedProgression(t);
-        }
       }
     }, 5000);
   } else {
@@ -928,9 +916,6 @@ export function updateTaskStatus(taskId: string, status: TaskResponse['status'])
         if (t && t.status === 'waiting_cover_head_install') {
           t.coverHeadPhysicalConfirmed = true;
           addAuditLog('CONFIRMATION', t.employeeId, `Physical Cover Head Installation button confirmed on AGV (Job: ${t.jobId})`);
-          if (t.trayOpenedConfirmed) {
-            executeCoverHeadInstalledProgression(t);
-          }
         }
       }, 5000);
     } else if (status === 'waiting_cover_head_remove') {
@@ -941,9 +926,6 @@ export function updateTaskStatus(taskId: string, status: TaskResponse['status'])
         if (t && t.status === 'waiting_cover_head_remove') {
           t.coverHeadPhysicalConfirmed = true;
           addAuditLog('CONFIRMATION', t.employeeId, `Physical Cover Head Removal button confirmed on AGV (Job: ${t.jobId})`);
-          if (t.trayOpenedConfirmed) {
-            executeCoverHeadRemovedProgression(t);
-          }
         }
       }, 5000);
     } else {
