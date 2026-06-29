@@ -80,6 +80,11 @@ export const translations = {
     blocked: 'Blocked',
     failedStatus: 'Failed',
     canceled: 'Canceled',
+    agvStatusOk: 'Ok',
+    agvStatusEngineering: 'Engineering Use',
+    agvStatusPM: 'PM',
+    agvStatusError: 'Error',
+
 
     // Actions
     confirm: 'Confirm',
@@ -289,6 +294,11 @@ export const translations = {
     blocked: 'ถูกบล็อก',
     failedStatus: 'ล้มเหลว',
     canceled: 'ยกเลิกแล้ว',
+    agvStatusOk: 'Ok',
+    agvStatusEngineering: 'Engineering Use',
+    agvStatusPM: 'PM',
+    agvStatusError: 'Error',
+
 
     // Actions
     confirm: 'ยืนยัน',

@@ -322,9 +322,9 @@ function generateJobId(): string {
 }
 
 // ─── Dual AGV Status ───
-type AGVStatus = 'OK' | 'ERROR';
-let agv1Status: AGVStatus = 'OK';
-let agv2Status: AGVStatus = 'OK';
+export type AGVStatus = 'Ok' | 'Engineering Use' | 'PM' | 'Error';
+let agv1Status: AGVStatus = 'Ok';
+let agv2Status: AGVStatus = 'Ok';
 
 export function getAGV1Status(): AGVStatus { return agv1Status; }
 export function getAGV2Status(): AGVStatus { return agv2Status; }
@@ -335,9 +335,9 @@ export function setAGV1Status(status: AGVStatus): void {
   // Pause or resume tasks assigned to AGV-01
   for (const task of mockTaskQueue) {
     if (task.agvId === 'AGV-01') {
-      if (status === 'ERROR' && !isTerminal(task.status) && task.status !== 'blocked' && task.status !== 'submitted') {
-        pauseTaskProgression(task.taskId);
-      } else if (status === 'OK' && task.status === 'blocked') {
+      if (status !== 'Ok' && !isTerminal(task.status) && task.status !== 'blocked' && task.status !== 'submitted') {
+        pauseTaskProgression(task.taskId, status);
+      } else if (status === 'Ok' && task.status === 'blocked') {
         resumeTaskProgression(task.taskId);
       }
     }
@@ -350,18 +350,21 @@ export function setAGV2Status(status: AGVStatus): void {
   // Pause or resume tasks assigned to AGV-02
   for (const task of mockTaskQueue) {
     if (task.agvId === 'AGV-02') {
-      if (status === 'ERROR' && !isTerminal(task.status) && task.status !== 'blocked' && task.status !== 'submitted') {
-        pauseTaskProgression(task.taskId);
-      } else if (status === 'OK' && task.status === 'blocked') {
+      if (status !== 'Ok' && !isTerminal(task.status) && task.status !== 'blocked' && task.status !== 'submitted') {
+        pauseTaskProgression(task.taskId, status);
+      } else if (status === 'Ok' && task.status === 'blocked') {
         resumeTaskProgression(task.taskId);
       }
     }
   }
 }
 
-// Legacy compat — returns ERROR if either AGV is ERROR
+// Legacy compat — returns Error if either AGV is Error, or PM, or Engineering Use, otherwise Ok
 export function getAGVSystemStatus(): AGVStatus {
-  return (agv1Status === 'ERROR' || agv2Status === 'ERROR') ? 'ERROR' : 'OK';
+  if (agv1Status === 'Error' || agv2Status === 'Error') return 'Error';
+  if (agv1Status === 'PM' || agv2Status === 'PM') return 'PM';
+  if (agv1Status === 'Engineering Use' || agv2Status === 'Engineering Use') return 'Engineering Use';
+  return 'Ok';
 }
 export function setAGVSystemStatus(status: AGVStatus): void {
   setAGV1Status(status);
@@ -437,7 +440,7 @@ function scheduleNextStep(taskId: string, nextStatus: TaskResponse['status']): v
   activeTimers.set(taskId, timer);
 }
 
-function pauseTaskProgression(taskId: string): void {
+function pauseTaskProgression(taskId: string, agvStatus: AGVStatus): void {
   const task = mockTaskQueue.find(t => t.taskId === taskId);
   if (!task || isTerminal(task.status)) return;
 
@@ -458,7 +461,7 @@ function pauseTaskProgression(taskId: string): void {
   // Mark as blocked
   const previousStatus = task.status;
   task.status = 'blocked';
-  addAuditLog('STATE_CHANGE', task.employeeId, `Job ${task.jobId} BLOCKED (was ${previousStatus}) — assigned AGV is in ERROR state`);
+  addAuditLog('STATE_CHANGE', task.employeeId, `Job ${task.jobId} BLOCKED (was ${previousStatus}) — assigned AGV is in ${agvStatus} state`);
 }
 
 function resumeTaskProgression(taskId: string): void {
@@ -880,9 +883,9 @@ export function updateTaskStatus(taskId: string, status: TaskResponse['status'])
 
     // Check if the assigned AGV is in ERROR — block immediately
     if (task.agvId) {
-      const agvOK = task.agvId === 'AGV-01' ? agv1Status === 'OK' : agv2Status === 'OK';
-      if (!agvOK && !isTerminal(status) && status !== 'submitted') {
-        pauseTaskProgression(taskId);
+      const agvStatusVal = task.agvId === 'AGV-01' ? agv1Status : agv2Status;
+      if (agvStatusVal !== 'Ok' && !isTerminal(status) && status !== 'submitted') {
+        pauseTaskProgression(taskId, agvStatusVal);
         return;
       }
     }

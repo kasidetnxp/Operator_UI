@@ -3,7 +3,7 @@ import { EmployeeLogin, EmployeeMenu } from '@/features/auth';
 import { ModeSelection, ReturnFPCWorkflow, RequestFPCWorkflow, MoveFPCWorkflow, FPCSearchPage, UnloadLoadWorkflow } from '@/features/workflow';
 import { TaskQueuePage } from '@/features/queue';
 import { AdminLogsPage } from '@/features/admin';
-import { addAuditLog, getAGV1Status, getAGV2Status } from '@/shared/utils/mockApi';
+import { addAuditLog, getAGV1Status, getAGV2Status, type AGVStatus } from '@/shared/utils/mockApi';
 import { translations } from '@/shared/utils/translations';
 import type { Language, OperationMode, Page, Role } from '@/shared/types';
 
@@ -19,8 +19,8 @@ export default function App() {
     }
     return 'mode-selection';
   });
-  const [agv1Status, setAgv1StatusLocal] = useState<'OK' | 'ERROR'>('OK');
-  const [agv2Status, setAgv2StatusLocal] = useState<'OK' | 'ERROR'>('OK');
+  const [agv1Status, setAgv1StatusLocal] = useState<AGVStatus>('Ok');
+  const [agv2Status, setAgv2StatusLocal] = useState<AGVStatus>('Ok');
 
   useEffect(() => {
     const checkAGVStatus = () => {
@@ -96,32 +96,52 @@ export default function App() {
                 {/* AGV 1 Badge */}
                 <span
                   className={`px-4 py-2 text-lg font-black rounded-full flex items-center gap-2 border shadow-sm transition-all duration-300 ${
-                    agv1Status === 'OK'
+                    agv1Status === 'Ok'
                       ? 'bg-success-background text-success-foreground border-success'
+                      : agv1Status === 'Engineering Use'
+                      ? 'bg-info-background text-info-foreground border-info'
+                      : agv1Status === 'PM'
+                      ? 'bg-warning-background text-warning-foreground border-warning'
                       : 'bg-error-background text-error-foreground border-error animate-pulse'
                   }`}
                 >
                   <span
                     className={`w-3 h-3 rounded-full ${
-                      agv1Status === 'OK' ? 'bg-success' : 'bg-error animate-ping'
+                      agv1Status === 'Ok'
+                        ? 'bg-success'
+                        : agv1Status === 'Engineering Use'
+                        ? 'bg-info'
+                        : agv1Status === 'PM'
+                        ? 'bg-warning'
+                        : 'bg-error animate-ping'
                     }`}
                   />
-                  AGV 1: {agv1Status}
+                  AGV 1: {agv1Status === 'Ok' ? translations[language].agvStatusOk : agv1Status === 'Engineering Use' ? translations[language].agvStatusEngineering : agv1Status === 'PM' ? translations[language].agvStatusPM : translations[language].agvStatusError}
                 </span>
                 {/* AGV 2 Badge */}
                 <span
                   className={`px-4 py-2 text-lg font-black rounded-full flex items-center gap-2 border shadow-sm transition-all duration-300 ${
-                    agv2Status === 'OK'
+                    agv2Status === 'Ok'
                       ? 'bg-success-background text-success-foreground border-success'
+                      : agv2Status === 'Engineering Use'
+                      ? 'bg-info-background text-info-foreground border-info'
+                      : agv2Status === 'PM'
+                      ? 'bg-warning-background text-warning-foreground border-warning'
                       : 'bg-error-background text-error-foreground border-error animate-pulse'
                   }`}
                 >
                   <span
                     className={`w-3 h-3 rounded-full ${
-                      agv2Status === 'OK' ? 'bg-success' : 'bg-error animate-ping'
+                      agv2Status === 'Ok'
+                        ? 'bg-success'
+                        : agv2Status === 'Engineering Use'
+                        ? 'bg-info'
+                        : agv2Status === 'PM'
+                        ? 'bg-warning'
+                        : 'bg-error animate-ping'
                     }`}
                   />
-                  AGV 2: {agv2Status}
+                  AGV 2: {agv2Status === 'Ok' ? translations[language].agvStatusOk : agv2Status === 'Engineering Use' ? translations[language].agvStatusEngineering : agv2Status === 'PM' ? translations[language].agvStatusPM : translations[language].agvStatusError}
                 </span>
                 {/* Floor Badge */}
                 <span
