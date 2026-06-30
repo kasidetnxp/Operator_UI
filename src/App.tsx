@@ -12,9 +12,17 @@ export default function App() {
   const [employeeId, setEmployeeId] = useState<string>(() => localStorage.getItem('nxp_employee_id') || '');
   const [role, setRole] = useState<Role | null>(() => localStorage.getItem('nxp_role') as Role | null);
   const [floor, setFloor] = useState<string>(() => localStorage.getItem('nxp_floor') || 'E4');
-  const [currentPage, setCurrentPage] = useState<Page>('mode-selection');
+  const [currentPage, setCurrentPage] = useState<Page>(() => {
+    return (localStorage.getItem('nxp_current_page') as Page) || 'mode-selection';
+  });
   const [agv1Status, setAgv1StatusLocal] = useState<AGVStatus>('Ok');
   const [agv2Status, setAgv2StatusLocal] = useState<AGVStatus>('Ok');
+
+  useEffect(() => {
+    if (currentPage) {
+      localStorage.setItem('nxp_current_page', currentPage);
+    }
+  }, [currentPage]);
 
   useEffect(() => {
     const checkAGVStatus = () => {
@@ -35,6 +43,7 @@ export default function App() {
     localStorage.setItem('nxp_floor', selectedFloor);
     addAuditLog('LOGIN', id, `Employee logged in successfully as ${userRole} on Floor ${selectedFloor}`);
     setCurrentPage('mode-selection');
+    localStorage.setItem('nxp_current_page', 'mode-selection');
   };
 
   const handleLogout = () => {
@@ -47,6 +56,7 @@ export default function App() {
     localStorage.removeItem('nxp_employee_id');
     localStorage.removeItem('nxp_role');
     localStorage.removeItem('nxp_floor');
+    localStorage.removeItem('nxp_current_page');
     setCurrentPage('mode-selection');
   };
 
