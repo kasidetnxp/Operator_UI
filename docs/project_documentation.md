@@ -101,11 +101,12 @@ Operators can trigger four operations from the **Mode Selection** screen:
     3.  Confirm and submit the job to dispatch the AGV.
 
 #### C. สลับ FPC — Swap FPC Workflow
-*   **Goal**: Transfer an FPC directly from a source machine to a destination machine without going through Smart Storage.
+*   **Goal**: Transfer an FPC directly from a source machine to a destination machine without going through Smart Storage. If the destination machine already has an FPC installed, the system supports a swap-and-move workflow where the AGV retrieves the old FPC first, returns it to Smart Storage, and installs the new FPC onto the destination machine.
 *   **Flow**:
     1.  Select the **Source Machine**.
     2.  Select the **Destination Machine** (the selected source machine is automatically disabled in this view).
-    3.  Confirm and submit the job.
+    3.  If the destination is occupied, the UI displays an informative alert block and updates the confirmation summary to list both FPC IDs and the return location (Smart Storage).
+    4.  Confirm and submit the job.
 
 #### D. เปลี่ยน FPC — Unload & Load FPC Workflow
 *   **Goal**: Unload an existing FPC from a workstation and return it to Smart Storage, then load a new selected FPC from Smart Storage onto the same workstation.
@@ -115,19 +116,20 @@ Operators can trigger four operations from the **Mode Selection** screen:
     3.  Confirm and submit the job.
 
 ### 3. Task Queue & AGV Progress Tracking
-The **Task Queue** displays all active and historical transport jobs. It simulates real-world interaction milestones requiring operator feedback:
+The **Task Queue** displays all active and historical transport jobs. It simulates real-world interaction milestones requiring operator feedback sequentially:
 1.  `submitted`: Job is created and waiting for backend validation.
 2.  `queued`: Job has been accepted and placed in the queue.
 3.  `starting`: Backend is preparing the AGV mission.
 4.  `moving_to_source`: AGV is moving to the source machine.
 5.  `arrived_at_source`: AGV has arrived at the source.
-6.  `picking_up_fpc`: AGV is picking up the FPC.
-7.  `waiting_cover_head_install`: Operator must satisfy the dual-verification safety checklist (tick "Tray is opened" on screen, and verify that the cover head is installed and press the physical button on the AGV), and then click the screen "Confirm" button to proceed.
-8.  `moving_to_destination`: AGV is in transit to destination.
-9.  `arrived_at_destination`: AGV has arrived at destination.
-10. `placing_fpc`: AGV is placing the FPC.
-11. `waiting_cover_head_remove`: Operator must satisfy the dual-verification safety checklist (tick "Tray is opened" on screen, and verify that the cover head is removed and press the physical button on the AGV), and then click the screen "Confirm" button to proceed.
-12. `completed` / `failed` / `rejected` / `blocked` / `canceled` / `error`: Terminal states.
+6.  `waiting_tray_open`: AGV is paused. The operator must confirm that the machine tray is open by clicking the "Confirm Tray Opened" button on the screen to proceed.
+7.  `picking_up_fpc`: AGV is picking up the FPC.
+8.  `waiting_cover_head_install`: AGV is paused. The operator must verify that the cover head is physically installed and confirm by pressing the physical button on the AGV (simulated). The task progresses automatically once registered.
+9.  `moving_to_destination`: AGV is in transit to destination.
+10. `arrived_at_destination`: AGV has arrived at destination.
+11. `placing_fpc`: AGV is placing the FPC.
+12. `waiting_cover_head_remove`: AGV is paused. The operator must verify that the cover head is physically removed and confirm by pressing the physical button on the AGV (simulated). The task completes/progresses automatically once registered.
+13. `completed` / `failed` / `rejected` / `blocked` / `canceled` / `error`: Terminal states.
 
 *   **Task Queue Sorting**: Active tasks (not finished) are automatically sorted by creation time (newest first) and kept at the top of the queue. Finished/completed/canceled tasks are automatically pushed to the bottom of the list.
 *   **Task Cancellation**: Operators can cancel active tasks that they submitted. Prior to cancellation, the interface prompts the operator with a confirmation dialog. Once cancelled, the task's status is changed to `canceled`, and any running simulation tasks/timers for this task are stopped.

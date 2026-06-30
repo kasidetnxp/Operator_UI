@@ -24,27 +24,28 @@ export interface TaskResponse {
   taskId: string;
   jobId: string;
   status:
-    | 'submitted'
-    | 'queued'
-    | 'starting'
-    | 'moving_to_source'
-    | 'arrived_at_source'
-    | 'picking_up_fpc'
-    | 'waiting_cover_head_install'
-    | 'moving_to_destination'
-    | 'arrived_at_destination'
-    | 'placing_fpc'
-    | 'waiting_cover_head_remove'
-    | 'completed'
-    | 'rejected'
-    | 'blocked'
-    | 'failed'
-    | 'canceled'
-    | 'in_progress'
-    | 'arrived'
-    | 'waiting_confirmation'
-    | 'complete'
-    | 'error';
+  | 'submitted'
+  | 'queued'
+  | 'starting'
+  | 'moving_to_source'
+  | 'arrived_at_source'
+  | 'picking_up_fpc'
+  | 'waiting_cover_head_install'
+  | 'moving_to_destination'
+  | 'arrived_at_destination'
+  | 'placing_fpc'
+  | 'waiting_cover_head_remove'
+  | 'waiting_tray_open'
+  | 'completed'
+  | 'rejected'
+  | 'blocked'
+  | 'failed'
+  | 'canceled'
+  | 'in_progress'
+  | 'arrived'
+  | 'waiting_confirmation'
+  | 'complete'
+  | 'error';
   message: string;
   employeeId: string;
   type: 'return' | 'request' | 'move' | 'unload_load';
@@ -57,6 +58,8 @@ export interface TaskResponse {
   currentStepIndex?: number;
   trayOpenedConfirmed?: boolean;
   coverHeadPhysicalConfirmed?: boolean;
+  isOccupiedMove?: boolean;
+  oldFpcId?: string;
 }
 
 // In-memory task queue (replace with API call)
@@ -288,7 +291,7 @@ const mockFPCDatabase: FPCItem[] = [
   { id: 'P14080-FHH-2655', address: '008', functionName: 'PM Load', label: 'P14080-FHH-2655', comment: '', category: 'Deposit PM', location: 'Smart Storage' },
   { id: 'P15450-FHH-2685', address: '009', functionName: 'PM Load', label: 'P15450-FHH-2685', comment: '', category: 'Deposit Production', location: 'Smart Storage' },
   { id: 'PIR011-TBB-0594', address: '010', functionName: 'PM Load', label: 'PIR011-TBB-0594', comment: '', category: 'Storage', location: 'Smart Storage' },
-  { id: '2IE075TV001B', address: '011', functionName: 'PM Load', label: '2IE075TV001B', comment: '', category: 'Service', location: 'Smart Storage' },
+  { id: '2IE075TV001B', address: '-', functionName: 'PM Load', label: '2IE075TV001B', comment: '', category: 'Service', location: 'AVT_002' },
   { id: '2ID021FV003B', address: '-', functionName: 'PM Load', label: '2ID021FV003B', comment: '', category: 'Deposit PM', location: 'AVT_001' },
   { id: 'P15700-FBB-0707', address: '014', functionName: 'PM Load', label: 'P15700-FBB-0707', comment: '', category: 'Deposit Production', location: 'Smart Storage' },
 ];
@@ -380,16 +383,41 @@ function isTerminal(status: TaskResponse['status']): boolean {
 // ─── Step-Based Progression Engine ───
 const RETURN_STEPS: TaskResponse['status'][] = [
   'queued', 'starting', 'moving_to_source', 'arrived_at_source',
-  'picking_up_fpc', 'waiting_cover_head_install'
+  'waiting_tray_open', 'picking_up_fpc', 'waiting_cover_head_install',
+  'moving_to_destination', 'arrived_at_destination', 'placing_fpc',
+  'completed'
 ];
 const REQUEST_STEPS: TaskResponse['status'][] = [
   'queued', 'starting', 'moving_to_source', 'arrived_at_source',
   'picking_up_fpc', 'moving_to_destination', 'arrived_at_destination',
-  'placing_fpc', 'waiting_cover_head_remove'
+  'waiting_tray_open', 'placing_fpc', 'waiting_cover_head_remove',
+  'completed'
 ];
 const MOVE_STEPS: TaskResponse['status'][] = [
   'queued', 'starting', 'moving_to_source', 'arrived_at_source',
-  'picking_up_fpc', 'waiting_cover_head_install'
+  'waiting_tray_open', 'picking_up_fpc', 'waiting_cover_head_install',
+  'moving_to_destination', 'arrived_at_destination', 'waiting_tray_open',
+  'placing_fpc', 'waiting_cover_head_remove', 'completed'
+];
+const MOVE_OCCUPIED_STEPS: TaskResponse['status'][] = [
+  'queued',
+  'starting',
+  'moving_to_source',
+  'arrived_at_source',
+  'waiting_tray_open',
+  'picking_up_fpc',
+  'waiting_cover_head_install',
+  'moving_to_destination',
+  'arrived_at_destination',
+  'waiting_tray_open',
+  'picking_up_fpc',
+  'waiting_cover_head_install',
+  'waiting_cover_head_remove',
+  'placing_fpc',
+  'moving_to_destination',
+  'arrived_at_destination',
+  'placing_fpc',
+  'completed'
 ];
 const UNLOAD_LOAD_STEPS: TaskResponse['status'][] = [
   'queued',
@@ -399,6 +427,8 @@ const UNLOAD_LOAD_STEPS: TaskResponse['status'][] = [
   'picking_up_fpc',
   'moving_to_destination',
   'arrived_at_destination',
+  'waiting_tray_open',
+  'picking_up_fpc',
   'waiting_cover_head_install',
   'waiting_cover_head_remove',
   'placing_fpc',
@@ -413,6 +443,7 @@ const STEP_DELAYS: Record<string, number> = {
   starting: 2500,
   moving_to_source: 3000,
   arrived_at_source: 3500,
+  waiting_tray_open: 1000,
   picking_up_fpc: 3500,
   waiting_cover_head_install: 3500,
   moving_to_destination: 4000,
@@ -426,10 +457,11 @@ const activeTimers = new Map<string, ReturnType<typeof setTimeout>>();
 // Saved "next step" for paused tasks so we can resume
 const pausedNextStep = new Map<string, TaskResponse['status']>();
 
-function getStepsForType(type: TaskResponse['type']): TaskResponse['status'][] {
-  if (type === 'return') return RETURN_STEPS;
-  if (type === 'request') return REQUEST_STEPS;
-  if (type === 'unload_load') return UNLOAD_LOAD_STEPS;
+function getStepsForType(task: TaskResponse): TaskResponse['status'][] {
+  if (task.type === 'return') return RETURN_STEPS;
+  if (task.type === 'request') return REQUEST_STEPS;
+  if (task.type === 'unload_load') return UNLOAD_LOAD_STEPS;
+  if (task.type === 'move' && task.isOccupiedMove) return MOVE_OCCUPIED_STEPS;
   return MOVE_STEPS;
 }
 
@@ -454,7 +486,7 @@ function pauseTaskProgression(taskId: string, agvStatus: AGVStatus): void {
   }
 
   // Determine what the next step would have been
-  const steps = getStepsForType(task.type);
+  const steps = getStepsForType(task);
   const currentIdx = steps.indexOf(task.status);
   if (currentIdx >= 0 && currentIdx < steps.length - 1) {
     pausedNextStep.set(taskId, steps[currentIdx + 1]);
@@ -478,7 +510,7 @@ function resumeTaskProgression(taskId: string): void {
     // Resume: schedule the next step
     addAuditLog('STATE_CHANGE', task.employeeId, `Job ${task.jobId} RESUMED — AGV back to OK, scheduling ${savedStep}`);
     // Put task back to a running state temporarily, then let scheduleNextStep advance
-    const steps = getStepsForType(task.type);
+    const steps = getStepsForType(task);
     const savedIdx = steps.indexOf(savedStep);
     if (savedIdx > 0) {
       task.status = steps[savedIdx - 1];
@@ -493,10 +525,10 @@ function resumeTaskProgression(taskId: string): void {
   }
 }
 
-function startProgression(taskId: string, type: TaskResponse['type']): void {
-  const steps = getStepsForType(type);
+function startProgression(task: TaskResponse): void {
+  const steps = getStepsForType(task);
   if (steps.length > 0) {
-    scheduleNextStep(taskId, steps[0]);
+    scheduleNextStep(task.taskId, steps[0]);
   }
 }
 
@@ -529,7 +561,7 @@ export async function updateFPCLocation(
   newAddress: string | null
 ): Promise<void> {
   await delay(500);
-  
+
   const fpc = mockFPCDatabase.find(f => f.id === fpcId);
   if (!fpc) {
     throw new Error('FPC not found');
@@ -563,7 +595,7 @@ export async function updateFPCLocation(
 
   const newLocStr = newLocation === 'Smart Storage' ? `Smart Storage (Slot: ${newAddress})` : `Machine ${newLocation}`;
   const oldLocStr = oldLocation === 'Smart Storage' ? `Smart Storage (Slot: ${oldAddress})` : `Machine ${oldLocation}`;
-  
+
   addAuditLog(
     'STATE_CHANGE',
     employeeId,
@@ -593,7 +625,7 @@ export async function swapFPCLocations(
 
   fpc1.location = loc2;
   fpc1.address = addr2;
-  
+
   fpc2.location = loc1;
   fpc2.address = addr1;
 
@@ -639,7 +671,7 @@ export async function submitReturnFPCJob(
   addAuditLog('TASK_SUBMIT', employeeId, `Submitted Return FPC job (Job: ${jobId}). Source: ${machine?.name || sourceMachineId}`);
 
   // Step-based progression
-  startProgression(taskId, 'return');
+  startProgression(task);
 
   return task;
 }
@@ -678,7 +710,7 @@ export async function submitRequestFPCJob(
   addAuditLog('TASK_SUBMIT', employeeId, `Submitted Request FPC job (Job: ${jobId}). FPC: ${fpcId}, Destination: ${machine?.name || destinationMachineId}`);
 
   // Step-based progression
-  startProgression(taskId, 'request');
+  startProgression(task);
 
   return task;
 }
@@ -695,10 +727,8 @@ export async function submitMoveFPCJob(
   if (!hasSourceFPC) {
     throw new Error('Source machine does not have a Probecard');
   }
-  const hasDestFPC = mockFPCDatabase.some(f => f.location === destinationMachineId);
-  if (hasDestFPC) {
-    throw new Error('Destination machine already has a Probecard');
-  }
+  const destFPC = mockFPCDatabase.find(f => f.location === destinationMachineId);
+  const isOccupiedMove = !!destFPC;
 
   const taskId = `TASK-${Date.now()}`;
   const jobId = generateJobId();
@@ -716,13 +746,20 @@ export async function submitMoveFPCJob(
     destinationMachine: destMachine?.name || destinationMachineId,
     createdAt: new Date().toISOString(),
     coverHeadInstalledConfirmed: false,
+    isOccupiedMove,
+    oldFpcId: destFPC?.id,
+    currentStepIndex: isOccupiedMove ? 0 : undefined,
   };
 
   mockTaskQueue.push(task);
-  addAuditLog('TASK_SUBMIT', employeeId, `Submitted Move FPC job (Job: ${jobId}). Source: ${srcMachine?.name || sourceMachineId}, Destination: ${destMachine?.name || destinationMachineId}`);
+  if (isOccupiedMove) {
+    addAuditLog('TASK_SUBMIT', employeeId, `Submitted Occupied Move FPC job (Job: ${jobId}). Source: ${srcMachine?.name || sourceMachineId}, Destination: ${destMachine?.name || destinationMachineId}, Old FPC: ${destFPC?.id}`);
+  } else {
+    addAuditLog('TASK_SUBMIT', employeeId, `Submitted Move FPC job (Job: ${jobId}). Source: ${srcMachine?.name || sourceMachineId}, Destination: ${destMachine?.name || destinationMachineId}`);
+  }
 
   // Step-based progression
-  startProgression(taskId, 'move');
+  startProgression(task);
 
   return task;
 }
@@ -758,18 +795,36 @@ export async function submitUnloadLoadFPCJob(
   addAuditLog('TASK_SUBMIT', employeeId, `Submitted Unload & Load FPC job (Job: ${jobId}). FPC: ${fpcId}, Destination: ${machine?.name || destinationMachineId}`);
 
   // Step-based progression
-  startProgression(taskId, 'unload_load');
+  startProgression(task);
 
   return task;
 }
 
 /** Confirm or unconfirm Tray Opened manually by Operator from screen UI */
-export async function confirmTrayOpened(taskId: string, confirmed: boolean): Promise<TaskResponse> {
+export async function confirmTrayOpened(taskId: string, confirmed: boolean = true): Promise<TaskResponse> {
   await delay(300);
   const task = mockTaskQueue.find(t => t.taskId === taskId);
   if (task) {
-    task.trayOpenedConfirmed = confirmed;
-    addAuditLog('CONFIRMATION', task.employeeId, `${confirmed ? 'Confirmed' : 'Unconfirmed'} Tray Opened for job (Job: ${task.jobId})`);
+    if (task.status === 'waiting_tray_open') {
+      task.trayOpenedConfirmed = confirmed;
+      addAuditLog('CONFIRMATION', task.employeeId, `${confirmed ? 'Confirmed' : 'Unconfirmed'} Tray Opened for job (Job: ${task.jobId})`);
+      
+      if (confirmed) {
+        const steps = getStepsForType(task);
+        let currentIdx = task.currentStepIndex;
+        if (currentIdx === undefined || steps[currentIdx] !== 'waiting_tray_open') {
+          currentIdx = steps.indexOf('waiting_tray_open', task.currentStepIndex ?? 0);
+          if (currentIdx === -1) {
+            currentIdx = steps.indexOf('waiting_tray_open');
+          }
+        }
+        if (currentIdx >= 0 && currentIdx < steps.length - 1) {
+          const nextStatus = steps[currentIdx + 1];
+          task.currentStepIndex = currentIdx + 1;
+          updateTaskStatus(taskId, nextStatus);
+        }
+      }
+    }
   }
   return task || {
     taskId,
@@ -789,70 +844,58 @@ export function executeCoverHeadInstalledProgression(task: TaskResponse): void {
   addAuditLog('CONFIRMATION', task.employeeId, `Confirmed Cover Head Installed for ${task.type.toUpperCase()} job (Job: ${task.jobId})`);
 
   if (task.type === 'move') {
-    task.coverHeadInstalledConfirmed = true;
-    task.status = 'moving_to_destination';
-    task.message = 'Cover Head installation confirmed, AGV proceeding to destination';
-    
-    addAuditLog('STATE_CHANGE', task.employeeId, `Job ${task.jobId} status updated to moving_to_destination`);
-
-    // Simulate transit to destination machine
-    setTimeout(() => updateTaskStatus(task.taskId, 'arrived_at_destination'), 3000);
-    setTimeout(() => updateTaskStatus(task.taskId, 'placing_fpc'), 6500);
-    setTimeout(() => updateTaskStatus(task.taskId, 'waiting_cover_head_remove'), 10000);
+    if (task.isOccupiedMove) {
+      task.coverHeadInstalledConfirmed = true;
+      const currentIndex = task.currentStepIndex ?? 0;
+      if (currentIndex === 6) {
+        task.currentStepIndex = 7;
+        task.message = 'Cover Head installation for new FPC confirmed, AGV proceeding to destination';
+        updateTaskStatus(task.taskId, 'moving_to_destination');
+      } else if (currentIndex === 11) {
+        task.currentStepIndex = 12;
+        task.message = 'Cover Head installation for old FPC confirmed, preparing to install new FPC';
+        updateTaskStatus(task.taskId, 'waiting_cover_head_remove');
+      }
+    } else {
+      task.coverHeadInstalledConfirmed = true;
+      task.currentStepIndex = 7; // Index of 'moving_to_destination' in MOVE_STEPS is 7
+      task.message = 'Cover Head installation confirmed, AGV proceeding to destination';
+      updateTaskStatus(task.taskId, 'moving_to_destination');
+    }
   } else if (task.type === 'unload_load') {
     task.coverHeadInstalledConfirmed = true;
-    task.status = 'waiting_cover_head_remove';
-    task.trayOpenedConfirmed = false;
-    task.coverHeadPhysicalConfirmed = false;
-    task.currentStepIndex = 8; // Index of 'waiting_cover_head_remove' in UNLOAD_LOAD_STEPS
+    task.currentStepIndex = 10; // Index of 'waiting_cover_head_remove' in UNLOAD_LOAD_STEPS is 10
     task.message = 'Cover Head installation confirmed, preparing to install new FPC';
-
-    addAuditLog('STATE_CHANGE', task.employeeId, `Job ${task.jobId} status updated to waiting_cover_head_remove`);
-
-    // Simulate AGV physical button confirmation after 5 seconds
-    setTimeout(() => {
-      const t = mockTaskQueue.find(tk => tk.taskId === task.taskId);
-      if (t && t.status === 'waiting_cover_head_remove') {
-        t.coverHeadPhysicalConfirmed = true;
-        addAuditLog('CONFIRMATION', t.employeeId, `Physical Cover Head Removal button confirmed on AGV (Job: ${t.jobId})`);
-      }
-    }, 5000);
+    updateTaskStatus(task.taskId, 'waiting_cover_head_remove');
   } else {
-    task.status = 'moving_to_destination';
+    task.currentStepIndex = 7; // Index of 'moving_to_destination' in RETURN_STEPS is 7
     task.message = 'Cover Head installation confirmed, AGV proceeding to Smart Storage';
-
-    addAuditLog('STATE_CHANGE', task.employeeId, `Job ${task.jobId} status updated to moving_to_destination`);
-
-    // Simulate transit to Smart Storage
-    setTimeout(() => updateTaskStatus(task.taskId, 'arrived_at_destination'), 3000);
-    setTimeout(() => updateTaskStatus(task.taskId, 'placing_fpc'), 6500);
-    setTimeout(() => updateTaskStatus(task.taskId, 'completed'), 10000);
+    updateTaskStatus(task.taskId, 'moving_to_destination');
   }
 }
 
 /** Execute status progression for Cover Head Removed */
 export function executeCoverHeadRemovedProgression(task: TaskResponse): void {
   if (task.status === 'canceled') return;
-  
+
   addAuditLog('CONFIRMATION', task.employeeId, `Confirmed Cover Head Removed for ${task.type.toUpperCase()} job (Job: ${task.jobId})`);
-  
+
   if (task.type === 'unload_load') {
-    task.status = 'placing_fpc';
-    task.currentStepIndex = 9; // Index of first 'placing_fpc' in UNLOAD_LOAD_STEPS
+    task.currentStepIndex = 11; // Index of placing_fpc in UNLOAD_LOAD_STEPS is 11
+    task.message = 'Cover Head removal confirmed, placing FPC';
+    updateTaskStatus(task.taskId, 'placing_fpc');
+  } else if (task.type === 'move' && task.isOccupiedMove) {
+    task.currentStepIndex = 13; // Index of placing_fpc in MOVE_OCCUPIED_STEPS is 13
     task.message = 'Cover Head removal confirmed, placing new FPC';
-
-    addAuditLog('STATE_CHANGE', task.employeeId, `Job ${task.jobId} status updated to placing_fpc`);
-
-    // Custom timeout progression for the return leg
-    setTimeout(() => {
-      task.currentStepIndex = 10;
-      updateTaskStatus(task.taskId, 'moving_to_destination');
-    }, 3500);
+    updateTaskStatus(task.taskId, 'placing_fpc');
   } else {
-    task.status = 'completed';
+    const steps = getStepsForType(task);
+    const completedIdx = steps.indexOf('completed');
+    if (completedIdx >= 0) {
+      task.currentStepIndex = completedIdx;
+    }
     task.message = 'Cover Head removal confirmed, job completed';
-
-    addAuditLog('STATE_CHANGE', task.employeeId, `Job ${task.jobId} status updated to completed`);
+    updateTaskStatus(task.taskId, 'completed');
   }
 }
 
@@ -916,6 +959,12 @@ export function updateTaskStatus(taskId: string, status: TaskResponse['status'])
         if (t && t.status === 'waiting_cover_head_install') {
           t.coverHeadPhysicalConfirmed = true;
           addAuditLog('CONFIRMATION', t.employeeId, `Physical Cover Head Installation button confirmed on AGV (Job: ${t.jobId})`);
+          setTimeout(() => {
+            const t2 = mockTaskQueue.find(tk => tk.taskId === taskId);
+            if (t2 && t2.status === 'waiting_cover_head_install') {
+              executeCoverHeadInstalledProgression(t2);
+            }
+          }, 1500);
         }
       }, 5000);
     } else if (status === 'waiting_cover_head_remove') {
@@ -926,9 +975,27 @@ export function updateTaskStatus(taskId: string, status: TaskResponse['status'])
         if (t && t.status === 'waiting_cover_head_remove') {
           t.coverHeadPhysicalConfirmed = true;
           addAuditLog('CONFIRMATION', t.employeeId, `Physical Cover Head Removal button confirmed on AGV (Job: ${t.jobId})`);
+          setTimeout(() => {
+            const t2 = mockTaskQueue.find(tk => tk.taskId === taskId);
+            if (t2 && t2.status === 'waiting_cover_head_remove') {
+              executeCoverHeadRemovedProgression(t2);
+            }
+          }, 1500);
         }
       }, 5000);
+    } else if (status === 'waiting_tray_open') {
+      task.trayOpenedConfirmed = false;
+      // Do nothing, pause progression to wait for operator screen confirmation
     } else {
+      const steps = getStepsForType(task);
+      let currentIdx = steps.indexOf(status, task.currentStepIndex ?? 0);
+      if (currentIdx === -1) {
+        currentIdx = steps.indexOf(status);
+      }
+      if (currentIdx >= 0) {
+        task.currentStepIndex = currentIdx;
+      }
+
       if (task.type === 'unload_load') {
         const currentIndex = task.currentStepIndex ?? 0;
         if (currentIndex < UNLOAD_LOAD_STEPS.length - 1) {
@@ -960,10 +1027,48 @@ export function updateTaskStatus(taskId: string, status: TaskResponse['status'])
             );
           }
         }
+      } else if (task.type === 'move' && task.isOccupiedMove) {
+        const currentIndex = task.currentStepIndex ?? 0;
+        if (currentIndex < MOVE_OCCUPIED_STEPS.length - 1) {
+          const nextIndex = currentIndex + 1;
+          task.currentStepIndex = nextIndex;
+          const nextStatus = MOVE_OCCUPIED_STEPS[nextIndex];
+          scheduleNextStep(taskId, nextStatus);
+        } else if (status === 'completed') {
+          const newFpc = mockFPCDatabase.find(f => f.location === task.sourceMachine);
+          const oldFpc = mockFPCDatabase.find(f => f.id === task.oldFpcId);
+          if (newFpc && oldFpc) {
+            const occupiedSlots = mockFPCDatabase
+              .filter(f => f.location === 'Smart Storage')
+              .map(f => f.address);
+
+            let emptySlot = '';
+            for (let i = 1; i <= 50; i++) {
+              const slotStr = String(i).padStart(3, '0');
+              if (!occupiedSlots.includes(slotStr)) {
+                emptySlot = slotStr;
+                break;
+              }
+            }
+            if (!emptySlot) {
+              emptySlot = '099';
+            }
+
+            newFpc.location = task.destinationMachine || '';
+            newFpc.address = '-';
+
+            oldFpc.location = 'Smart Storage';
+            oldFpc.address = emptySlot;
+
+            addAuditLog(
+              'STATE_CHANGE',
+              'SYSTEM',
+              `Swapped FPC locations (Move Occupied): New FPC ${newFpc.id} is now on Machine ${newFpc.location}. Old FPC ${oldFpc.id} returned to Smart Storage Slot ${oldFpc.address}`
+            );
+          }
+        }
       } else {
         // Schedule next step in progression (for non-waiting statuses)
-        const steps = getStepsForType(task.type);
-        const currentIdx = steps.indexOf(status);
         if (currentIdx >= 0 && currentIdx < steps.length - 1) {
           const nextStatus = steps[currentIdx + 1];
           scheduleNextStep(taskId, nextStatus);

@@ -38,12 +38,13 @@ In LOAD (คืน FPC) mode, the operator shall select the source machine from 
 
 The destination shall be fixed as Smart Storage in the current scope.
 
-The frontend shall display the instruction details when the backend reports the status indicating that pickup has been completed and operator confirmation is required for cover head installation.
+The frontend shall display the instruction details during the sequential safety verification flow.
 
-The confirmation requires a dual-verification safety checklist:
-1. The operator shall manually check "Tray is opened" on the Operator UI.
-2. The operator shall verify the cover head is installed and confirm by pressing a physical button on the AGV (which registers as "AGV physical button confirmed" automatically after a simulated 5-second delay).
-The operator must then click the screen "Confirm" button (which is enabled only when both checklist items are verified) to progress the task. No screen-based bypass confirmation is allowed before checklists are complete.
+The confirmation requires sequential steps:
+1. When the AGV arrives at the source machine and the status changes to `waiting_tray_open`, the operator must confirm that the machine tray is open by clicking the "Confirm Tray Opened" button on the screen to proceed.
+2. The AGV picks up the FPC.
+3. Once the FPC is picked up and the status changes to `waiting_cover_head_install`, the operator must physically install the cover head and confirm by pressing the physical button on the AGV (which registers as "AGV physical button confirmed" automatically after a simulated 5-second delay). The screen UI will display instructions and indicate that it is waiting for physical confirmation; no screen-based bypass confirm button will be available.
+
 
 ### UNLOAD (เบิก FPC) Mode
 
@@ -57,18 +58,21 @@ The operator shall then select the desired FPC and an available destination mach
 
 Machines marked as Unavailable shall not be selectable.
 
-After the AGV arrives at the selected destination machine and the backend reports the status indicating that operator confirmation is required, the frontend shall display instructions for the operator to verify that the cover head has been removed.
+After the AGV arrives at the selected destination machine and the backend reports the status indicating that operator confirmation is required, the frontend shall guide the operator through sequential safety verification steps.
 
-The confirmation requires a dual-verification safety checklist:
-1. The operator shall manually check "Tray is opened" on the Operator UI.
-2. The operator shall verify the cover head is removed and confirm by pressing a physical button on the AGV (which registers as "AGV physical button confirmed" automatically after a simulated 5-second delay).
-The operator must then click the screen "Confirm" button (which is enabled only when both checklist items are verified) to complete the workflow step. No screen-based bypass confirmation is allowed before checklists are complete.
+The confirmation requires sequential steps:
+1. When the AGV arrives at the destination machine and the status changes to `waiting_tray_open`, the operator must confirm that the machine tray is open by clicking the "Confirm Tray Opened" button on the screen to proceed.
+2. The AGV places the FPC.
+3. Once the FPC is placed and the status changes to `waiting_cover_head_remove`, the operator must physically remove the cover head and confirm by pressing the physical button on the AGV (which registers as "AGV physical button confirmed" automatically after a simulated 5-second delay). The screen UI will display instructions and indicate that it is waiting for physical confirmation; no screen-based bypass confirm button will be available.
+
 
 ### สลับ FPC Mode
 
 In สลับ FPC mode, the operator shall select both the source machine and the destination machine so that the AGV can pick up an FPC from one machine and deliver it to another machine.
 
 The frontend shall prevent the operator from selecting the same machine as both source and destination.
+
+If the destination machine already has an FPC installed, the system shall support a swap-and-move workflow where the AGV first retrieves the new FPC from the source machine, then retrieves the old FPC from the destination machine, places the new FPC on the destination machine, and finally returns the old FPC back to an automatically allocated empty slot in Smart Storage. The operator interface shall dynamically display an informational banner and confirmation details listing both the FPC to load and the FPC to unload. The confirmation dialog will show the return destination as Smart Storage without displaying a specific slot number.
 
 If operator confirmation is required during pickup or placement, the frontend shall display instructions when the backend reports the corresponding status.
 
@@ -83,12 +87,13 @@ The destination machine must have an FPC already installed on it. If the selecte
 When the job is submitted and starts, the AGV shall perform the following operational flow:
 1. Retrieve the new FPC from Smart Storage.
 2. Move to the destination machine.
-3. Retrieve the old FPC from the destination machine.
-4. Wait for the operator to complete the dual-verification safety checklist (tick "Tray is opened" on screen, and confirm cover head installation via the physical button on the AGV), and then click the screen "Confirm" button to proceed.
-5. Wait for the operator to complete the dual-verification safety checklist (tick "Tray is opened" on screen, and confirm cover head removal via the physical button on the AGV), and then click the screen "Confirm" button to proceed.
-6. Install the new FPC onto the destination machine.
-7. Return to Smart Storage with the old FPC.
-8. Place the old FPC into the Smart Storage slot vacated by the new FPC.
+3. Wait for the operator to confirm that the destination machine tray is open by clicking the "Confirm Tray Opened" button on the screen to proceed.
+4. Retrieve the old FPC from the destination machine.
+5. Wait for the operator to confirm physical cover head installation via the physical button on the AGV (under status `waiting_cover_head_install` with no screen bypass button).
+6. Wait for the operator to confirm physical cover head removal via the physical button on the AGV (under status `waiting_cover_head_remove` with no screen bypass button).
+7. Install the new FPC onto the destination machine.
+8. Return to Smart Storage with the old FPC.
+9. Place the old FPC into the Smart Storage slot vacated by the new FPC.
 
 After the task transitions to the `Completed` status, the system shall swap the location records of the two FPCs in the database.
 

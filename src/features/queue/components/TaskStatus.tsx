@@ -15,6 +15,7 @@ export type TaskStatusType =
   | 'arrived_at_destination'
   | 'placing_fpc'
   | 'waiting_cover_head_remove'
+  | 'waiting_tray_open'
   | 'completed'
   | 'rejected'
   | 'blocked'
@@ -59,6 +60,8 @@ export function TaskStatus({ status, language, errorMessage }: TaskStatusProps) 
         return { label: t.placingFPC, color: 'primary' as const, icon: <Loader className="w-5 h-5 animate-spin" />, severity: 'info' as const };
       case 'waiting_cover_head_remove':
         return { label: t.waitingCoverHeadRemove, color: 'warning' as const, icon: <AlertCircle className="w-5 h-5" />, severity: 'warning' as const };
+      case 'waiting_tray_open':
+        return { label: t.waitingTrayOpen, color: 'warning' as const, icon: <AlertCircle className="w-5 h-5" />, severity: 'warning' as const };
       case 'completed':
         return { label: t.completed, color: 'success' as const, icon: <CheckCircle className="w-5 h-5" />, severity: 'success' as const };
       case 'rejected':

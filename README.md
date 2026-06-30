@@ -27,7 +27,7 @@ A modern, responsive Operator User Interface for requesting, returning, and swap
 2. **Four-Mode Workflow (LOAD / UNLOAD / Swap / UNLOAD & LOAD)**
    - **LOAD (คืน FPC)**: Dispatch an AGV to pick up an FPC from a machine and return it to Smart Storage.
    - **UNLOAD (เบิก FPC)**: Search/select a specific FPC from Smart Storage and command the AGV to deliver it to a destination machine.
-   - **สลับ FPC (Swap)**: Transfer an FPC directly from a source machine to a destination machine without going through Smart Storage.
+   - **สลับ FPC (Swap)**: Transfer an FPC directly from a source machine to a destination machine without going through Smart Storage. If the destination machine already has an FPC installed, the system supports a swap-and-move workflow where the AGV retrieves the old FPC first, returns it to Smart Storage, and installs the new FPC onto the destination machine.
    - **UNLOAD & LOAD (เปลี่ยน FPC)**: Remove the old FPC from a machine and install a new FPC from Smart Storage in a single task sequence. The database automatically swaps the location records of the FPCs once the task is completed.
 
 3. **Machine Selector**
@@ -35,8 +35,10 @@ A modern, responsive Operator User Interface for requesting, returning, and swap
    - Visual indicators showing machine availability (Available/Unavailable).
 
 4. **Task Queue & AGV Status Tracking**
-   - Real-time progress monitoring through detailed statuses: `Submitted` → `Queued` → `Starting` → `Moving to Source` → `Arrived at Source` → `Picking Up FPC` → `Waiting for Cover Head Installation` → `Moving to Destination` → `Arrived at Destination` → `Placing FPC` → `Waiting for Cover Head Removal` → `Completed`.
-   - **Safety Checklist & Confirm Button**: Implements a dual-verification safety checklist requiring the operator to manually check "Tray is opened" on screen and confirm cover head installation/removal via the physical AGV button (simulated with a 5-second delay). Once both checklist items are satisfied, a manual "Confirm" button is enabled on the screen to progress the workflow.
+   - Real-time progress monitoring through detailed statuses: `Submitted` → `Queued` → `Starting` → `Moving to Source` → `Arrived at Source` → `Waiting for Tray to be Opened` → `Picking Up FPC` → `Waiting for Cover Head Installation` → `Moving to Destination` → `Arrived at Destination` → `Waiting for Tray to be Opened` → `Placing FPC` → `Waiting for Cover Head Removal` → `Completed`.
+   - **Sequential Safety Verification Flow**: Replaces the static checklist with a sequential workflow where:
+     1. Operator confirms **"Tray is opened"** on screen (in `Waiting for Tray to be Opened` status) *before* the AGV executes picking/placing.
+     2. Operator confirms **Cover Head installation/removal** via the physical button on the AGV (simulated with a 5-second delay, in `Waiting for Cover Head` statuses) *after* the AGV completes picking/placing. The screen UI shows instructions and waits for AGV confirmation with no screen-based bypass buttons.
 
 5. **Admin Panel & Audit Logs**
    - System audit log viewing and management.

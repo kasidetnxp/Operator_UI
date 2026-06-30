@@ -49,19 +49,24 @@ export function MoveFPCWorkflow({ employeeId, language, onBack, onTaskSubmitted 
     });
   }, [selectedSourceMachine]);
 
+  const isDestOccupied = !!(selectedDestinationMachine && destFPC);
+  const occupiedNotice = useMemo(() => {
+    if (!isDestOccupied) return '';
+    return language === 'th'
+      ? 'เครื่องจักรปลายทางมี Probecard อยู่แล้ว ระบบจะทำการส่งคืน Probecard เดิมกลับ Smart Store และติดตั้ง Probecard ใหม่ในงานเดียวกันโดยอัตโนมัติ'
+      : 'Destination machine already has a Probecard. The system will automatically return the old Probecard to Smart Storage and install the new one in a single workflow.';
+  }, [isDestOccupied, language]);
+
   // Dynamic validation warning/error
   const validationError = useMemo(() => {
     if (selectedSourceMachine && !sourceFPC) {
       return t.errorMachineHasNoFPC;
     }
-    if (selectedDestinationMachine && destFPC) {
-      return t.errorMachineAlreadyHasFPC;
-    }
     if (selectedSourceMachine && selectedDestinationMachine && selectedSourceMachine === selectedDestinationMachine) {
       return language === 'th' ? 'กรุณาเลือกเครื่องจักรต้นทางและปลายทางที่ต่างกัน' : 'Source and destination machines must be different';
     }
     return '';
-  }, [selectedSourceMachine, selectedDestinationMachine, sourceFPC, destFPC, language, t.errorMachineHasNoFPC, t.errorMachineAlreadyHasFPC]);
+  }, [selectedSourceMachine, selectedDestinationMachine, sourceFPC, language, t.errorMachineHasNoFPC]);
 
   const handleSubmitClick = () => {
     if (!selectedSourceMachine) {
@@ -147,6 +152,11 @@ export function MoveFPCWorkflow({ employeeId, language, onBack, onTaskSubmitted 
             </div>
 
             <div className="space-y-4 mt-6">
+              {occupiedNotice && (
+                <Alert severity="info" className="!text-xl !py-4">
+                  {occupiedNotice}
+                </Alert>
+              )}
               {validationError && (
                 <Alert severity="error" className="!text-xl !py-4">
                   {validationError}
@@ -197,6 +207,12 @@ export function MoveFPCWorkflow({ employeeId, language, onBack, onTaskSubmitted 
                 <span className="text-muted-foreground">{t.probecardToReceiveFromDest}:</span>
                 <span className="font-bold text-success">{destFPC ? destFPC.id : '-'}</span>
               </div>
+              {isDestOccupied && (
+                <div className="flex justify-between text-xl">
+                  <span className="text-muted-foreground">{language === 'th' ? 'ปลายทางเก็บ FPC ตัวเดิม:' : 'Return Location (Old FPC):'}</span>
+                  <span className="font-bold text-warning">{t.smartStorage}</span>
+                </div>
+              )}
               <div className="flex justify-between text-xl border-t border-border pt-3">
                 <span className="text-muted-foreground">{t.source}:</span>
                 <span className="font-bold text-foreground">{sourceMachineName}</span>

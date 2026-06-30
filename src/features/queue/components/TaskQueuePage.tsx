@@ -1,11 +1,11 @@
 import { useState, useEffect, useMemo } from 'react';
 import { Card, CardContent, Button, Alert, Chip, Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material';
-import { ArrowLeft, CheckCircle, Clock } from 'lucide-react';
+import { ArrowLeft, CheckCircle, Clock, Loader } from 'lucide-react';
 import { TaskStatus } from './TaskStatus';
 import type { TaskStatusType } from './TaskStatus';
 import { translations } from '@/shared/utils/translations';
 import type { Language } from '@/shared/types';
-import { getAllTasks, cancelTask, confirmTrayOpened, confirmCoverHeadInstalled, confirmCoverHeadRemoved } from '@/shared/utils/mockApi';
+import { getAllTasks, cancelTask, confirmTrayOpened } from '@/shared/utils/mockApi';
 import type { TaskResponse } from '@/shared/utils/mockApi';
 
 interface TaskQueuePageProps {
@@ -99,6 +99,7 @@ export function TaskQueuePage({ employeeId, language, onBack, onNewTask }: TaskQ
 
   const canConfirm = (task: TaskResponse) =>
     (task.status === 'waiting_confirmation' ||
+      task.status === 'waiting_tray_open' ||
       task.status === 'waiting_cover_head_install' ||
       task.status === 'waiting_cover_head_remove') &&
     isMyTask(task);
@@ -290,89 +291,65 @@ export function TaskQueuePage({ employeeId, language, onBack, onNewTask }: TaskQ
 
                   {canConfirm(selectedTask) && (
                     <div className="space-y-4">
-                      <Alert severity="warning" className="!items-start !text-xl !py-6">
-                        <p className="text-xl">
-                          {selectedTask.type === 'return'
-                            ? t.coverHeadInstallationConfirm
-                            : selectedTask.type === 'request'
-                              ? t.coverHeadRemovalConfirm
-                              : !selectedTask.coverHeadInstalledConfirmed
-                                ? t.coverHeadInstallationConfirm
-                                : t.coverHeadRemovalConfirm}
-                        </p>
-                      </Alert>
-
-                      {/* Safety Checklist Card */}
-                      <Card className="border border-warning bg-warning-background/10">
-                        <CardContent className="p-6 space-y-4">
-                          <h4 className="text-xl font-bold text-warning-foreground flex items-center gap-2">
-                            {t.safetyChecklist}
-                          </h4>
-                          <div className="flex flex-col gap-3">
-                            {/* Checkbox 1: Tray Opened */}
-                            <label className="flex items-center gap-4 p-4 rounded-lg bg-card border border-border cursor-pointer hover:bg-muted/30 transition-all select-none min-h-[48px]">
-                              <input
-                                type="checkbox"
-                                checked={!!selectedTask.trayOpenedConfirmed}
-                                onChange={async (e) => {
-                                  const targetChecked = e.target.checked;
-                                  try {
-                                    await confirmTrayOpened(selectedTask.taskId, targetChecked);
-                                    // Reload tasks immediately to update UI
-                                    const allTasks = await getAllTasks();
-                                    setTasks(sortTasks(allTasks));
-                                  } catch (err) {
-                                    console.error("Failed to update tray opened:", err);
-                                  }
-                                }}
-                                className="w-6 h-6 accent-info cursor-pointer"
-                              />
-                              <span className="text-lg font-bold text-foreground">
-                                {t.trayOpenedChecklist}
-                              </span>
-                            </label>
-
-                            {/* Checkbox 2: AGV Button Confirmation */}
-                            <label className="flex items-center gap-4 p-4 rounded-lg bg-zinc-100 border border-zinc-200 cursor-not-allowed select-none min-h-[48px]">
-                              <input
-                                type="checkbox"
-                                checked={!!selectedTask.coverHeadPhysicalConfirmed}
-                                disabled
-                                className="w-6 h-6 accent-success cursor-not-allowed"
-                              />
-                              <span className="text-lg font-bold text-zinc-500">
-                                {t.agvPhysicalButtonChecklist}
-                              </span>
-                            </label>
-                          </div>
-
-                          {/* Confirm Button */}
+                      {selectedTask.status === 'waiting_tray_open' ? (
+                        <div className="space-y-4">
+                          <Alert severity="info" className="!items-start !text-xl !py-6">
+                            <p className="text-xl">
+                              {t.trayOpenedMessage}
+                            </p>
+                          </Alert>
                           <div className="pt-2 flex justify-end">
                             <Button
                               variant="contained"
                               color="primary"
-                              disabled={!selectedTask.trayOpenedConfirmed || !selectedTask.coverHeadPhysicalConfirmed}
                               onClick={async () => {
                                 try {
-                                  if (selectedTask.status === 'waiting_cover_head_install') {
-                                    await confirmCoverHeadInstalled(selectedTask.taskId);
-                                  } else if (selectedTask.status === 'waiting_cover_head_remove') {
-                                    await confirmCoverHeadRemoved(selectedTask.taskId);
-                                  }
+                                  await confirmTrayOpened(selectedTask.taskId);
                                   // Reload tasks immediately to update UI
                                   const allTasks = await getAllTasks();
                                   setTasks(sortTasks(allTasks));
                                 } catch (err) {
-                                  console.error("Failed to confirm checklist progress:", err);
+                                  console.error("Failed to confirm tray opened:", err);
                                 }
                               }}
                               className="!py-3 !px-6 !text-lg !font-bold"
                             >
-                              {t.confirm}
+                              {t.confirmTrayOpenedAction}
                             </Button>
                           </div>
-                        </CardContent>
-                      </Card>
+                        </div>
+                      ) : (
+                        <div className="space-y-4">
+                          <Alert severity="warning" className="!items-start !text-xl !py-6">
+                            <p className="text-xl">
+                              {selectedTask.status === 'waiting_cover_head_install'
+                                ? t.coverHeadInstallationConfirm
+                                : t.coverHeadRemovalConfirm}
+                            </p>
+                          </Alert>
+
+                          {/* Hardware Confirmation Waiting Status Card */}
+                          {!selectedTask.coverHeadPhysicalConfirmed ? (
+                            <div className="flex items-center gap-4 p-6 rounded-lg border border-warning bg-warning-background/5 justify-center min-h-[80px]">
+                              <Loader className="w-8 h-8 animate-spin text-warning" />
+                              <span className="text-xl font-bold text-warning-foreground">
+                                {language === 'th'
+                                  ? 'กำลังรอการกดยืนยันปุ่มกายภาพบนตัวรถ AGV...'
+                                  : 'Waiting for physical button confirmation on AGV...'}
+                              </span>
+                            </div>
+                          ) : (
+                            <div className="flex items-center gap-4 p-6 rounded-lg border border-success bg-success-background/5 justify-center min-h-[80px]">
+                              <CheckCircle className="w-8 h-8 text-success" />
+                              <span className="text-xl font-bold text-success-foreground">
+                                {language === 'th'
+                                  ? 'ได้รับการยืนยันจากปุ่มกายภาพบนรถ AGV แล้ว กำลังดำเนินงาน...'
+                                  : 'Physical AGV button confirmed! Proceeding...'}
+                              </span>
+                            </div>
+                          )}
+                        </div>
+                      )}
                     </div>
                   )}
 
