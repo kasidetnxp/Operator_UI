@@ -277,11 +277,12 @@ Key security and reliability measures include:
 
 Operators begin by entering their employee ID and selecting an operation mode.
 
-The system supports three modes shown on the user interface as:
+The system supports four modes shown on the user interface as:
 
 - LOAD (คืน FPC)
 - UNLOAD (เบิก FPC)
 - สลับ FPC
+- เปลี่ยน FPC (UNLOAD & LOAD)
 
 In สลับ FPC mode, the AGV transfers an FPC from one machine to another machine.
 

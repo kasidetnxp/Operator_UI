@@ -54,7 +54,8 @@ src/
 │   │   └── index.ts        # Exports queue components
 │   └── workflow/           # Operator workflows & forms
 │       ├── components/     # MachineSelector, ModeSelection, ReturnFPCWorkflow,
-│       │                   # RequestFPCWorkflow, SwapFPCWorkflow, FPCSearchPage
+│       │                   # RequestFPCWorkflow, MoveFPCWorkflow, UnloadLoadWorkflow,
+│       │                   # FPCSearchPage
 │       └── index.ts        # Exports workflow components
 ├── shared/                 # Shared components, hooks, assets and configurations
 │   ├── components/         # Reusable global components (currently empty)
@@ -168,13 +169,13 @@ type Language = 'en' | 'th';
 ### `OperationMode`
 Defines active workflows:
 ```typescript
-type OperationMode = 'return' | 'request' | 'swap' | 'unload_load';
+type OperationMode = 'return' | 'request' | 'move' | 'unload_load';
 ```
 
 ### `Page`
 Defines navigable application pages:
 ```typescript
-type Page = 'mode-selection' | 'return' | 'request' | 'swap' | 'unload_load' | 'queue' | 'fpc-search' | 'admin';
+type Page = 'mode-selection' | 'return' | 'request' | 'move' | 'unload_load' | 'queue' | 'fpc-search' | 'admin';
 ```
 
 ### `Role`
@@ -247,7 +248,7 @@ interface TaskResponse {
     | 'error';
   message: string;
   employeeId: string;
-  type: 'return' | 'request' | 'swap';
+  type: 'return' | 'request' | 'move' | 'unload_load';
   sourceMachine?: string;
   destinationMachine?: string;
   fpcId?: string;
@@ -351,7 +352,7 @@ To connect this frontend to a production backend (e.g., AGV Fleet Manager API):
 |---|---|---|
 | Admin | `admin` | `admin` |
 | Store | `store` | `store` |
-| Operator | `operator` | `operator` |
+| Operator | `op` | `op` |
 
 ### Installation
 Install project dependencies:

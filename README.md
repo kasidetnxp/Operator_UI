@@ -81,7 +81,8 @@ src/
 |---|---|---|
 | Admin | `admin` | `admin` |
 | Store | `store` | `store` |
-| Operator | `operator` | `operator` |
+| Operator | `op` | `op` |
+
 
 ### 1. Install Dependencies
 ```bash
