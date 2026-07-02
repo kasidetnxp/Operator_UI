@@ -10,6 +10,8 @@ export interface Machine {
   id: string;
   name: string;
   available: boolean;
+  disableReason?: string;
+  disableComment?: string;
 }
 
 export interface MachineWithState extends Machine {
@@ -1011,6 +1013,13 @@ export async function updateMachineAvailability(
     throw new Error('Machine not found');
   }
   machine.available = available;
+  if (available) {
+    delete machine.disableReason;
+    delete machine.disableComment;
+  } else {
+    machine.disableReason = reason;
+    machine.disableComment = comment;
+  }
   saveMachines();
 
   const stateStr = available ? 'AVAILABLE' : 'UNAVAILABLE';

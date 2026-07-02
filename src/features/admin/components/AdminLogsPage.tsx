@@ -1048,7 +1048,15 @@ export function AdminLogsPage({ employeeId, userRole, language, onBack }: AdminL
                       default:
                         badgeClass = 'bg-gray-100 text-gray-600 border-gray-200';
                         dotClass = 'bg-gray-400';
-                        labelText = t.machineStateUnavailable;
+                        if (machine.disableReason === 'PM / Maintenance') {
+                          labelText = language === 'th' ? 'PM / ซ่อมบำรุง' : 'PM / Maintenance';
+                        } else if (machine.disableReason === 'Breakdown / Error') {
+                          labelText = language === 'th' ? 'เครื่องเสีย (Breakdown)' : 'Breakdown / Error';
+                        } else if (machine.disableReason === 'Engineering Use') {
+                          labelText = language === 'th' ? 'งานวิศวกรรม (Engineering)' : 'Engineering Use';
+                        } else {
+                          labelText = t.machineStateUnavailable;
+                        }
                         break;
                     }
 
