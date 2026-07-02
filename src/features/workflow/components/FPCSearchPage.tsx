@@ -1,9 +1,9 @@
 import { useState, useMemo, useEffect } from 'react';
-import { Card, CardContent, Button, TextField, Alert, Table, TableBody, TableCell, TableHead, TableRow, Tabs, Tab } from '@mui/material';
-import { ArrowLeft } from 'lucide-react';
+import { Card, CardContent, Button, TextField, Alert, Table, TableBody, TableCell, TableHead, TableRow, Tabs, Tab, Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material';
+import { ArrowLeft, Pencil } from 'lucide-react';
 import { translations } from '@/shared/utils/translations';
 import type { Language } from '@/shared/types';
-import { searchFPC } from '@/shared/utils/mockApi';
+import { searchFPC, updateFPCComment } from '@/shared/utils/mockApi';
 import type { FPCItem } from '@/shared/utils/mockApi';
 
 interface FPCSearchPageProps {
@@ -12,14 +12,40 @@ interface FPCSearchPageProps {
   onBack: () => void;
 }
 
-export function FPCSearchPage({ language, onBack }: FPCSearchPageProps) {
+export function FPCSearchPage({ employeeId, language, onBack }: FPCSearchPageProps) {
   const [searchQuery, setSearchQuery] = useState('');
   const [allFPCItems, setAllFPCItems] = useState<FPCItem[]>([]);
   const [activeTab, setActiveTab] = useState<'ALL' | 'Storage' | 'Service' | 'Deposit PM' | 'Deposit Production'>('ALL');
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
 
+  const [editingFpc, setEditingFpc] = useState<FPCItem | null>(null);
+  const [tempComment, setTempComment] = useState('');
+  const [isSavingComment, setIsSavingComment] = useState(false);
+  const [saveError, setSaveError] = useState('');
+
   const t = translations[language];
+
+  const handleSaveComment = async () => {
+    if (!editingFpc) return;
+    setIsSavingComment(true);
+    setSaveError('');
+    try {
+      await updateFPCComment(employeeId, editingFpc.id, tempComment);
+      // Update local state instantly
+      setAllFPCItems(prev =>
+        prev.map(item =>
+          item.id === editingFpc.id ? { ...item, comment: tempComment } : item
+        )
+      );
+      setEditingFpc(null);
+    } catch (err) {
+      console.error(err);
+      setSaveError(language === 'th' ? 'เกิดข้อผิดพลาดในการบันทึก' : 'Failed to save comment');
+    } finally {
+      setIsSavingComment(false);
+    }
+  };
 
   // Load FPC items on mount
   useEffect(() => {
@@ -161,7 +187,23 @@ export function FPCSearchPage({ language, onBack }: FPCSearchPageProps) {
                       <TableCell className="!text-xl !py-5 !pl-8 font-medium text-foreground font-mono">{fpc.address}</TableCell>
                       <TableCell className="!text-xl !py-5 font-semibold text-foreground">{fpc.functionName}</TableCell>
                       <TableCell className="!text-xl !py-5 font-mono text-info">{fpc.label}</TableCell>
-                      <TableCell className="!text-xl !py-5 !pr-8 text-muted-foreground">{fpc.comment || '-'}</TableCell>
+                      <TableCell className="!text-xl !py-5 !pr-8 text-muted-foreground">
+                        <div className="flex items-center justify-between gap-4">
+                          <span className="truncate max-w-[200px] sm:max-w-none">{fpc.comment || '-'}</span>
+                          <Button
+                            onClick={() => {
+                              setEditingFpc(fpc);
+                              setTempComment(fpc.comment || '');
+                              setSaveError('');
+                            }}
+                            size="small"
+                            className="!min-w-[48px] !min-h-[48px] !p-0 !text-info hover:!bg-info/10"
+                            aria-label={t.editComment}
+                          >
+                            <Pencil className="w-5 h-5" />
+                          </Button>
+                        </div>
+                      </TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
@@ -170,6 +212,61 @@ export function FPCSearchPage({ language, onBack }: FPCSearchPageProps) {
           )}
         </CardContent>
       </Card>
+
+      {/* Edit Comment Dialog */}
+      <Dialog
+        open={editingFpc !== null}
+        onClose={() => !isSavingComment && setEditingFpc(null)}
+        maxWidth="sm"
+        fullWidth
+        PaperProps={{ className: '!p-6 !bg-card !text-foreground rounded-lg border border-border' }}
+      >
+        <DialogTitle className="!text-3xl !font-bold !pb-4">
+          {t.editComment} ({editingFpc?.label})
+        </DialogTitle>
+        <DialogContent className="!py-4">
+          <div className="space-y-4">
+            <TextField
+              fullWidth
+              multiline
+              rows={3}
+              placeholder={t.commentPlaceholder}
+              value={tempComment}
+              onChange={(e) => setTempComment(e.target.value)}
+              variant="outlined"
+              disabled={isSavingComment}
+              inputProps={{
+                style: { fontSize: '1.25rem', lineHeight: '1.75rem' },
+                maxLength: 200,
+                'aria-label': t.editComment
+              }}
+            />
+            {saveError && (
+              <Alert severity="error" className="!text-lg">
+                {saveError}
+              </Alert>
+            )}
+          </div>
+        </DialogContent>
+        <DialogActions className="!p-4 !pt-2 gap-4">
+          <Button
+            onClick={() => setEditingFpc(null)}
+            variant="outlined"
+            disabled={isSavingComment}
+            className="!py-4 !px-8 !text-xl !min-w-[120px] !min-h-[48px]"
+          >
+            {t.cancel}
+          </Button>
+          <Button
+            onClick={handleSaveComment}
+            variant="contained"
+            disabled={isSavingComment}
+            className="!py-4 !px-8 !text-xl !min-w-[120px] !min-h-[48px]"
+          >
+            {isSavingComment ? t.processing : t.save}
+          </Button>
+        </DialogActions>
+      </Dialog>
     </div>
   );
 }
