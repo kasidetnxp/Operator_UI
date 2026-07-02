@@ -532,7 +532,26 @@ function startProgression(task: TaskResponse): void {
   }
 }
 
-// ─── API Functions (stub — replace with real fetch/axios calls) ───
+/** Update FPC comment */
+export async function updateFPCComment(
+  employeeId: string,
+  fpcId: string,
+  comment: string
+): Promise<void> {
+  await delay(300);
+  const fpc = mockFPCDatabase.find(f => f.id === fpcId);
+  if (!fpc) {
+    throw new Error('FPC not found');
+  }
+  const oldComment = fpc.comment;
+  fpc.comment = comment;
+  
+  addAuditLog(
+    'STATE_CHANGE',
+    employeeId,
+    `Updated comment for FPC ${fpcId} from "${oldComment || '-'}" to "${comment || '-'}"`
+  );
+}
 
 /** Search FPC items by query string */
 export async function searchFPC(query: string): Promise<FPCItem[]> {
