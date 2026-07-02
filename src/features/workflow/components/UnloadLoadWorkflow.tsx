@@ -2,7 +2,7 @@ import { useState, useMemo, useEffect } from 'react';
 import { Button, Card, CardContent, TextField, Alert, Table, TableBody, TableCell, TableHead, TableRow, Radio, Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material';
 import { ArrowLeft } from 'lucide-react';
 import { MachineSelector } from './MachineSelector';
-import { mockMachines, getAllFPCs, submitUnloadLoadFPCJob } from '@/shared/utils/mockApi';
+import { getAllFPCs, submitUnloadLoadFPCJob, getMachinesWithState, type MachineWithState } from '@/shared/utils/mockApi';
 import type { FPCItem } from '@/shared/utils/mockApi';
 import { translations } from '@/shared/utils/translations';
 import type { Language } from '@/shared/types';
@@ -15,6 +15,7 @@ interface UnloadLoadWorkflowProps {
 }
 
 export function UnloadLoadWorkflow({ employeeId, language, onBack, onTaskSubmitted }: UnloadLoadWorkflowProps) {
+  const [machines, setMachines] = useState<MachineWithState[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [allFPCItems, setAllFPCItems] = useState<FPCItem[]>([]);
   const [selectedFPC, setSelectedFPC] = useState<FPCItem | null>(null);
@@ -32,8 +33,12 @@ export function UnloadLoadWorkflow({ employeeId, language, onBack, onTaskSubmitt
     const loadAllFPC = async () => {
       setIsLoading(true);
       try {
-        const results = await getAllFPCs();
+        const [results, machineList] = await Promise.all([
+          getAllFPCs(),
+          getMachinesWithState()
+        ]);
         setFullFPCList(results);
+        setMachines(machineList);
         const inStorageItems = results.filter(
           item => item.location === 'Smart Storage' && item.address && item.address !== '-'
         );
@@ -105,7 +110,7 @@ export function UnloadLoadWorkflow({ employeeId, language, onBack, onTaskSubmitt
     }
   };
 
-  const selectedMachineName = mockMachines.find(m => m.id === selectedMachine)?.name;
+  const selectedMachineName = machines.find(m => m.id === selectedMachine)?.name;
 
   return (
     <div className="h-full flex flex-col">
@@ -214,11 +219,12 @@ export function UnloadLoadWorkflow({ employeeId, language, onBack, onTaskSubmitt
           <CardContent className="p-8 flex flex-col flex-1 min-h-0">
             <div className="flex-1 min-h-0">
               <MachineSelector
-                machines={mockMachines}
+                machines={machines}
                 selectedMachine={selectedMachine}
                 onSelectMachine={setSelectedMachine}
                 language={language}
                 title={t.selectDestinationMachine}
+                isMachineSelectable={(_id, state) => state === 'occupied'}
               />
             </div>
 

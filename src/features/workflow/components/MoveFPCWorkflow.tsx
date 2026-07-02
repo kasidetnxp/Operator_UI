@@ -4,7 +4,7 @@ import { ArrowLeft } from 'lucide-react';
 import { MachineSelector } from './MachineSelector';
 import { translations } from '@/shared/utils/translations';
 import type { Language } from '@/shared/types';
-import { mockMachines, submitMoveFPCJob, getAllFPCs } from '@/shared/utils/mockApi';
+import { submitMoveFPCJob, getAllFPCs, getMachinesWithState, type MachineWithState, type MachineState } from '@/shared/utils/mockApi';
 import type { FPCItem } from '@/shared/utils/mockApi';
 
 interface MoveFPCWorkflowProps {
@@ -15,6 +15,7 @@ interface MoveFPCWorkflowProps {
 }
 
 export function MoveFPCWorkflow({ employeeId, language, onBack, onTaskSubmitted }: MoveFPCWorkflowProps) {
+  const [machines, setMachines] = useState<MachineWithState[]>([]);
   const [selectedSourceMachine, setSelectedSourceMachine] = useState<string | null>(null);
   const [selectedDestinationMachine, setSelectedDestinationMachine] = useState<string | null>(null);
   const [error, setError] = useState<string>('');
@@ -23,15 +24,19 @@ export function MoveFPCWorkflow({ employeeId, language, onBack, onTaskSubmitted 
   const [allFPCs, setAllFPCs] = useState<FPCItem[]>([]);
 
   useEffect(() => {
-    const loadFPCs = async () => {
+    const loadData = async () => {
       try {
-        const items = await getAllFPCs();
+        const [items, machineList] = await Promise.all([
+          getAllFPCs(),
+          getMachinesWithState()
+        ]);
         setAllFPCs(items);
+        setMachines(machineList);
       } catch (err) {
-        console.error('Failed to load FPCs for Move workflow', err);
+        console.error('Failed to load data for Move workflow', err);
       }
     };
-    loadFPCs();
+    loadData();
   }, []);
 
   const sourceFPC = allFPCs.find(f => f.location === selectedSourceMachine);
@@ -41,13 +46,13 @@ export function MoveFPCWorkflow({ employeeId, language, onBack, onTaskSubmitted 
 
   // Modify destination machine list to disable the selected source machine
   const destinationMachines = useMemo(() => {
-    return mockMachines.map(m => {
+    return machines.map(m => {
       if (m.id === selectedSourceMachine) {
-        return { ...m, available: false };
+        return { ...m, state: 'unavailable' as MachineState };
       }
       return m;
     });
-  }, [selectedSourceMachine]);
+  }, [machines, selectedSourceMachine]);
 
   const isDestOccupied = !!(selectedDestinationMachine && destFPC);
   const occupiedNotice = useMemo(() => {
@@ -99,8 +104,8 @@ export function MoveFPCWorkflow({ employeeId, language, onBack, onTaskSubmitted 
     }
   };
 
-  const sourceMachineName = mockMachines.find(m => m.id === selectedSourceMachine)?.name;
-  const destinationMachineName = mockMachines.find(m => m.id === selectedDestinationMachine)?.name;
+  const sourceMachineName = machines.find(m => m.id === selectedSourceMachine)?.name;
+  const destinationMachineName = machines.find(m => m.id === selectedDestinationMachine)?.name;
 
   return (
     <div className="h-full flex flex-col">
@@ -128,11 +133,12 @@ export function MoveFPCWorkflow({ employeeId, language, onBack, onTaskSubmitted 
           <CardContent className="p-8 flex flex-col flex-1 min-h-0">
             <div className="flex-1 min-h-0">
               <MachineSelector
-                machines={mockMachines}
+                machines={machines}
                 selectedMachine={selectedSourceMachine}
                 onSelectMachine={setSelectedSourceMachine}
                 language={language}
                 title={t.selectSourceMachine}
+                isMachineSelectable={(_id, state) => state === 'occupied'}
               />
             </div>
           </CardContent>
@@ -148,6 +154,7 @@ export function MoveFPCWorkflow({ employeeId, language, onBack, onTaskSubmitted 
                 onSelectMachine={setSelectedDestinationMachine}
                 language={language}
                 title={t.selectDestinationMachine}
+                isMachineSelectable={(id, state) => (state === 'empty' || state === 'occupied') && id !== selectedSourceMachine}
               />
             </div>
 

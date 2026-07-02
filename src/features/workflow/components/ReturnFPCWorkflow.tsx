@@ -4,7 +4,7 @@ import { ArrowLeft } from 'lucide-react';
 import { MachineSelector } from './MachineSelector';
 import { translations } from '@/shared/utils/translations';
 import type { Language } from '@/shared/types';
-import { mockMachines, submitReturnFPCJob, getAllFPCs } from '@/shared/utils/mockApi';
+import { submitReturnFPCJob, getAllFPCs, getMachinesWithState, type MachineWithState } from '@/shared/utils/mockApi';
 import type { FPCItem } from '@/shared/utils/mockApi';
 
 interface ReturnFPCWorkflowProps {
@@ -15,6 +15,7 @@ interface ReturnFPCWorkflowProps {
 }
 
 export function ReturnFPCWorkflow({ employeeId, language, onBack, onTaskSubmitted }: ReturnFPCWorkflowProps) {
+  const [machines, setMachines] = useState<MachineWithState[]>([]);
   const [selectedMachine, setSelectedMachine] = useState<string | null>(null);
   const [error, setError] = useState<string>('');
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -22,15 +23,19 @@ export function ReturnFPCWorkflow({ employeeId, language, onBack, onTaskSubmitte
   const [allFPCs, setAllFPCs] = useState<FPCItem[]>([]);
 
   useEffect(() => {
-    const loadFPCs = async () => {
+    const loadData = async () => {
       try {
-        const items = await getAllFPCs();
+        const [items, machineList] = await Promise.all([
+          getAllFPCs(),
+          getMachinesWithState()
+        ]);
         setAllFPCs(items);
+        setMachines(machineList);
       } catch (err) {
-        console.error('Failed to load FPCs for Return workflow', err);
+        console.error('Failed to load data for Return workflow', err);
       }
     };
-    loadFPCs();
+    loadData();
   }, []);
 
   const currentFPC = allFPCs.find(f => f.location === selectedMachine);
@@ -72,7 +77,7 @@ export function ReturnFPCWorkflow({ employeeId, language, onBack, onTaskSubmitte
     }
   };
 
-  const selectedMachineName = mockMachines.find(m => m.id === selectedMachine)?.name;
+  const selectedMachineName = machines.find(m => m.id === selectedMachine)?.name;
 
   return (
     <div className="h-full flex flex-col">
@@ -96,11 +101,12 @@ export function ReturnFPCWorkflow({ employeeId, language, onBack, onTaskSubmitte
         <CardContent className="p-8 h-full flex flex-col">
           <div className="flex-1 min-h-0">
             <MachineSelector
-              machines={mockMachines}
+              machines={machines}
               selectedMachine={selectedMachine}
               onSelectMachine={setSelectedMachine}
               language={language}
               title={t.selectSourceMachine}
+              isMachineSelectable={(_id, state) => state === 'occupied'}
             />
           </div>
 
