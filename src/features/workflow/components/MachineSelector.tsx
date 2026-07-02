@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import { TextField, Tabs, Tab, Box } from '@mui/material';
+import { TextField } from '@mui/material';
 import { CheckCircle } from 'lucide-react';
 import { translations } from '@/shared/utils/translations';
 import type { Language } from '@/shared/types';
@@ -23,24 +23,17 @@ export function MachineSelector({
   isMachineSelectable,
 }: MachineSelectorProps) {
   const [searchQuery, setSearchQuery] = useState('');
-  const [activeFilterTab, setActiveFilterTab] = useState<'ALL' | 'empty' | 'occupied' | 'reserved' | 'unavailable'>('ALL');
   const t = translations[language];
 
   const filteredMachines = useMemo(() => {
-    let list = machines;
-    if (searchQuery.trim()) {
-      const lowerQuery = searchQuery.toLowerCase();
-      list = list.filter(
-        machine =>
-          machine.id.toLowerCase().includes(lowerQuery) ||
-          machine.name.toLowerCase().includes(lowerQuery)
-      );
-    }
-    if (activeFilterTab !== 'ALL') {
-      list = list.filter(machine => machine.state === activeFilterTab);
-    }
-    return list;
-  }, [searchQuery, machines, activeFilterTab]);
+    if (!searchQuery.trim()) return machines;
+    const lowerQuery = searchQuery.toLowerCase();
+    return machines.filter(
+      machine =>
+        machine.id.toLowerCase().includes(lowerQuery) ||
+        machine.name.toLowerCase().includes(lowerQuery)
+    );
+  }, [searchQuery, machines]);
 
   return (
     <div className="flex flex-col h-full">
@@ -62,33 +55,6 @@ export function MachineSelector({
           maxLength: 100
         }}
       />
-
-      {/* Tabs Filter for Operator workflows */}
-      <Box className="border-b border-border mb-6">
-        <Tabs
-          value={activeFilterTab}
-          onChange={(_e, val) => setActiveFilterTab(val)}
-          textColor="primary"
-          indicatorColor="primary"
-          variant="scrollable"
-          scrollButtons="auto"
-          sx={{
-            '& .MuiTab-root': {
-              fontSize: '1.1rem',
-              fontWeight: 'bold',
-              py: 1.5,
-              px: 3,
-              textTransform: 'none',
-            },
-          }}
-        >
-          <Tab value="ALL" label={<div className="flex items-center gap-2"><span>{t.filterAll}</span><span className="bg-muted text-muted-foreground px-2.5 py-0.5 rounded-full text-xs font-bold">{machines.length}</span></div>} />
-          <Tab value="empty" label={<div className="flex items-center gap-2"><span className="w-3 h-3 rounded-full bg-emerald-500 shrink-0" /><span>{t.filterEmpty}</span><span className="bg-emerald-50 text-emerald-700 px-2.5 py-0.5 rounded-full text-xs font-bold">{machines.filter(m => m.state === 'empty').length}</span></div>} />
-          <Tab value="occupied" label={<div className="flex items-center gap-2"><span className="w-3 h-3 rounded-full bg-blue-500 shrink-0" /><span>{t.filterOccupied}</span><span className="bg-blue-50 text-blue-700 px-2.5 py-0.5 rounded-full text-xs font-bold">{machines.filter(m => m.state === 'occupied').length}</span></div>} />
-          <Tab value="reserved" label={<div className="flex items-center gap-2"><span className="w-3 h-3 rounded-full bg-amber-500 shrink-0" /><span>{t.filterReserved}</span><span className="bg-amber-50 text-amber-700 px-2.5 py-0.5 rounded-full text-xs font-bold">{machines.filter(m => m.state === 'reserved').length}</span></div>} />
-          <Tab value="unavailable" label={<div className="flex items-center gap-2"><span className="w-3 h-3 rounded-full bg-gray-400 shrink-0" /><span>{t.filterUnavailable}</span><span className="bg-gray-100 text-gray-700 px-2.5 py-0.5 rounded-full text-xs font-bold">{machines.filter(m => m.state === 'unavailable').length}</span></div>} />
-        </Tabs>
-      </Box>
 
       <div className="flex-1 overflow-auto">
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 pb-4">
@@ -145,8 +111,8 @@ export function MachineSelector({
                   ${!isSelectable
                     ? 'bg-muted border-border opacity-50 cursor-not-allowed'
                     : selectedMachine === machine.id
-                    ? 'bg-info-background border-info shadow-lg'
-                    : 'bg-card border-border hover:border-info hover:shadow-md cursor-pointer'
+                      ? 'bg-info-background border-info shadow-lg'
+                      : 'bg-card border-border hover:border-info hover:shadow-md cursor-pointer'
                   }
                 `}
               >
