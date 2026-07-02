@@ -91,51 +91,47 @@ export default function App() {
               <div className="flex flex-col sm:flex-row gap-2">
                 {/* AGV 1 Badge */}
                 <span
-                  className={`px-4 py-2 text-lg font-black rounded-full flex items-center gap-2 border shadow-sm transition-all duration-300 ${
-                    agv1Status === 'Ok'
+                  className={`px-4 py-2 text-lg font-black rounded-full flex items-center gap-2 border shadow-sm transition-all duration-300 ${agv1Status === 'Ok'
                       ? 'bg-success-background text-success-foreground border-success'
                       : agv1Status === 'Engineering Use'
-                      ? 'bg-info-background text-info-foreground border-info'
-                      : agv1Status === 'PM'
-                      ? 'bg-warning-background text-warning-foreground border-warning'
-                      : 'bg-error-background text-error-foreground border-error animate-pulse'
-                  }`}
+                        ? 'bg-info-background text-info-foreground border-info'
+                        : agv1Status === 'PM'
+                          ? 'bg-warning-background text-warning-foreground border-warning'
+                          : 'bg-error-background text-error-foreground border-error animate-pulse'
+                    }`}
                 >
                   <span
-                    className={`w-3 h-3 rounded-full ${
-                      agv1Status === 'Ok'
+                    className={`w-3 h-3 rounded-full ${agv1Status === 'Ok'
                         ? 'bg-success'
                         : agv1Status === 'Engineering Use'
-                        ? 'bg-info'
-                        : agv1Status === 'PM'
-                        ? 'bg-warning'
-                        : 'bg-error animate-ping'
-                    }`}
+                          ? 'bg-info'
+                          : agv1Status === 'PM'
+                            ? 'bg-warning'
+                            : 'bg-error animate-ping'
+                      }`}
                   />
                   AGV 1: {agv1Status === 'Ok' ? translations[language].agvStatusOk : agv1Status === 'Engineering Use' ? translations[language].agvStatusEngineering : agv1Status === 'PM' ? translations[language].agvStatusPM : translations[language].agvStatusError}
                 </span>
                 {/* AGV 2 Badge */}
                 <span
-                  className={`px-4 py-2 text-lg font-black rounded-full flex items-center gap-2 border shadow-sm transition-all duration-300 ${
-                    agv2Status === 'Ok'
+                  className={`px-4 py-2 text-lg font-black rounded-full flex items-center gap-2 border shadow-sm transition-all duration-300 ${agv2Status === 'Ok'
                       ? 'bg-success-background text-success-foreground border-success'
                       : agv2Status === 'Engineering Use'
-                      ? 'bg-info-background text-info-foreground border-info'
-                      : agv2Status === 'PM'
-                      ? 'bg-warning-background text-warning-foreground border-warning'
-                      : 'bg-error-background text-error-foreground border-error animate-pulse'
-                  }`}
+                        ? 'bg-info-background text-info-foreground border-info'
+                        : agv2Status === 'PM'
+                          ? 'bg-warning-background text-warning-foreground border-warning'
+                          : 'bg-error-background text-error-foreground border-error animate-pulse'
+                    }`}
                 >
                   <span
-                    className={`w-3 h-3 rounded-full ${
-                      agv2Status === 'Ok'
+                    className={`w-3 h-3 rounded-full ${agv2Status === 'Ok'
                         ? 'bg-success'
                         : agv2Status === 'Engineering Use'
-                        ? 'bg-info'
-                        : agv2Status === 'PM'
-                        ? 'bg-warning'
-                        : 'bg-error animate-ping'
-                    }`}
+                          ? 'bg-info'
+                          : agv2Status === 'PM'
+                            ? 'bg-warning'
+                            : 'bg-error animate-ping'
+                      }`}
                   />
                   AGV 2: {agv2Status === 'Ok' ? translations[language].agvStatusOk : agv2Status === 'Engineering Use' ? translations[language].agvStatusEngineering : agv2Status === 'PM' ? translations[language].agvStatusPM : translations[language].agvStatusError}
                 </span>
@@ -156,11 +152,10 @@ export default function App() {
                 {(role === 'admin' || role === 'store') && (
                   <button
                     onClick={handleGoToAdmin}
-                    className={`px-8 py-3 text-xl font-bold rounded-lg transition-colors shadow-md ${
-                      currentPage === 'admin'
-                        ? 'text-primary-foreground bg-primary hover:bg-primary/90'
+                    className={`px-8 py-3 text-xl font-bold rounded-lg transition-colors shadow-md ${currentPage === 'admin'
+                        ? 'text-white bg-primary hover:bg-primary/90'
                         : 'text-primary bg-card border-2 border-primary hover:bg-accent'
-                    }`}
+                      }`}
                   >
                     {role === 'admin' ? translations[language].adminPanel : translations[language].managementPanel}
                   </button>
@@ -169,11 +164,10 @@ export default function App() {
                 {role === 'operator' && (
                   <button
                     onClick={handleGoToAdmin}
-                    className={`px-8 py-3 text-xl font-bold rounded-lg transition-colors shadow-md ${
-                      currentPage === 'admin'
-                        ? 'text-primary-foreground bg-primary hover:bg-primary/90'
+                    className={`px-8 py-3 text-xl font-bold rounded-lg transition-colors shadow-md ${currentPage === 'admin'
+                        ? 'text-white bg-primary hover:bg-primary/90'
                         : 'text-primary bg-card border-2 border-primary hover:bg-accent'
-                    }`}
+                      }`}
                   >
                     {translations[language].adminLogsTab}
                   </button>
@@ -181,23 +175,19 @@ export default function App() {
 
                 <button
                   onClick={handleGoToFPCSearch}
-                  style={{ textShadow: '-1px -1px 0 #fff, 1px -1px 0 #fff, -1px 1px 0 #fff, 1px 1px 0 #fff' }}
-                  className={`px-8 py-3 text-xl font-bold rounded-lg transition-colors shadow-md ${
-                    currentPage === 'fpc-search'
-                      ? 'text-info-foreground bg-info hover:bg-info/90'
-                      : 'text-info bg-card border-2 border-info hover:bg-info-background'
-                  }`}
+                  className={`px-8 py-3 text-xl font-bold rounded-lg transition-colors shadow-md ${currentPage === 'fpc-search'
+                        ? 'text-white bg-info hover:bg-info/90'
+                        : 'text-info bg-card border-2 border-info hover:bg-info-background'
+                      }`}
                 >
                   {language === 'th' ? 'ค้นหา FPC' : 'FPC Search'}
                 </button>
                 <button
                   onClick={handleGoToQueue}
-                  style={{ textShadow: '-1px -1px 0 #fff, 1px -1px 0 #fff, -1px 1px 0 #fff, 1px 1px 0 #fff' }}
-                  className={`px-8 py-3 text-xl font-bold rounded-lg transition-colors shadow-md ${
-                    currentPage === 'queue'
-                      ? 'text-info-foreground bg-info hover:bg-info/90'
-                      : 'text-info bg-card border-2 border-info hover:bg-info-background'
-                  }`}
+                  className={`px-8 py-3 text-xl font-bold rounded-lg transition-colors shadow-md ${currentPage === 'queue'
+                        ? 'text-white bg-info hover:bg-info/90'
+                        : 'text-info bg-card border-2 border-info hover:bg-info-background'
+                      }`}
                 >
                   {language === 'th' ? 'ดูคิว' : 'View Queue'}
                 </button>
