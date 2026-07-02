@@ -4,10 +4,16 @@
 // when connecting to the backend.
 // ─────────────────────────────────────────────
 
+export type MachineState = 'empty' | 'occupied' | 'reserved' | 'unavailable';
+
 export interface Machine {
   id: string;
   name: string;
   available: boolean;
+}
+
+export interface MachineWithState extends Machine {
+  state: MachineState;
 }
 
 export interface FPCItem {
@@ -227,7 +233,7 @@ export async function updateUser(
 
 
 // ─── Mock Machine Data (50 machines) ───
-export const mockMachines: Machine[] = [
+const DEFAULT_MACHINES: Machine[] = [
   { id: 'AVT_001', name: 'AVT_001', available: true },
   { id: 'AVT_002', name: 'AVT_002', available: true },
   { id: 'AVT_003', name: 'AVT_003', available: false },
@@ -279,6 +285,25 @@ export const mockMachines: Machine[] = [
   { id: 'AVT_049', name: 'AVT_049', available: true },
   { id: 'AVT_050', name: 'AVT_050', available: false },
 ];
+
+function loadMachines(): Machine[] {
+  const data = localStorage.getItem('nxp_machines');
+  if (data) {
+    try {
+      return JSON.parse(data);
+    } catch (e) {
+      console.error('Failed to parse nxp_machines', e);
+    }
+  }
+  localStorage.setItem('nxp_machines', JSON.stringify(DEFAULT_MACHINES));
+  return DEFAULT_MACHINES;
+}
+
+export const mockMachines: Machine[] = loadMachines();
+
+function saveMachines(): void {
+  localStorage.setItem('nxp_machines', JSON.stringify(mockMachines));
+}
 
 // ─── Mock FPC Database ───
 const mockFPCDatabase: FPCItem[] = [
@@ -944,6 +969,67 @@ export async function getTaskStatus(taskId: string): Promise<TaskResponse | null
 export async function getAllTasks(): Promise<TaskResponse[]> {
   await delay(300);
   return [...mockTaskQueue];
+}
+
+export function getMachineState(
+  machine: Machine,
+  fpcItems: FPCItem[],
+  activeTasks: TaskResponse[]
+): MachineState {
+  if (!machine.available) {
+    return 'unavailable';
+  }
+  const isReserved = activeTasks.some(task => {
+    if (['completed', 'complete', 'canceled', 'failed', 'rejected', 'error'].includes(task.status)) {
+      return false;
+    }
+    return task.sourceMachine === machine.name ||
+           task.sourceMachine === machine.id ||
+           task.destinationMachine === machine.name ||
+           task.destinationMachine === machine.id;
+  });
+  if (isReserved) {
+    return 'reserved';
+  }
+  const isOccupied = fpcItems.some(f => f.location === machine.id);
+  if (isOccupied) {
+    return 'occupied';
+  }
+  return 'empty';
+}
+
+export async function updateMachineAvailability(
+  employeeId: string,
+  machineId: string,
+  available: boolean,
+  reason?: string,
+  comment?: string
+): Promise<void> {
+  await delay(300);
+  const machine = mockMachines.find(m => m.id === machineId);
+  if (!machine) {
+    throw new Error('Machine not found');
+  }
+  machine.available = available;
+  saveMachines();
+
+  const stateStr = available ? 'AVAILABLE' : 'UNAVAILABLE';
+  const reasonStr = reason ? `Reason: ${reason}. ` : '';
+  const commentStr = comment ? `Comment: ${comment}` : '';
+  addAuditLog(
+    'STATE_CHANGE',
+    employeeId,
+    `User manually set machine ${machineId} to ${stateStr}. ${reasonStr}${commentStr}`
+  );
+}
+
+export async function getMachinesWithState(): Promise<MachineWithState[]> {
+  const fpcItems = await getAllFPCs();
+  const activeTasks = await getAllTasks();
+  return mockMachines.map(m => ({
+    ...m,
+    state: getMachineState(m, fpcItems, activeTasks)
+  }));
 }
 
 /** Update task status in-memory */
