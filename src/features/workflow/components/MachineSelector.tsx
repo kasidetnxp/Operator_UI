@@ -64,9 +64,9 @@ export function MachineSelector({
               : machine.state !== 'unavailable' && machine.state !== 'reserved';
 
             // Style configuration based on state
-            let badgeClass = '';
-            let dotClass = '';
-            let labelText = '';
+            let badgeClass: string;
+            let dotClass: string;
+            let labelText: string;
 
             switch (machine.state) {
               case 'empty':
