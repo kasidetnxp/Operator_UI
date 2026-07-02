@@ -1562,7 +1562,7 @@ export function AdminLogsPage({ employeeId, userRole, language, onBack }: AdminL
           </p>
 
           {!targetMachineAvailable && (
-            <div className="space-y-4">
+            <div className="flex flex-col gap-6 mt-6">
               <FormControl fullWidth variant="outlined" error={!!toggleError}>
                 <InputLabel className="!text-lg">{t.reasonLabel}</InputLabel>
                 <Select
