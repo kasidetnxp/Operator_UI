@@ -181,13 +181,21 @@ export default function App() {
 
                 <button
                   onClick={handleGoToFPCSearch}
-                  className="px-8 py-3 text-xl font-bold text-info bg-card border-2 border-info rounded-lg hover:bg-info-background transition-colors shadow-sm"
+                  className={`px-8 py-3 text-xl font-bold rounded-lg transition-colors shadow-md ${
+                    currentPage === 'fpc-search'
+                      ? 'text-info-foreground bg-info hover:bg-info/90'
+                      : 'text-info bg-card border-2 border-info hover:bg-info-background'
+                  }`}
                 >
                   {language === 'th' ? 'ค้นหา FPC' : 'FPC Search'}
                 </button>
                 <button
                   onClick={handleGoToQueue}
-                  className="px-8 py-3 text-xl font-bold text-info-foreground bg-info rounded-lg hover:bg-info/90 transition-colors shadow-md"
+                  className={`px-8 py-3 text-xl font-bold rounded-lg transition-colors shadow-md ${
+                    currentPage === 'queue'
+                      ? 'text-info-foreground bg-info hover:bg-info/90'
+                      : 'text-info bg-card border-2 border-info hover:bg-info-background'
+                  }`}
                 >
                   {language === 'th' ? 'ดูคิว' : 'View Queue'}
                 </button>
