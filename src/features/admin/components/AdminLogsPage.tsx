@@ -58,7 +58,10 @@ import {
   addUser,
   deleteUser,
   updateUser,
-  type AGVStatus
+  type AGVStatus,
+  getMachinesWithState,
+  updateMachineAvailability,
+  type MachineWithState
 } from '@/shared/utils/mockApi';
 import { translations } from '@/shared/utils/translations';
 import type { Language, Role, UserAccount } from '@/shared/types';
@@ -71,10 +74,23 @@ interface AdminLogsPageProps {
 }
 
 export function AdminLogsPage({ employeeId, userRole, language, onBack }: AdminLogsPageProps) {
-  // Page Tab state (logs, location, users)
+  // Page Tab state (logs, location, users, machines)
   const [activeTab, setActiveTab] = useState<string>('logs');
   const [agv1Status, setLocalAgv1Status] = useState<AGVStatus>(getAGV1Status());
   const [agv2Status, setLocalAgv2Status] = useState<AGVStatus>(getAGV2Status());
+
+  // Machines state
+  const [machinesList, setMachinesList] = useState<MachineWithState[]>([]);
+  const [machineSearchQuery, setMachineSearchQuery] = useState('');
+  const [machineFilterTab, setMachineFilterTab] = useState<'ALL' | 'empty' | 'occupied' | 'reserved' | 'unavailable'>('ALL');
+
+  // Toggle Machine Confirmation Dialog state
+  const [isToggleMachineDialogOpen, setIsToggleMachineDialogOpen] = useState(false);
+  const [targetMachineId, setTargetMachineId] = useState<string | null>(null);
+  const [targetMachineAvailable, setTargetMachineAvailable] = useState<boolean>(true);
+  const [toggleReason, setToggleReason] = useState<string>('');
+  const [toggleComment, setToggleComment] = useState<string>('');
+  const [toggleError, setToggleError] = useState<string>('');
 
   // Audit Logs state
   const [logs, setLogs] = useState<AuditLog[]>([]);
@@ -118,19 +134,21 @@ export function AdminLogsPage({ employeeId, userRole, language, onBack }: AdminL
   const [editPassword, setEditPassword] = useState('');
   const [editRole, setEditRole] = useState<'admin' | 'store' | 'operator'>('operator');
 
-  // Fetch all admin data (logs and FPCs)
+  // Fetch all admin data (logs, FPCs and machines)
   const fetchData = useCallback(async (showSpinner = false) => {
     if (showSpinner) setIsRefreshing(true);
     try {
-      const promises: Promise<AuditLog[] | FPCItem[]>[] = [getAuditLogs()];
+      const promises: Promise<any[]>[] = [getAuditLogs()];
       if (userRole === 'admin' || userRole === 'store') {
         promises.push(getAllFPCs());
+        promises.push(getMachinesWithState());
       }
       
       const results = await Promise.all(promises);
       setLogs(results[0] as AuditLog[]);
       if (userRole === 'admin' || userRole === 'store') {
         setFpcItems(results[1] as FPCItem[]);
+        setMachinesList(results[2] as MachineWithState[]);
       }
       setLocalAgv1Status(getAGV1Status());
       setLocalAgv2Status(getAGV2Status());
@@ -186,6 +204,15 @@ export function AdminLogsPage({ employeeId, userRole, language, onBack }: AdminL
     };
   }, [activeTab, fetchUsersList]);
 
+  const handleToggleMachine = (machineId: string, currentAvailable: boolean) => {
+    setTargetMachineId(machineId);
+    setTargetMachineAvailable(!currentAvailable);
+    setToggleReason('');
+    setToggleComment('');
+    setToggleError('');
+    setIsToggleMachineDialogOpen(true);
+  };
+
   const handleTabChange = (_event: React.SyntheticEvent, newValue: string) => {
     setActiveTab(newValue);
     setErrorMsg('');
@@ -216,6 +243,19 @@ export function AdminLogsPage({ employeeId, userRole, language, onBack }: AdminL
       return matchesCategory && matchesSearch;
     });
   }, [fpcItems, fpcCategoryFilter, fpcSearchQuery]);
+
+  // Filter machines (memoized)
+  const filteredMachinesList = useMemo(() => {
+    let list = machinesList;
+    if (machineSearchQuery.trim()) {
+      const lower = machineSearchQuery.toLowerCase();
+      list = list.filter(m => m.id.toLowerCase().includes(lower) || m.name.toLowerCase().includes(lower));
+    }
+    if (machineFilterTab !== 'ALL') {
+      list = list.filter(m => m.state === machineFilterTab);
+    }
+    return list;
+  }, [machinesList, machineSearchQuery, machineFilterTab]);
 
   // Calculate stats for Audit tab (optimized to run in a single-pass O(N) loop and memoized)
   const { totalCount, loginCount, taskSubmitCount, stateChangeCount } = useMemo(() => {
@@ -642,6 +682,10 @@ export function AdminLogsPage({ employeeId, userRole, language, onBack }: AdminL
             <Tab value="location" label={t.adminLocationTab} icon={<Database className="w-5 h-5 mr-1" />} iconPosition="start" />
           )}
 
+          {(userRole === 'admin' || userRole === 'store') && (
+            <Tab value="machines" label={t.machineTab} icon={<Monitor className="w-5 h-5 mr-1" />} iconPosition="start" />
+          )}
+
           {userRole === 'admin' && (
             <Tab value="users" label={t.userManagement} icon={<User className="w-5 h-5 mr-1" />} iconPosition="start" />
           )}
@@ -919,6 +963,131 @@ export function AdminLogsPage({ employeeId, userRole, language, onBack }: AdminL
                   </TableBody>
                 </Table>
               </TableContainer>
+            </CardContent>
+          </Card>
+        </div>
+      )}
+
+      {activeTab === 'machines' && (userRole === 'admin' || userRole === 'store') && (
+        // ──────────────────────── MACHINES MANAGEMENT TAB ────────────────────────
+        <div className="flex flex-col flex-1 min-h-0 gap-6">
+          <Card className="flex flex-col flex-1 min-h-0 shadow-sm border border-border rounded-xl bg-card">
+            <CardContent className="flex flex-col h-full p-6 min-h-0 gap-6">
+              
+              {/* Search & Category tabs */}
+              <div className="flex flex-col md:flex-row gap-6 justify-between items-center">
+                <TextField
+                  fullWidth
+                  placeholder={translations[language].searchMachinePlaceholder}
+                  value={machineSearchQuery}
+                  onChange={(e) => setMachineSearchQuery(e.target.value)}
+                  variant="outlined"
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <Search className="w-5 h-5 text-muted-foreground" />
+                      </InputAdornment>
+                    ),
+                    className: '!text-xl'
+                  }}
+                  className="max-w-md"
+                />
+
+                <div className="border-b border-border w-full md:w-auto">
+                  <Tabs
+                    value={machineFilterTab}
+                    onChange={(_e, val) => setMachineFilterTab(val)}
+                    textColor="primary"
+                    indicatorColor="primary"
+                    variant="scrollable"
+                    scrollButtons="auto"
+                    sx={{
+                      '& .MuiTab-root': {
+                        fontSize: '1.1rem',
+                        fontWeight: 'bold',
+                        py: 1.5,
+                        px: 3,
+                        textTransform: 'none',
+                      },
+                    }}
+                  >
+                    <Tab value="ALL" label={<div className="flex items-center gap-2"><span>{t.filterAll}</span><span className="bg-muted text-muted-foreground px-2.5 py-0.5 rounded-full text-xs font-bold">{machinesList.length}</span></div>} />
+                    <Tab value="empty" label={<div className="flex items-center gap-2"><span className="w-3 h-3 rounded-full bg-emerald-500 shrink-0" /><span>{t.filterEmpty}</span><span className="bg-emerald-50 text-emerald-700 px-2.5 py-0.5 rounded-full text-xs font-bold">{machinesList.filter(m => m.state === 'empty').length}</span></div>} />
+                    <Tab value="occupied" label={<div className="flex items-center gap-2"><span className="w-3 h-3 rounded-full bg-blue-500 shrink-0" /><span>{t.filterOccupied}</span><span className="bg-blue-50 text-blue-700 px-2.5 py-0.5 rounded-full text-xs font-bold">{machinesList.filter(m => m.state === 'occupied').length}</span></div>} />
+                    <Tab value="reserved" label={<div className="flex items-center gap-2"><span className="w-3 h-3 rounded-full bg-amber-500 shrink-0" /><span>{t.filterReserved}</span><span className="bg-amber-50 text-amber-700 px-2.5 py-0.5 rounded-full text-xs font-bold">{machinesList.filter(m => m.state === 'reserved').length}</span></div>} />
+                    <Tab value="unavailable" label={<div className="flex items-center gap-2"><span className="w-3 h-3 rounded-full bg-gray-400 shrink-0" /><span>{t.filterUnavailable}</span><span className="bg-gray-100 text-gray-700 px-2.5 py-0.5 rounded-full text-xs font-bold">{machinesList.filter(m => m.state === 'unavailable').length}</span></div>} />
+                  </Tabs>
+                </div>
+              </div>
+
+              {/* Grid List */}
+              <div className="flex-1 overflow-auto">
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 pb-4">
+                  {filteredMachinesList.map((machine) => {
+                    let badgeClass = '';
+                    let dotClass = '';
+                    let labelText = '';
+
+                    switch (machine.state) {
+                      case 'empty':
+                        badgeClass = 'bg-emerald-50 text-emerald-700 border-emerald-200';
+                        dotClass = 'bg-emerald-500';
+                        labelText = t.machineStateEmpty;
+                        break;
+                      case 'occupied':
+                        badgeClass = 'bg-blue-50 text-blue-700 border-blue-200';
+                        dotClass = 'bg-blue-500';
+                        labelText = t.machineStateOccupied;
+                        break;
+                      case 'reserved':
+                        badgeClass = 'bg-amber-50 text-amber-700 border-amber-200';
+                        dotClass = 'bg-amber-500';
+                        labelText = t.machineStateReserved;
+                        break;
+                      case 'unavailable':
+                      default:
+                        badgeClass = 'bg-gray-100 text-gray-600 border-gray-200';
+                        dotClass = 'bg-gray-400';
+                        labelText = t.machineStateUnavailable;
+                        break;
+                    }
+
+                    return (
+                      <Card key={machine.id} className="border border-border rounded-xl bg-card hover:shadow-md transition-shadow">
+                        <CardContent className="p-6 flex flex-col items-center space-y-4">
+                          <div className="text-2xl font-bold text-foreground">{machine.name}</div>
+                          <div className="text-lg text-muted-foreground font-mono">{machine.id}</div>
+                          
+                          <div className={`flex items-center space-x-2 px-4 py-2 rounded-full text-lg font-medium border ${badgeClass}`}>
+                            <span className={`w-3 h-3 rounded-full shrink-0 ${dotClass}`} />
+                            <span>{labelText}</span>
+                          </div>
+
+                          <Button
+                            variant={machine.available ? 'contained' : 'outlined'}
+                            onClick={() => handleToggleMachine(machine.id, machine.available)}
+                            className={`!w-full !py-2 !rounded-xl !font-bold ${
+                              machine.available
+                                ? '!bg-emerald-600 hover:!bg-emerald-700 text-white'
+                                : '!border-red-500 !text-red-500 hover:!bg-red-55'
+                            }`}
+                          >
+                            {machine.available
+                              ? (language === 'th' ? 'เปิดใช้งานอยู่' : 'Enabled')
+                              : (language === 'th' ? 'ปิดใช้งานอยู่' : 'Disabled')}
+                          </Button>
+                        </CardContent>
+                      </Card>
+                    );
+                  })}
+                </div>
+
+                {filteredMachinesList.length === 0 && (
+                  <div className="flex items-center justify-center h-40">
+                    <p className="text-2xl text-muted-foreground">{t.noResults}</p>
+                  </div>
+                )}
+              </div>
             </CardContent>
           </Card>
         </div>
@@ -1364,6 +1533,113 @@ export function AdminLogsPage({ employeeId, userRole, language, onBack }: AdminL
             </Button>
           </DialogActions>
         </form>
+      </Dialog>
+
+      {/* ── TOGGLE MACHINE STATUS CONFIRMATION DIALOG ── */}
+      <Dialog
+        open={isToggleMachineDialogOpen}
+        onClose={() => !isUpdating && setIsToggleMachineDialogOpen(false)}
+        maxWidth="sm"
+        fullWidth
+        className="!rounded-2xl"
+      >
+        <DialogTitle className="!text-2xl !font-bold !pb-2">
+          {targetMachineAvailable ? t.confirmToggleActiveTitle : t.confirmToggleMachineTitle}
+        </DialogTitle>
+        <DialogContent className="!pt-4 space-y-6">
+          <p className="text-xl text-muted-foreground">
+            {targetMachineAvailable
+              ? t.confirmToggleActiveMessage.replace('{machineId}', targetMachineId || '')
+              : t.confirmToggleMachineMessage.replace('{machineId}', targetMachineId || '')}
+          </p>
+
+          {!targetMachineAvailable && (
+            <div className="space-y-4">
+              <FormControl fullWidth variant="outlined" error={!!toggleError}>
+                <InputLabel className="!text-lg">{t.reasonLabel}</InputLabel>
+                <Select
+                  value={toggleReason}
+                  onChange={(e) => {
+                    setToggleReason(e.target.value);
+                    setToggleError('');
+                  }}
+                  label={t.reasonLabel}
+                  className="text-lg"
+                >
+                  <MenuItem value="pm" className="!text-lg">{t.reasonMaintenance}</MenuItem>
+                  <MenuItem value="breakdown" className="!text-lg">{t.reasonBreakdown}</MenuItem>
+                  <MenuItem value="engineering" className="!text-lg">{t.reasonEngineering}</MenuItem>
+                  <MenuItem value="other" className="!text-lg">{t.reasonOther}</MenuItem>
+                </Select>
+                {toggleError && <p className="text-red-500 text-sm mt-1">{toggleError}</p>}
+              </FormControl>
+
+              <TextField
+                fullWidth
+                multiline
+                rows={3}
+                label={t.commentLabel}
+                placeholder={t.overrideCommentPlaceholder}
+                value={toggleComment}
+                onChange={(e) => setToggleComment(e.target.value)}
+                variant="outlined"
+                InputProps={{ className: '!text-lg' }}
+                InputLabelProps={{ className: '!text-md' }}
+              />
+            </div>
+          )}
+        </DialogContent>
+        <DialogActions className="!p-6 !pt-2">
+          <Button
+            onClick={() => setIsToggleMachineDialogOpen(false)}
+            variant="outlined"
+            size="large"
+            disabled={isUpdating}
+            className="!py-2.5 !px-6 !text-base !font-semibold !rounded-xl"
+          >
+            {t.cancelBtn}
+          </Button>
+          <Button
+            onClick={async () => {
+              if (!targetMachineAvailable && !toggleReason) {
+                setToggleError(t.reasonRequiredError);
+                return;
+              }
+              setIsUpdating(true);
+              try {
+                let reasonLabel = '';
+                if (!targetMachineAvailable) {
+                  if (toggleReason === 'pm') reasonLabel = 'PM / Maintenance';
+                  else if (toggleReason === 'breakdown') reasonLabel = 'Breakdown / Error';
+                  else if (toggleReason === 'engineering') reasonLabel = 'Engineering Use';
+                  else reasonLabel = 'Other';
+                }
+                await updateMachineAvailability(
+                  employeeId,
+                  targetMachineId!,
+                  targetMachineAvailable,
+                  reasonLabel,
+                  toggleComment
+                );
+                setSuccessMsg(t.commentUpdatedSuccessfully || 'Status updated successfully');
+                setIsToggleMachineDialogOpen(false);
+                setToggleReason('');
+                setToggleComment('');
+                fetchData();
+              } catch (err: any) {
+                setErrorMsg(err.message || 'Failed to update machine availability');
+              } finally {
+                setIsUpdating(false);
+              }
+            }}
+            variant="contained"
+            size="large"
+            disabled={isUpdating}
+            className="!py-2.5 !px-6 !text-base !font-semibold !rounded-xl !bg-primary hover:!bg-primary/90 text-primary-foreground disabled:opacity-50"
+          >
+            {isUpdating ? t.processing : t.confirmBtn}
+          </Button>
+        </DialogActions>
       </Dialog>
     </div>
   );
