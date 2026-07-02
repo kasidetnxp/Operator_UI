@@ -138,7 +138,7 @@ export function AdminLogsPage({ employeeId, userRole, language, onBack }: AdminL
   const fetchData = useCallback(async (showSpinner = false) => {
     if (showSpinner) setIsRefreshing(true);
     try {
-      const promises: Promise<any[]>[] = [getAuditLogs()];
+      const promises: Promise<AuditLog[] | FPCItem[] | MachineWithState[]>[] = [getAuditLogs()];
       if (userRole === 'admin' || userRole === 'store') {
         promises.push(getAllFPCs());
         promises.push(getMachinesWithState());
@@ -1024,9 +1024,9 @@ export function AdminLogsPage({ employeeId, userRole, language, onBack }: AdminL
               <div className="flex-1 overflow-auto">
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 pb-4">
                   {filteredMachinesList.map((machine) => {
-                    let badgeClass = '';
-                    let dotClass = '';
-                    let labelText = '';
+                    let badgeClass: string;
+                    let dotClass: string;
+                    let labelText: string;
 
                     switch (machine.state) {
                       case 'empty':
@@ -1626,8 +1626,9 @@ export function AdminLogsPage({ employeeId, userRole, language, onBack }: AdminL
                 setToggleReason('');
                 setToggleComment('');
                 fetchData();
-              } catch (err: any) {
-                setErrorMsg(err.message || 'Failed to update machine availability');
+              } catch (err) {
+                const message = err instanceof Error ? err.message : 'Failed to update machine availability';
+                setErrorMsg(message);
               } finally {
                 setIsUpdating(false);
               }
