@@ -181,6 +181,7 @@ export default function App() {
 
                 <button
                   onClick={handleGoToFPCSearch}
+                  style={{ textShadow: '-1px -1px 0 #fff, 1px -1px 0 #fff, -1px 1px 0 #fff, 1px 1px 0 #fff' }}
                   className={`px-8 py-3 text-xl font-bold rounded-lg transition-colors shadow-md ${
                     currentPage === 'fpc-search'
                       ? 'text-info-foreground bg-info hover:bg-info/90'
@@ -191,6 +192,7 @@ export default function App() {
                 </button>
                 <button
                   onClick={handleGoToQueue}
+                  style={{ textShadow: '-1px -1px 0 #fff, 1px -1px 0 #fff, -1px 1px 0 #fff, 1px 1px 0 #fff' }}
                   className={`px-8 py-3 text-xl font-bold rounded-lg transition-colors shadow-md ${
                     currentPage === 'queue'
                       ? 'text-info-foreground bg-info hover:bg-info/90'
