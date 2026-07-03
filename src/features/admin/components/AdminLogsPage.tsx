@@ -582,81 +582,109 @@ export function AdminLogsPage({ employeeId, userRole, language, onBack }: AdminL
         </div>
 
         <div className="flex flex-wrap gap-4 w-full sm:w-auto">
-           {userRole === 'admin' && (
-             <div className="flex flex-col sm:flex-row gap-4 items-center bg-card p-2 rounded-xl border border-border">
-               {/* AGV 1 Status Selector */}
-               <FormControl variant="outlined" size="small" className="w-[210px] shrink-0">
-                 <InputLabel id="agv1-status-label" className="!text-sm !font-bold">AGV 1 Status</InputLabel>
-                 <Select
-                   labelId="agv1-status-label"
-                   value={agv1Status}
-                   label="AGV 1 Status"
-                   onChange={(e) => {
-                     const val = e.target.value as AGVStatus;
-                     setAGV1Status(val);
-                     setLocalAgv1Status(val);
-                   }}
-                   sx={{
-                     '& .MuiSelect-select': {
-                       fontSize: '1rem',
-                       fontWeight: '700',
-                       py: 1.5,
-                     }
-                   }}
-                   className={`!rounded-xl transition-all ${
-                     agv1Status === 'Ok'
-                       ? '!text-emerald-600 bg-emerald-50 border-emerald-200'
-                       : agv1Status === 'Engineering Use'
-                       ? '!text-blue-600 bg-blue-50 border-blue-200'
-                       : agv1Status === 'PM'
-                       ? '!text-amber-600 bg-amber-50 border-amber-200'
-                       : '!text-red-600 bg-red-50 border-red-200'
-                   }`}
-                 >
-                   <MenuItem value="Ok" className="!text-base !font-semibold !text-emerald-600">{translations[language].agvStatusOk}</MenuItem>
-                   <MenuItem value="Engineering Use" className="!text-base !font-semibold !text-blue-600">{translations[language].agvStatusEngineering}</MenuItem>
-                   <MenuItem value="PM" className="!text-base !font-semibold !text-amber-600">{translations[language].agvStatusPM}</MenuItem>
-                   <MenuItem value="Error" className="!text-base !font-semibold !text-red-600">{translations[language].agvStatusError}</MenuItem>
-                 </Select>
-               </FormControl>
+          {userRole === 'admin' && (
+            <div className="flex flex-col sm:flex-row gap-4 items-center bg-card p-2 rounded-xl border border-border">
+              {/* AGV 1 Status Selector */}
+              {agv1Status === 'Error' ? (
+                <Button
+                  variant="contained"
+                  color="error"
+                  onClick={() => {
+                    setAGV1Status('Ok');
+                    setLocalAgv1Status('Ok');
+                  }}
+                  className="!py-3 !px-4 !text-sm !font-bold !rounded-xl w-[210px] shrink-0"
+                >
+                  {language === 'th' ? 'รีเซ็ต AGV 1 Error' : 'Reset AGV 1 Error'}
+                </Button>
+              ) : (
+                <FormControl variant="outlined" size="small" className="w-[210px] shrink-0">
+                  <InputLabel id="agv1-status-label" className="!text-sm !font-bold">AGV 1 Status</InputLabel>
+                  <Select
+                    labelId="agv1-status-label"
+                    value={agv1Status}
+                    label="AGV 1 Status"
+                    onChange={(e) => {
+                      const val = e.target.value as AGVStatus;
+                      setAGV1Status(val);
+                      setLocalAgv1Status(val);
+                    }}
+                    sx={{
+                      '& .MuiSelect-select': {
+                        fontSize: '1rem',
+                        fontWeight: '700',
+                        py: 1.5,
+                      }
+                    }}
+                    className={`!rounded-xl transition-all ${
+                      agv1Status === 'Ok'
+                        ? '!text-emerald-600 bg-emerald-50 border-emerald-200'
+                        : agv1Status === 'Engineering Use'
+                        ? '!text-blue-600 bg-blue-50 border-blue-200'
+                        : agv1Status === 'PM'
+                        ? '!text-amber-600 bg-amber-50 border-amber-200'
+                        : '!text-red-600 bg-red-50 border-red-200'
+                    }`}
+                  >
+                    <MenuItem value="Ok" className="!text-base !font-semibold !text-emerald-600">{translations[language].agvStatusOk}</MenuItem>
+                    <MenuItem value="Engineering Use" className="!text-base !font-semibold !text-blue-600">{translations[language].agvStatusEngineering}</MenuItem>
+                    <MenuItem value="PM" className="!text-base !font-semibold !text-amber-600">{translations[language].agvStatusPM}</MenuItem>
+                    <MenuItem value="Error" className="!text-base !font-semibold !text-red-600">{translations[language].agvStatusError}</MenuItem>
+                  </Select>
+                </FormControl>
+              )}
 
-               {/* AGV 2 Status Selector */}
-               <FormControl variant="outlined" size="small" className="w-[210px] shrink-0">
-                 <InputLabel id="agv2-status-label" className="!text-sm !font-bold">AGV 2 Status</InputLabel>
-                 <Select
-                   labelId="agv2-status-label"
-                   value={agv2Status}
-                   label="AGV 2 Status"
-                   onChange={(e) => {
-                     const val = e.target.value as AGVStatus;
-                     setAGV2Status(val);
-                     setLocalAgv2Status(val);
-                   }}
-                   sx={{
-                     '& .MuiSelect-select': {
-                       fontSize: '1rem',
-                       fontWeight: '700',
-                       py: 1.5,
-                     }
-                   }}
-                   className={`!rounded-xl transition-all ${
-                     agv2Status === 'Ok'
-                       ? '!text-emerald-600 bg-emerald-50 border-emerald-200'
-                       : agv2Status === 'Engineering Use'
-                       ? '!text-blue-600 bg-blue-50 border-blue-200'
-                       : agv2Status === 'PM'
-                       ? '!text-amber-600 bg-amber-50 border-amber-200'
-                       : '!text-red-600 bg-red-50 border-red-200'
-                   }`}
-                 >
-                   <MenuItem value="Ok" className="!text-base !font-semibold !text-emerald-600">{translations[language].agvStatusOk}</MenuItem>
-                   <MenuItem value="Engineering Use" className="!text-base !font-semibold !text-blue-600">{translations[language].agvStatusEngineering}</MenuItem>
-                   <MenuItem value="PM" className="!text-base !font-semibold !text-amber-600">{translations[language].agvStatusPM}</MenuItem>
-                   <MenuItem value="Error" className="!text-base !font-semibold !text-red-600">{translations[language].agvStatusError}</MenuItem>
-                 </Select>
-               </FormControl>
-             </div>
-           )}
+              {/* AGV 2 Status Selector */}
+              {agv2Status === 'Error' ? (
+                <Button
+                  variant="contained"
+                  color="error"
+                  onClick={() => {
+                    setAGV2Status('Ok');
+                    setLocalAgv2Status('Ok');
+                  }}
+                  className="!py-3 !px-4 !text-sm !font-bold !rounded-xl w-[210px] shrink-0"
+                >
+                  {language === 'th' ? 'รีเซ็ต AGV 2 Error' : 'Reset AGV 2 Error'}
+                </Button>
+              ) : (
+                <FormControl variant="outlined" size="small" className="w-[210px] shrink-0">
+                  <InputLabel id="agv2-status-label" className="!text-sm !font-bold">AGV 2 Status</InputLabel>
+                  <Select
+                    labelId="agv2-status-label"
+                    value={agv2Status}
+                    label="AGV 2 Status"
+                    onChange={(e) => {
+                      const val = e.target.value as AGVStatus;
+                      setAGV2Status(val);
+                      setLocalAgv2Status(val);
+                    }}
+                    sx={{
+                      '& .MuiSelect-select': {
+                        fontSize: '1rem',
+                        fontWeight: '700',
+                        py: 1.5,
+                      }
+                    }}
+                    className={`!rounded-xl transition-all ${
+                      agv2Status === 'Ok'
+                        ? '!text-emerald-600 bg-emerald-50 border-emerald-200'
+                        : agv2Status === 'Engineering Use'
+                        ? '!text-blue-600 bg-blue-50 border-blue-200'
+                        : agv2Status === 'PM'
+                        ? '!text-amber-600 bg-amber-50 border-amber-200'
+                        : '!text-red-600 bg-red-50 border-red-200'
+                    }`}
+                  >
+                    <MenuItem value="Ok" className="!text-base !font-semibold !text-emerald-600">{translations[language].agvStatusOk}</MenuItem>
+                    <MenuItem value="Engineering Use" className="!text-base !font-semibold !text-blue-600">{translations[language].agvStatusEngineering}</MenuItem>
+                    <MenuItem value="PM" className="!text-base !font-semibold !text-amber-600">{translations[language].agvStatusPM}</MenuItem>
+                    <MenuItem value="Error" className="!text-base !font-semibold !text-red-600">{translations[language].agvStatusError}</MenuItem>
+                  </Select>
+                </FormControl>
+              )}
+            </div>
+          )}
 
           <Button
             variant="outlined"
