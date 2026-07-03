@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react';
-import { TextField } from '@mui/material';
-import { CheckCircle } from 'lucide-react';
+import { TextField, Button, Menu, MenuItem } from '@mui/material';
+import { CheckCircle, Filter } from 'lucide-react';
 import { translations } from '@/shared/utils/translations';
 import type { Language } from '@/shared/types';
 import type { MachineWithState, MachineState } from '@/shared/utils/mockApi';
@@ -23,38 +23,176 @@ export function MachineSelector({
   isMachineSelectable,
 }: MachineSelectorProps) {
   const [searchQuery, setSearchQuery] = useState('');
+  const [statusFilter, setStatusFilter] = useState<'ALL' | 'SELECTABLE' | MachineState>('SELECTABLE');
   const t = translations[language];
 
+  // Menu anchor element state for dropdown filter menu
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const isMenuOpen = Boolean(anchorEl);
+
+  const handleMenuClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleMenuClose = () => {
+    setAnchorEl(null);
+  };
+
+  const handleSelectFilter = (val: typeof statusFilter) => {
+    setStatusFilter(val);
+    handleMenuClose();
+  };
+
+  const counts = useMemo(() => {
+    const res = { ALL: 0, selectable: 0, empty: 0, occupied: 0, reserved: 0, unavailable: 0 };
+    machines.forEach(m => {
+      res.ALL++;
+      
+      const isSelectable = isMachineSelectable
+        ? isMachineSelectable(m.id, m.state)
+        : m.state !== 'unavailable' && m.state !== 'reserved';
+      
+      if (isSelectable) {
+        res.selectable++;
+      }
+      
+      if (m.state in res) {
+        res[m.state as keyof typeof res]++;
+      }
+    });
+    return res;
+  }, [machines, isMachineSelectable]);
+
   const filteredMachines = useMemo(() => {
-    if (!searchQuery.trim()) return machines;
-    const lowerQuery = searchQuery.toLowerCase();
-    return machines.filter(
-      machine =>
-        machine.id.toLowerCase().includes(lowerQuery) ||
-        machine.name.toLowerCase().includes(lowerQuery)
-    );
-  }, [searchQuery, machines]);
+    let list = machines;
+    if (statusFilter === 'SELECTABLE') {
+      list = list.filter(m => {
+        return isMachineSelectable
+          ? isMachineSelectable(m.id, m.state)
+          : m.state !== 'unavailable' && m.state !== 'reserved';
+      });
+    } else if (statusFilter !== 'ALL') {
+      list = list.filter(machine => machine.state === statusFilter);
+    }
+    
+    if (searchQuery.trim()) {
+      const lowerQuery = searchQuery.toLowerCase();
+      list = list.filter(
+        machine =>
+          machine.id.toLowerCase().includes(lowerQuery) ||
+          machine.name.toLowerCase().includes(lowerQuery)
+      );
+    }
+    return list;
+  }, [searchQuery, statusFilter, machines, isMachineSelectable]);
+
+  const getActiveFilterLabel = () => {
+    switch (statusFilter) {
+      case 'SELECTABLE':
+        return `${t.filterSelectable} (${counts.selectable})`;
+      case 'ALL':
+        return `${t.filterAll} (${counts.ALL})`;
+      case 'empty':
+        return `${t.filterEmpty} (${counts.empty})`;
+      case 'occupied':
+        return `${t.filterOccupied} (${counts.occupied})`;
+      case 'reserved':
+        return `${t.filterReserved} (${counts.reserved})`;
+      case 'unavailable':
+        return `${t.filterUnavailable} (${counts.unavailable})`;
+    }
+  };
 
   return (
     <div className="flex flex-col h-full">
       <h3 className="text-3xl font-bold mb-6 text-foreground">{title}</h3>
 
-      <TextField
-        fullWidth
-        placeholder={t.searchMachinePlaceholder}
-        value={searchQuery}
-        onChange={(e) => setSearchQuery(e.target.value)}
-        variant="outlined"
-        className="!mb-6"
-        InputProps={{
-          className: '!text-2xl !py-4',
-        }}
-        inputProps={{
-          style: { fontSize: '1.5rem', padding: '1rem' },
-          'aria-label': t.searchMachine,
-          maxLength: 100
-        }}
-      />
+      <div className="flex gap-4 items-center !mb-6 w-full">
+        <TextField
+          placeholder={t.searchMachinePlaceholder}
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          variant="outlined"
+          className="flex-1"
+          InputProps={{
+            className: '!text-xl !py-2',
+          }}
+          inputProps={{
+            style: { fontSize: '1.25rem', padding: '0.75rem' },
+            'aria-label': t.searchMachine,
+            maxLength: 100
+          }}
+        />
+
+        <Button
+          variant="outlined"
+          onClick={handleMenuClick}
+          startIcon={<Filter className="w-5 h-5 text-muted-foreground" />}
+          className="!py-4 !px-6 !text-lg !font-semibold !rounded-xl border-border bg-card hover:bg-muted text-foreground flex gap-2 items-center normal-case shrink-0"
+        >
+          {getActiveFilterLabel()}
+        </Button>
+
+        <Menu
+          anchorEl={anchorEl}
+          open={isMenuOpen}
+          onClose={handleMenuClose}
+          slotProps={{
+            paper: {
+              className: 'shadow-lg border border-border rounded-xl mt-1 min-w-[200px]'
+            }
+          }}
+        >
+          <MenuItem onClick={() => handleSelectFilter('SELECTABLE')} className="!text-lg !py-3 !px-5">
+            <div className="flex items-center justify-between gap-6 w-full">
+              <span>{t.filterSelectable}</span>
+              <span className="bg-info-background text-info-foreground px-2.5 py-0.5 rounded-full text-xs font-bold">{counts.selectable}</span>
+            </div>
+          </MenuItem>
+          <MenuItem onClick={() => handleSelectFilter('ALL')} className="!text-lg !py-3 !px-5">
+            <div className="flex items-center justify-between gap-6 w-full">
+              <span>{t.filterAll}</span>
+              <span className="bg-muted text-muted-foreground px-2.5 py-0.5 rounded-full text-xs font-bold">{counts.ALL}</span>
+            </div>
+          </MenuItem>
+          <MenuItem onClick={() => handleSelectFilter('empty')} className="!text-lg !py-3 !px-5">
+            <div className="flex items-center justify-between gap-6 w-full">
+              <div className="flex items-center gap-2">
+                <span className="w-3 h-3 rounded-full bg-emerald-500 shrink-0" />
+                <span>{t.filterEmpty}</span>
+              </div>
+              <span className="bg-emerald-50 text-emerald-700 px-2.5 py-0.5 rounded-full text-xs font-bold">{counts.empty}</span>
+            </div>
+          </MenuItem>
+          <MenuItem onClick={() => handleSelectFilter('occupied')} className="!text-lg !py-3 !px-5">
+            <div className="flex items-center justify-between gap-6 w-full">
+              <div className="flex items-center gap-2">
+                <span className="w-3 h-3 rounded-full bg-blue-500 shrink-0" />
+                <span>{t.filterOccupied}</span>
+              </div>
+              <span className="bg-blue-50 text-blue-700 px-2.5 py-0.5 rounded-full text-xs font-bold">{counts.occupied}</span>
+            </div>
+          </MenuItem>
+          <MenuItem onClick={() => handleSelectFilter('reserved')} className="!text-lg !py-3 !px-5">
+            <div className="flex items-center justify-between gap-6 w-full">
+              <div className="flex items-center gap-2">
+                <span className="w-3 h-3 rounded-full bg-amber-500 shrink-0" />
+                <span>{t.filterReserved}</span>
+              </div>
+              <span className="bg-amber-50 text-amber-700 px-2.5 py-0.5 rounded-full text-xs font-bold">{counts.reserved}</span>
+            </div>
+          </MenuItem>
+          <MenuItem onClick={() => handleSelectFilter('unavailable')} className="!text-lg !py-3 !px-5">
+            <div className="flex items-center justify-between gap-6 w-full">
+              <div className="flex items-center gap-2">
+                <span className="w-3 h-3 rounded-full bg-gray-400 shrink-0" />
+                <span>{t.filterUnavailable}</span>
+              </div>
+              <span className="bg-gray-100 text-gray-700 px-2.5 py-0.5 rounded-full text-xs font-bold">{counts.unavailable}</span>
+            </div>
+          </MenuItem>
+        </Menu>
+      </div>
 
       <div className="flex-1 overflow-auto">
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 pb-4">

@@ -26,20 +26,22 @@ import {
   FormControlLabel,
   RadioGroup,
   Radio,
-  Alert
+  Alert,
+  Menu
 } from '@mui/material';
 import {
   Search,
   Clock,
   Shield,
-  Activity,
   ArrowLeft,
   User,
   RefreshCw,
   Edit,
   AlertTriangle,
   Database,
-  Monitor
+  Monitor,
+  X,
+  Filter
 } from 'lucide-react';
 import {
   getAuditLogs,
@@ -84,6 +86,23 @@ export function AdminLogsPage({ employeeId, userRole, language, onBack }: AdminL
   const [machineSearchQuery, setMachineSearchQuery] = useState('');
   const [machineFilterTab, setMachineFilterTab] = useState<'ALL' | 'empty' | 'occupied' | 'reserved' | 'unavailable'>('ALL');
 
+  // Menu anchor element state for admin machines status filter menu
+  const [machineFilterAnchorEl, setMachineFilterAnchorEl] = useState<null | HTMLElement>(null);
+  const isMachineMenuOpen = Boolean(machineFilterAnchorEl);
+
+  const handleMachineMenuClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+    setMachineFilterAnchorEl(event.currentTarget);
+  };
+
+  const handleMachineMenuClose = () => {
+    setMachineFilterAnchorEl(null);
+  };
+
+  const handleSelectMachineFilter = (val: typeof machineFilterTab) => {
+    setMachineFilterTab(val);
+    handleMachineMenuClose();
+  };
+
   // Toggle Machine Confirmation Dialog state
   const [isToggleMachineDialogOpen, setIsToggleMachineDialogOpen] = useState(false);
   const [targetMachineId, setTargetMachineId] = useState<string | null>(null);
@@ -96,6 +115,7 @@ export function AdminLogsPage({ employeeId, userRole, language, onBack }: AdminL
   const [logs, setLogs] = useState<AuditLog[]>([]);
   const [searchOperator, setSearchOperator] = useState('');
   const [selectedEventType, setSelectedEventType] = useState<string>('ALL');
+  const [selectedDate, setSelectedDate] = useState<string>('');
 
   // FPCs state
   const [fpcItems, setFpcItems] = useState<FPCItem[]>([]);
@@ -225,9 +245,16 @@ export function AdminLogsPage({ employeeId, userRole, language, onBack }: AdminL
     return logs.filter(log => {
       const matchesOperator = log.employeeId.toLowerCase().includes(lowerOperator);
       const matchesType = selectedEventType === 'ALL' || log.eventType === selectedEventType;
-      return matchesOperator && matchesType;
+      
+      let matchesDate = true;
+      if (selectedDate) {
+        const logDateStr = log.timestamp.substring(0, 10);
+        matchesDate = logDateStr === selectedDate;
+      }
+      
+      return matchesOperator && matchesType && matchesDate;
     });
-  }, [logs, searchOperator, selectedEventType]);
+  }, [logs, searchOperator, selectedEventType, selectedDate]);
 
   // Filter FPCs (memoized to avoid recalculation on every polling tick)
   const filteredFpcs = useMemo(() => {
@@ -257,27 +284,7 @@ export function AdminLogsPage({ employeeId, userRole, language, onBack }: AdminL
     return list;
   }, [machinesList, machineSearchQuery, machineFilterTab]);
 
-  // Calculate stats for Audit tab (optimized to run in a single-pass O(N) loop and memoized)
-  const { totalCount, loginCount, taskSubmitCount, stateChangeCount } = useMemo(() => {
-    const total = logs.length;
-    let logins = 0;
-    let taskSubmits = 0;
-    let stateChanges = 0;
 
-    for (let i = 0; i < logs.length; i++) {
-      const type = logs[i].eventType;
-      if (type === 'LOGIN') logins++;
-      else if (type === 'TASK_SUBMIT') taskSubmits++;
-      else if (type === 'STATE_CHANGE') stateChanges++;
-    }
-
-    return {
-      totalCount: total,
-      loginCount: logins,
-      taskSubmitCount: taskSubmits,
-      stateChangeCount: stateChanges
-    };
-  }, [logs]);
 
   const getEventBadgeClass = (type: AuditLog['eventType']) => {
     switch (type) {
@@ -307,10 +314,14 @@ export function AdminLogsPage({ employeeId, userRole, language, onBack }: AdminL
     return type;
   };
 
-  const formatTime = (isoString: string) => {
+  const formatDateTime = (isoString: string) => {
     try {
       const date = new Date(isoString);
-      return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+      const day = String(date.getDate()).padStart(2, '0');
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const year = date.getFullYear();
+      const timeStr = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+      return `${day}/${month}/${year} ${timeStr}`;
     } catch {
       return isoString;
     }
@@ -708,70 +719,13 @@ export function AdminLogsPage({ employeeId, userRole, language, onBack }: AdminL
       {activeTab === 'logs' && (
         // ──────────────────────── AUDIT LOGS TAB ────────────────────────
         <div className="flex flex-col flex-1 min-h-0 gap-6">
-          {/* Summary Statistics Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-            <Card className="shadow-sm border border-border transition-all hover:border-muted-foreground/40 bg-card">
-              <CardContent className="flex items-center justify-between p-6">
-                <div>
-                  <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                    {language === 'th' ? 'Log ทั้งหมด' : 'Total Logs'}
-                  </p>
-                  <h3 className="text-3xl font-semibold text-foreground mt-1">{totalCount}</h3>
-                </div>
-                <div className="p-4 bg-info-background text-info-foreground rounded-2xl">
-                  <Activity className="w-8 h-8" />
-                </div>
-              </CardContent>
-            </Card>
 
-            <Card className="shadow-sm border border-border transition-all hover:border-muted-foreground/40 bg-card">
-              <CardContent className="flex items-center justify-between p-6">
-                <div>
-                  <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                    {language === 'th' ? 'การเข้าใช้งาน' : 'Logins'}
-                  </p>
-                  <h3 className="text-3xl font-semibold text-foreground mt-1">{loginCount}</h3>
-                </div>
-                <div className="p-4 bg-success-background text-success-foreground rounded-2xl">
-                  <User className="w-8 h-8" />
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card className="shadow-sm border border-border transition-all hover:border-muted-foreground/40 bg-card">
-              <CardContent className="flex items-center justify-between p-6">
-                <div>
-                  <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                    {language === 'th' ? 'ส่งคำขอเคลื่อนย้าย' : 'Tasks Submitted'}
-                  </p>
-                  <h3 className="text-3xl font-semibold text-foreground mt-1">{taskSubmitCount}</h3>
-                </div>
-                <div className="p-4 bg-info-background text-info-foreground rounded-2xl">
-                  <Activity className="w-8 h-8" />
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card className="shadow-sm border border-border transition-all hover:border-muted-foreground/40 bg-card">
-              <CardContent className="flex items-center justify-between p-6">
-                <div>
-                  <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                    {language === 'th' ? 'เปลี่ยนสถานะ AGV' : 'State Changes'}
-                  </p>
-                  <h3 className="text-3xl font-semibold text-foreground mt-1">{stateChangeCount}</h3>
-                </div>
-                <div className="p-4 bg-accent text-primary rounded-2xl">
-                  <Clock className="w-8 h-8" />
-                </div>
-              </CardContent>
-            </Card>
-          </div>
 
           {/* Logs Table Container */}
           <Card className="flex flex-col flex-1 min-h-0 shadow-sm border border-border rounded-2xl bg-card">
             <CardContent className="flex flex-col h-full p-6 min-h-0 gap-6">
               <div className="flex flex-col md:flex-row gap-6 justify-between items-center">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 flex-1 w-full">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 flex-1 w-full">
                   <TextField
                     fullWidth
                     label={language === 'th' ? 'ค้นหาด้วยรหัสพนักงาน' : 'Filter by Employee ID'}
@@ -809,6 +763,30 @@ export function AdminLogsPage({ employeeId, userRole, language, onBack }: AdminL
                       <MenuItem value="SYSTEM" className="!text-lg">{language === 'th' ? 'SYSTEM (ระบบ)' : 'SYSTEM'}</MenuItem>
                     </Select>
                   </FormControl>
+
+                  <TextField
+                    fullWidth
+                    type="date"
+                    label={t.filterByDate}
+                    value={selectedDate}
+                    onChange={(e) => setSelectedDate(e.target.value)}
+                    variant="outlined"
+                    InputLabelProps={{ shrink: true, className: '!text-lg' }}
+                    InputProps={{
+                      className: '!text-xl',
+                      endAdornment: selectedDate ? (
+                        <InputAdornment position="end">
+                          <button
+                            onClick={() => setSelectedDate('')}
+                            className="p-1 hover:bg-muted rounded-full transition-colors cursor-pointer border-0 bg-transparent"
+                            type="button"
+                          >
+                            <X className="w-5 h-5 text-muted-foreground" />
+                          </button>
+                        </InputAdornment>
+                      ) : null
+                    }}
+                  />
                 </div>
                 
                 {userRole === 'admin' && (
@@ -827,7 +805,7 @@ export function AdminLogsPage({ employeeId, userRole, language, onBack }: AdminL
                 <Table stickyHeader className="min-w-[700px]">
                   <TableHead>
                     <TableRow>
-                      <TableCell className="!text-base !font-semibold !bg-background !text-muted-foreground !py-3" style={{ width: '15%' }}>{t.timestamp}</TableCell>
+                      <TableCell className="!text-base !font-semibold !bg-background !text-muted-foreground !py-3" style={{ width: '22%' }}>{t.timestamp}</TableCell>
                       <TableCell className="!text-base !font-semibold !bg-background !text-muted-foreground !py-3" style={{ width: '18%' }}>{t.eventType}</TableCell>
                       <TableCell className="!text-base !font-semibold !bg-background !text-muted-foreground !py-3" style={{ width: '15%' }}>{t.operator}</TableCell>
                       <TableCell className="!text-base !font-semibold !bg-background !text-muted-foreground !py-3">{t.message}</TableCell>
@@ -837,7 +815,7 @@ export function AdminLogsPage({ employeeId, userRole, language, onBack }: AdminL
                     {filteredLogs.length > 0 ? (
                       filteredLogs.map((log) => (
                         <TableRow key={log.id} hover className="transition-colors">
-                          <TableCell className="!text-base !text-muted-foreground !py-3">{formatTime(log.timestamp)}</TableCell>
+                          <TableCell className="!text-base !text-muted-foreground !py-3">{formatDateTime(log.timestamp)}</TableCell>
                           <TableCell className="!py-3">
                             <span className={`px-4 py-1.5 text-base font-semibold rounded-full border ${getEventBadgeClass(log.eventType)}`}>
                               {getEventTypeName(log.eventType)}
@@ -974,10 +952,9 @@ export function AdminLogsPage({ employeeId, userRole, language, onBack }: AdminL
           <Card className="flex flex-col flex-1 min-h-0 shadow-sm border border-border rounded-xl bg-card">
             <CardContent className="flex flex-col h-full p-6 min-h-0 gap-6">
               
-              {/* Search & Category tabs */}
-              <div className="flex flex-col md:flex-row gap-6 justify-between items-center">
+              {/* Search & Category Dropdown */}
+              <div className="flex gap-4 items-center !mb-6 w-full">
                 <TextField
-                  fullWidth
                   placeholder={translations[language].searchMachinePlaceholder}
                   value={machineSearchQuery}
                   onChange={(e) => setMachineSearchQuery(e.target.value)}
@@ -990,34 +967,75 @@ export function AdminLogsPage({ employeeId, userRole, language, onBack }: AdminL
                     ),
                     className: '!text-xl'
                   }}
-                  className="max-w-md"
+                  className="flex-1"
                 />
 
-                <div className="border-b border-border w-full md:w-auto">
-                  <Tabs
-                    value={machineFilterTab}
-                    onChange={(_e, val) => setMachineFilterTab(val)}
-                    textColor="primary"
-                    indicatorColor="primary"
-                    variant="scrollable"
-                    scrollButtons="auto"
-                    sx={{
-                      '& .MuiTab-root': {
-                        fontSize: '1.1rem',
-                        fontWeight: 'bold',
-                        py: 1.5,
-                        px: 3,
-                        textTransform: 'none',
-                      },
-                    }}
-                  >
-                    <Tab value="ALL" label={<div className="flex items-center gap-2"><span>{t.filterAll}</span><span className="bg-muted text-muted-foreground px-2.5 py-0.5 rounded-full text-xs font-bold">{machinesList.length}</span></div>} />
-                    <Tab value="empty" label={<div className="flex items-center gap-2"><span className="w-3 h-3 rounded-full bg-emerald-500 shrink-0" /><span>{t.filterEmpty}</span><span className="bg-emerald-50 text-emerald-700 px-2.5 py-0.5 rounded-full text-xs font-bold">{machinesList.filter(m => m.state === 'empty').length}</span></div>} />
-                    <Tab value="occupied" label={<div className="flex items-center gap-2"><span className="w-3 h-3 rounded-full bg-blue-500 shrink-0" /><span>{t.filterOccupied}</span><span className="bg-blue-50 text-blue-700 px-2.5 py-0.5 rounded-full text-xs font-bold">{machinesList.filter(m => m.state === 'occupied').length}</span></div>} />
-                    <Tab value="reserved" label={<div className="flex items-center gap-2"><span className="w-3 h-3 rounded-full bg-amber-500 shrink-0" /><span>{t.filterReserved}</span><span className="bg-amber-50 text-amber-700 px-2.5 py-0.5 rounded-full text-xs font-bold">{machinesList.filter(m => m.state === 'reserved').length}</span></div>} />
-                    <Tab value="unavailable" label={<div className="flex items-center gap-2"><span className="w-3 h-3 rounded-full bg-gray-400 shrink-0" /><span>{t.filterUnavailable}</span><span className="bg-gray-100 text-gray-700 px-2.5 py-0.5 rounded-full text-xs font-bold">{machinesList.filter(m => m.state === 'unavailable').length}</span></div>} />
-                  </Tabs>
-                </div>
+                <Button
+                  variant="outlined"
+                  onClick={handleMachineMenuClick}
+                  startIcon={<Filter className="w-5 h-5 text-muted-foreground" />}
+                  className="!py-4 !px-6 !text-lg !font-semibold !rounded-xl border-border bg-card hover:bg-muted text-foreground flex gap-2 items-center normal-case shrink-0"
+                >
+                  {machineFilterTab === 'ALL' && `${t.filterAll} (${machinesList.length})`}
+                  {machineFilterTab === 'empty' && `${t.filterEmpty} (${machinesList.filter(m => m.state === 'empty').length})`}
+                  {machineFilterTab === 'occupied' && `${t.filterOccupied} (${machinesList.filter(m => m.state === 'occupied').length})`}
+                  {machineFilterTab === 'reserved' && `${t.filterReserved} (${machinesList.filter(m => m.state === 'reserved').length})`}
+                  {machineFilterTab === 'unavailable' && `${t.filterUnavailable} (${machinesList.filter(m => m.state === 'unavailable').length})`}
+                </Button>
+
+                <Menu
+                  anchorEl={machineFilterAnchorEl}
+                  open={isMachineMenuOpen}
+                  onClose={handleMachineMenuClose}
+                  slotProps={{
+                    paper: {
+                      className: 'shadow-lg border border-border rounded-xl mt-1 min-w-[200px]'
+                    }
+                  }}
+                >
+                  <MenuItem onClick={() => handleSelectMachineFilter('ALL')} className="!text-lg !py-3 !px-5">
+                    <div className="flex items-center justify-between gap-6 w-full">
+                      <span>{t.filterAll}</span>
+                      <span className="bg-muted text-muted-foreground px-2.5 py-0.5 rounded-full text-xs font-bold">{machinesList.length}</span>
+                    </div>
+                  </MenuItem>
+                  <MenuItem onClick={() => handleSelectMachineFilter('empty')} className="!text-lg !py-3 !px-5">
+                    <div className="flex items-center justify-between gap-6 w-full">
+                      <div className="flex items-center gap-2">
+                        <span className="w-3 h-3 rounded-full bg-emerald-500 shrink-0" />
+                        <span>{t.filterEmpty}</span>
+                      </div>
+                      <span className="bg-emerald-50 text-emerald-700 px-2.5 py-0.5 rounded-full text-xs font-bold">{machinesList.filter(m => m.state === 'empty').length}</span>
+                    </div>
+                  </MenuItem>
+                  <MenuItem onClick={() => handleSelectMachineFilter('occupied')} className="!text-lg !py-3 !px-5">
+                    <div className="flex items-center justify-between gap-6 w-full">
+                      <div className="flex items-center gap-2">
+                        <span className="w-3 h-3 rounded-full bg-blue-500 shrink-0" />
+                        <span>{t.filterOccupied}</span>
+                      </div>
+                      <span className="bg-blue-50 text-blue-700 px-2.5 py-0.5 rounded-full text-xs font-bold">{machinesList.filter(m => m.state === 'occupied').length}</span>
+                    </div>
+                  </MenuItem>
+                  <MenuItem onClick={() => handleSelectMachineFilter('reserved')} className="!text-lg !py-3 !px-5">
+                    <div className="flex items-center justify-between gap-6 w-full">
+                      <div className="flex items-center gap-2">
+                        <span className="w-3 h-3 rounded-full bg-amber-500 shrink-0" />
+                        <span>{t.filterReserved}</span>
+                      </div>
+                      <span className="bg-amber-50 text-amber-700 px-2.5 py-0.5 rounded-full text-xs font-bold">{machinesList.filter(m => m.state === 'reserved').length}</span>
+                    </div>
+                  </MenuItem>
+                  <MenuItem onClick={() => handleSelectMachineFilter('unavailable')} className="!text-lg !py-3 !px-5">
+                    <div className="flex items-center justify-between gap-6 w-full">
+                      <div className="flex items-center gap-2">
+                        <span className="w-3 h-3 rounded-full bg-gray-400 shrink-0" />
+                        <span>{t.filterUnavailable}</span>
+                      </div>
+                      <span className="bg-gray-100 text-gray-700 px-2.5 py-0.5 rounded-full text-xs font-bold">{machinesList.filter(m => m.state === 'unavailable').length}</span>
+                    </div>
+                  </MenuItem>
+                </Menu>
               </div>
 
               {/* Grid List */}
@@ -1241,7 +1259,7 @@ export function AdminLogsPage({ employeeId, userRole, language, onBack }: AdminL
         <DialogTitle className="!text-xl !font-semibold !pb-2">
           {t.editLocation} ({selectedFpc?.id})
         </DialogTitle>
-        <DialogContent className="!pt-4 space-y-6">
+        <DialogContent className="!pt-4 flex flex-col gap-6">
           {/* Target Location Type Picker */}
           <FormControl component="fieldset">
             <RadioGroup
@@ -1265,7 +1283,7 @@ export function AdminLogsPage({ employeeId, userRole, language, onBack }: AdminL
 
           {/* Conditional Inputs */}
           {newLocationType === 'storage' ? (
-            <div className="space-y-2">
+            <div className="flex flex-col gap-4">
               <TextField
                 fullWidth
                 label={t.enterAddress}
@@ -1281,7 +1299,7 @@ export function AdminLogsPage({ employeeId, userRole, language, onBack }: AdminL
               />
             </div>
           ) : (
-            <div className="space-y-6">
+            <div className="flex flex-col gap-6">
               <FormControl fullWidth variant="outlined" disabled={isUpdating}>
                 <InputLabel className="!text-md">{t.selectMachine}</InputLabel>
                 <Select
@@ -1300,9 +1318,9 @@ export function AdminLogsPage({ employeeId, userRole, language, onBack }: AdminL
 
               {/* Target Machine Occupancy Alert & Displaced Options */}
               {targetMachineOccupant && (
-                <div className="space-y-4 p-4 border border-error/30 bg-error-background rounded-xl">
-                  <div className="flex items-start gap-2 text-error-foreground">
-                    <AlertTriangle className="w-5 h-5 shrink-0 mt-0.5" />
+                <div className="flex flex-col gap-5 p-5 border border-error/30 bg-error-background rounded-xl">
+                  <div className="flex items-start gap-3 text-error-foreground">
+                    <AlertTriangle className="w-6 h-6 shrink-0 mt-0.5" />
                     <div>
                       <p className="font-semibold text-base">
                         {t.errorMachineOccupied
@@ -1316,7 +1334,7 @@ export function AdminLogsPage({ employeeId, userRole, language, onBack }: AdminL
                   <RadioGroup
                     value={displacedAction}
                     onChange={(e) => setDisplacedAction(e.target.value as 'swap' | 'evict')}
-                    className="!pl-2"
+                    className="flex flex-col gap-3 !pl-2"
                   >
                     <FormControlLabel
                       value="swap"
@@ -1368,7 +1386,7 @@ export function AdminLogsPage({ employeeId, userRole, language, onBack }: AdminL
             </Alert>
           )}
         </DialogContent>
-        <DialogActions className="!p-6 !pt-2">
+        <DialogActions className="!p-6 !pt-4">
           <Button
             onClick={() => setIsEditOpen(false)}
             variant="outlined"
