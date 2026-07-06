@@ -59,14 +59,14 @@ A role that acts as backend support for production, handling process data update
 _Avoid_: Storage operator, stocker helper
 
 **Operator**:
-A role focused on executing FPC transport workflows (LOAD, UNLOAD, Swap) and interacting with active tasks.
+A role focused on executing FPC transport workflows (LOAD, UNLOAD, Move) and interacting with active tasks.
 _Avoid_: Shift worker, floor user
 
 **AGV Status**:
 The operational state of a transport vehicle (Ok, Engineering Use, PM, Error). Only administrators (Admin role) can modify this status. Tasks assigned to a vehicle in any state other than 'Ok' will be paused (blocked).
 
-**Safety Checklist**:
-A dual-verification safety screen presented before the AGV proceeds. Requires the operator to manually confirm that the tray is open on screen, and registers a physical confirmation button press on the AGV machine.
+**Sequential Safety Verification**:
+A dual-verification safety flow required before task milestones. First, the operator must confirm that the tray is open on screen (during the tray open state). Second, the system automatically waits for a physical button press on the AGV machine (during the cover head state) to proceed.
 
 
 

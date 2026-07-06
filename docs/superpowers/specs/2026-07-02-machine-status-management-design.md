@@ -19,7 +19,7 @@ Machines have one of four states determined dynamically:
 
 ### Workflow Selection Eligibility Matrix
 
-| Machine State | LOAD (คืน FPC)<br>*Src: Machine, Dest: Storage* | UNLOAD (เบิก FPC)<br>*Src: Storage, Dest: Machine* | สลับ FPC (Swap)<br>*Src: Machine A, Dest: Machine B* | เปลี่ยน FPC (UNLOAD & LOAD)<br>*Src: Storage, Dest: Machine* |
+| Machine State | LOAD (คืน FPC)<br>*Src: Machine, Dest: Storage* | UNLOAD (เบิก FPC)<br>*Src: Storage, Dest: Machine* | ย้าย FPC (Move)<br>*Src: Machine A, Dest: Machine B* | เปลี่ยน FPC (UNLOAD & LOAD)<br>*Src: Storage, Dest: Machine* |
 | :--- | :---: | :---: | :---: | :---: |
 | **Empty** (Green) | ❌ (No FPC to return) | ✅ Selectable as Dest | ✅ Selectable as Dest (simple move) | ❌ (No FPC to swap out) |
 | **Occupied** (Blue) | ✅ Selectable as Src | ❌ (Must be Empty first) | ✅ Selectable as Src<br>✅ Selectable as Dest (swap-and-move) | ✅ Selectable as Dest (swaps old FPC) |
@@ -100,7 +100,7 @@ Machines have one of four states determined dynamically:
 -   **Workflow pages logic**:
     -   **LOAD (ReturnFPCWorkflow.tsx)**: Allow selection only if state is `'occupied'`.
     -   **UNLOAD (RequestFPCWorkflow.tsx)**: Allow selection only if state is `'empty'`.
-    -   **สลับ FPC (MoveFPCWorkflow.tsx)**:
+    -   **ย้าย FPC (MoveFPCWorkflow.tsx)**:
         -   Source selector: Allow only if state is `'occupied'`.
         -   Destination selector: Allow if state is `'empty'` or `'occupied'`.
     -   **เปลี่ยน FPC (UnloadLoadWorkflow.tsx)**: Allow selection only if state is `'occupied'`.

@@ -76,7 +76,7 @@ These map to the 16 backend task states:
 ---
 
 ## 🏗️ Layout Patterns
-* **Mode Selection Screen**: Four large, equal-weight tiles (LOAD, UNLOAD, สลับ FPC, เปลี่ยน FPC) displayed centrally.
+* **Mode Selection Screen**: Four large, equal-weight tiles (LOAD, UNLOAD, ย้าย FPC, เปลี่ยน FPC) displayed centrally.
 * **Task Queue**: Two-pane list+detail layout (List on the left pane, Selected Task details on the right pane).
 * **Header / Navigation Bar**: Includes the company logo, a link button to FPC Search, and a role-aware employee profile dropdown.
 * **Header Constraints**: Operators (Employee ID `operator` / role Operator) must NOT have a "Main Menu" button in the header. They rely solely on the sub-page's internal back button to return.
@@ -90,18 +90,17 @@ These map to the 16 backend task states:
 ## 🛡️ Critical Domain & Interaction Rules
 
 ### 1. Confirmation Instruction Pattern (Safety-Critical)
-When a task status is `waiting_cover_head_install` or `waiting_cover_head_remove`, the right detail pane must display a high-prominence amber instruction card. 
-* **CRITICAL**: The UI card must NOT contain any clickable "Confirm" or "Complete" buttons to bypass physical confirmations.
-* **Safety Checklist**: The detail pane must display a safety checklist containing:
-  1. `Tray is opened` (checked manually on screen by the operator).
-  2. `AGV physical button confirmed` (checked automatically by the system when the physical confirmation is registered).
-* **Confirm Button**: A manual "Confirm" button on screen will be displayed below the checklist. It remains disabled until both checklist items are checked. Clicking this button executes the final status progression.
+The operator UI enforces safety checks using a **Sequential Safety Verification Flow**:
+* **Tray Opened Screen Confirmation**: When a task is in `waiting_tray_open` status, the detail pane displays a high-prominence instructions card and a manual "Confirm Tray Opened" button. The operator must click this button to confirm the workstation tray is open before the AGV proceeds.
+* **AGV Physical Button Confirmation**: When a task is in `waiting_cover_head_install` or `waiting_cover_head_remove` status, the detail pane displays a high-prominence amber instruction card showing instructions to physically install or remove the cover head and press the physical button on the AGV.
+  * **CRITICAL**: The UI card must NOT contain any clickable screen-based "Confirm" or "Complete" buttons to bypass physical confirmations.
+  * The screen displays a loader showing that it is waiting for physical button confirmation. Progression is automatic once the physical button is pressed (which registers automatically via the AGV interface).
 
 ### 2. Machine Selection Availability
 Machines with `available: false` must be displayed in `zinc-300`, must be unselectable/unclickable, and must never be included in the form payload submitted to the backend.
 
-### 3. Swap Mode Constraints
-The same machine cannot be selected as both the source and the destination in Swap (สลับ FPC) mode. Once a source machine is selected, that machine must be visually disabled and locked out in the destination dropdown/selector.
+### 3. Move Mode Constraints
+The same machine cannot be selected as both the source and the destination in Move (ย้าย FPC) mode. Once a source machine is selected, that machine must be visually disabled and locked out in the destination dropdown/selector.
 
 ### 4. Status Translation & Color Codes
 All 16 statuses must correspond to specific icons, colors, and Thai translations as defined in the translations dictionary. The frontend must never independently declare a task "Completed" or "Failed" — it must read this status directly from the backend.
@@ -131,5 +130,5 @@ Primary language: **Thai (TH)**, Secondary language: **English (EN)**.
 * Standardized operation names:
   * `"LOAD (คืน FPC)"`
   * `"UNLOAD (เบิก FPC)"`
-  * `"สลับ FPC"`
+  * `"ย้าย FPC"`
   * `"เปลี่ยน FPC (UNLOAD & LOAD)"`

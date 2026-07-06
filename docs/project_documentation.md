@@ -1,6 +1,6 @@
 # FPC Management System — Project Documentation
 
-Welcome to the **FPC Management System (NXP WT)** documentation. This application is a modern, responsive Operator User Interface designed for requesting, returning, swapping, and changing (UNLOAD & LOAD) **Front Opening Pod Carriers (FPCs)** between **Smart Storage** and factory workstations/machines via **Automated Guided Vehicles (AGVs)**.
+Welcome to the **FPC Management System (NXP WT)** documentation. This application is a modern, responsive Operator User Interface designed for requesting, returning, moving, and changing (UNLOAD & LOAD) **Front Opening Pod Carriers (FPCs)** between **Smart Storage** and factory workstations/machines via **Automated Guided Vehicles (AGVs)**.
 
 ---
 
@@ -101,7 +101,7 @@ Operators can trigger four operations from the **Mode Selection** screen:
     2.  Select the **Destination Machine** using the machine selector.
     3.  Confirm and submit the job to dispatch the AGV.
 
-#### C. สลับ FPC — Swap FPC Workflow
+#### C. ย้าย FPC — Move FPC Workflow
 *   **Goal**: Transfer an FPC directly from a source machine to a destination machine without going through Smart Storage. If the destination machine already has an FPC installed, the system supports a swap-and-move workflow where the AGV retrieves the old FPC first, returns it to Smart Storage, and installs the new FPC onto the destination machine.
 *   **Flow**:
     1.  Select the **Source Machine**.

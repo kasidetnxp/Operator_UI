@@ -5,12 +5,12 @@
 product
 
 ## Users
-* **Operators (Shift Workers)**: Work on the cleanroom factory floor. They use touch screen tablets or terminal monitors to load, unload, swap, and change (UNLOAD & LOAD) FPCs. They often wear gloves, work under bright fluorescent lights, and require quick, unambiguous status updates with large, easy-to-tap interactive elements.
+* **Operators (Shift Workers)**: Work on the cleanroom factory floor. They use touch screen tablets or terminal monitors to load, unload, move, and change (UNLOAD & LOAD) FPCs. They often wear gloves, work under bright fluorescent lights, and require quick, unambiguous status updates with large, easy-to-tap interactive elements.
 * **Store Personnel (Support)**: Provide backend support for production, handling process data updates, and resolving FPC mismatches and manual location overrides.
 * **Admins (Managers)**: Manage user roles, passwords, view comprehensive audit logs, and approve exception operations.
 
 ## Product Purpose
-The NXP WT FPC Management System is an operator user interface designed for requesting, returning, swapping, and changing (UNLOAD & LOAD) Front Opening Pod Carriers (FPCs) between Smart Storage and factory workstations/machines via Automated Guided Vehicles (AGVs). It serves to coordinate automated transport workflows, trace carrier locations, minimize manual errors, and provide real-time task status telemetry to ensure manufacturing safety and efficiency.
+The NXP WT FPC Management System is an operator user interface designed for requesting, returning, moving, and changing (UNLOAD & LOAD) Front Opening Pod Carriers (FPCs) between Smart Storage and factory workstations/machines via Automated Guided Vehicles (AGVs). It serves to coordinate automated transport workflows, trace carrier locations, minimize manual errors, and provide real-time task status telemetry to ensure manufacturing safety and efficiency.
 
 ## Brand Personality
 * **Keywords**: Precise, Industrial, High-Reliability, Cleanroom, Safety-Critical.
@@ -25,7 +25,7 @@ The NXP WT FPC Management System is an operator user interface designed for requ
 * **Inspirational imagery**: Stock cleanroom photos or generic corporate graphics.
 
 ## Design Principles
-1. **Safety First through Action Control**: The interface must physically and visually separate screen commands from real-world physical confirmations. For cover head operations, operators must verify a screen-based safety checklist (e.g., verifying that the tray is open) before the real-world physical confirmation (pressing the button on the AGV) can finalize the workflow; no screen-based bypass buttons for physical steps are allowed.
+1. **Safety First through Action Control**: The interface must physically and visually separate screen commands from real-world physical confirmations. In the safety verification flow, the operator must first manually confirm on-screen that the workstation tray is open, after which the system proceeds and automatically waits for the physical confirmation (pressing the button on the AGV) to finalize the workflow; no screen-based bypass buttons for physical steps are allowed.
 2. **Gloved Touch-First Layouts**: Every clickable area must accommodate cleanroom operators wearing gloves, ensuring high spacing and touch target clearance.
 3. **No Decorative Ambiguity**: Every visual state, status color, or transition must serve a direct information-delivery purpose. Statuses are never conveyed by color alone.
 4. **Restrained Semantic Accents**: Use clean, neutral surfaces (white/zinc) punctuated only by strict semantic indicators for active, warning, action, error, and success states.

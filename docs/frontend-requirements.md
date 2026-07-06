@@ -15,7 +15,7 @@ The frontend shall validate that both the employee ID and password fields are no
 
 The frontend system shall use Thai as the primary display language for the operator interface.
 
-Common technical terms that are already used by operators, such as LOAD (คืน FPC), UNLOAD (เบิก FPC), สลับ FPC, AGV, Smart Storage, Confirm, and Complete, may remain in English, Thai, or existing shop-floor terms where appropriate to maintain familiarity and reduce confusion for production users.
+Common technical terms that are already used by operators, such as LOAD (คืน FPC), UNLOAD (เบิก FPC), ย้าย FPC, AGV, Smart Storage, Confirm, and Complete, may remain in English, Thai, or existing shop-floor terms where appropriate to maintain familiarity and reduce confusion for production users.
 
 ### Operation Modes
 
@@ -23,7 +23,7 @@ The system shall support four operation modes shown on the user interface as:
 
 - LOAD (คืน FPC)
 - UNLOAD (เบิก FPC)
-- สลับ FPC
+- ย้าย FPC
 - เปลี่ยน FPC (UNLOAD & LOAD)
 
 In the current phase, the list of machines shall be a predefined configuration used by the frontend.
@@ -66,9 +66,9 @@ The confirmation requires sequential steps:
 3. Once the FPC is placed and the status changes to `waiting_cover_head_remove`, the operator must physically remove the cover head and confirm by pressing the physical button on the AGV (which registers as "AGV physical button confirmed" automatically after a simulated 5-second delay). The screen UI will display instructions and indicate that it is waiting for physical confirmation; no screen-based bypass confirm button will be available.
 
 
-### สลับ FPC Mode
+### ย้าย FPC Mode
 
-In สลับ FPC mode, the operator shall select both the source machine and the destination machine so that the AGV can pick up an FPC from one machine and deliver it to another machine.
+In ย้าย FPC mode, the operator shall select both the source machine and the destination machine so that the AGV can pick up an FPC from one machine and deliver it to another machine.
 
 The frontend shall prevent the operator from selecting the same machine as both source and destination.
 
@@ -281,10 +281,10 @@ The system supports four modes shown on the user interface as:
 
 - LOAD (คืน FPC)
 - UNLOAD (เบิก FPC)
-- สลับ FPC
+- ย้าย FPC
 - เปลี่ยน FPC (UNLOAD & LOAD)
 
-In สลับ FPC mode, the AGV transfers an FPC from one machine to another machine.
+In ย้าย FPC mode, the AGV transfers an FPC from one machine to another machine.
 
 For some workflow steps, operator confirmation is required before the backend proceeds, such as confirming cover head installation or removal via a physical button on the AGV to ensure safe operation.
 
