@@ -1,0 +1,249 @@
+<mxfile host="Electron">
+  <diagram name="Workflow" id="wNMPjH4np76F_C2bS9hf">
+    <mxGraphModel dx="1294" dy="647" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1300" pageHeight="1300" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="legend_bg" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=none;dashed=1;" value="" vertex="1">
+          <mxGeometry height="210" width="220" x="20" y="20" as="geometry" />
+        </mxCell>
+        <mxCell id="legend_title" parent="1" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" value="&lt;b&gt;สัญลักษณ์ (Legend)&lt;/b&gt;" vertex="1">
+          <mxGeometry height="30" width="220" x="20" y="30" as="geometry" />
+        </mxCell>
+        <mxCell id="leg_sys" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" value="System (MMS/EWFM)" vertex="1">
+          <mxGeometry height="30" width="180" x="40" y="60" as="geometry" />
+        </mxCell>
+        <mxCell id="leg_ui" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;" value="Web UI (หน้าจอ)" vertex="1">
+          <mxGeometry height="30" width="180" x="40" y="100" as="geometry" />
+        </mxCell>
+        <mxCell id="leg_op" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" value="Operator (พนักงาน)" vertex="1">
+          <mxGeometry height="30" width="180" x="40" y="140" as="geometry" />
+        </mxCell>
+        <mxCell id="leg_agv" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;" value="AGV (หุ่นยนต์)" vertex="1">
+          <mxGeometry height="30" width="180" x="40" y="180" as="geometry" />
+        </mxCell>
+        <mxCell id="login" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;" value="&lt;b&gt;[Operator / Web UI]&lt;/b&gt;&lt;br/&gt;Login เข้า Web UI&lt;br/&gt;(หน้าจอคอมพิวเตอร์ / แท็บเล็ต)" vertex="1">
+          <mxGeometry height="60" width="160" x="550" y="40" as="geometry" />
+        </mxCell>
+        <mxCell id="mode" parent="1" style="rhombus;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;" value="&lt;b&gt;เลือกโหมดการทำงาน&lt;/b&gt;" vertex="1">
+          <mxGeometry height="80" width="160" x="550" y="140" as="geometry" />
+        </mxCell>
+        <mxCell id="e_start" edge="1" parent="1" source="login" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;" target="mode">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="f1_title" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;fontStyle=1;fontSize=14;" value="1. เบิก FPC (UNLOAD)" vertex="1">
+          <mxGeometry height="40" width="200" x="80" y="260" as="geometry" />
+        </mxCell>
+        <mxCell id="f1_1" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" value="&lt;b&gt;[System]&lt;/b&gt;&lt;br/&gt;เช็ค/จอง FPC (MMS / EWFM)" vertex="1">
+          <mxGeometry height="60" width="160" x="100" y="350" as="geometry" />
+        </mxCell>
+        <mxCell id="f1_2" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;" value="&lt;b&gt;[Web UI]&lt;/b&gt;&lt;br/&gt;เลือก FPC &amp; เครื่องปลายทาง" vertex="1">
+          <mxGeometry height="60" width="160" x="100" y="450" as="geometry" />
+        </mxCell>
+        <mxCell id="f1_3" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;" value="&lt;b&gt;[AGV]&lt;/b&gt;&lt;br/&gt;รับ FPC จาก Smart Storage&lt;br/&gt;เคลื่อนไปเครื่องปลายทาง" vertex="1">
+          <mxGeometry height="60" width="160" x="100" y="550" as="geometry" />
+        </mxCell>
+        <mxCell id="f1_4" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;" value="&lt;b&gt;[Web UI]&lt;/b&gt;&lt;br/&gt;สถานะ: waiting_tray_open&lt;br/&gt;กดยืนยันเปิด Tray" vertex="1">
+          <mxGeometry height="60" width="160" x="100" y="650" as="geometry" />
+        </mxCell>
+        <mxCell id="f1_5" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" value="&lt;b&gt;[Operator]&lt;/b&gt;&lt;br/&gt;สถานะ: waiting_cover_head_remove&lt;br/&gt;ถอดฝาครอบ &amp; กดยืนยันที่ AGV" vertex="1">
+          <mxGeometry height="60" width="160" x="100" y="750" as="geometry" />
+        </mxCell>
+        <mxCell id="f1_6" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;" value="&lt;b&gt;[AGV]&lt;/b&gt;&lt;br/&gt;วาง FPC สำเร็จ (Completed)" vertex="1">
+          <mxGeometry height="60" width="160" x="100" y="850" as="geometry" />
+        </mxCell>
+        <mxCell id="e_f1_mode" edge="1" parent="1" source="mode" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;" target="f1_title">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="630" y="240" />
+              <mxPoint x="180" y="240" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e_f1_title" edge="1" parent="1" source="f1_title" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;" target="f1_1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_f1_1" edge="1" parent="1" source="f1_1" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;" target="f1_2">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_f1_2" edge="1" parent="1" source="f1_2" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;" target="f1_3">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_f1_3" edge="1" parent="1" source="f1_3" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;" target="f1_4">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_f1_4" edge="1" parent="1" source="f1_4" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;" target="f1_5">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_f1_5" edge="1" parent="1" source="f1_5" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;" target="f1_6">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="f2_title" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;fontStyle=1;fontSize=14;" value="2. เปลี่ยน FPC (UNLOAD &amp; LOAD)" vertex="1">
+          <mxGeometry height="40" width="200" x="380" y="260" as="geometry" />
+        </mxCell>
+        <mxCell id="f2_1" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;" value="&lt;b&gt;[Web UI]&lt;/b&gt;&lt;br/&gt;เลือก FPC ใบใหม่ &amp; ปลายทาง" vertex="1">
+          <mxGeometry height="60" width="160" x="400" y="350" as="geometry" />
+        </mxCell>
+        <mxCell id="f2_2" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;" value="&lt;b&gt;[AGV]&lt;/b&gt;&lt;br/&gt;หยิบ FPC ใบใหม่จาก Storage" vertex="1">
+          <mxGeometry height="60" width="160" x="400" y="450" as="geometry" />
+        </mxCell>
+        <mxCell id="f2_3" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;" value="&lt;b&gt;[Web UI]&lt;/b&gt;&lt;br/&gt;สถานะ: waiting_tray_open&lt;br/&gt;กดยืนยันเปิด Tray" vertex="1">
+          <mxGeometry height="60" width="160" x="400" y="550" as="geometry" />
+        </mxCell>
+        <mxCell id="f2_4" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;" value="&lt;b&gt;[AGV]&lt;/b&gt;&lt;br/&gt;หยิบ FPC ใบเก่าออก" vertex="1">
+          <mxGeometry height="60" width="160" x="400" y="650" as="geometry" />
+        </mxCell>
+        <mxCell id="f2_5" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" value="&lt;b&gt;[Operator]&lt;/b&gt;&lt;br/&gt;สถานะ: waiting_cover_head_install&lt;br/&gt;ติดตั้งฝาครอบ &amp; กดยืนยัน" vertex="1">
+          <mxGeometry height="60" width="160" x="400" y="750" as="geometry" />
+        </mxCell>
+        <mxCell id="f2_5b" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;" value="&lt;b&gt;[AGV]&lt;/b&gt;&lt;br/&gt;ติดตั้งใบใหม่" vertex="1">
+          <mxGeometry height="60" width="160" x="400" y="850" as="geometry" />
+        </mxCell>
+        <mxCell id="f2_6" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" value="&lt;b&gt;[Operator]&lt;/b&gt;&lt;br/&gt;สถานะ: waiting_cover_head_remove&lt;br/&gt;ถอดฝาครอบ &amp; กดยืนยัน" vertex="1">
+          <mxGeometry height="60" width="160" x="400" y="950" as="geometry" />
+        </mxCell>
+        <mxCell id="f2_7" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;" value="&lt;b&gt;[AGV]&lt;/b&gt;&lt;br/&gt;เก็บใบเก่าเข้าคลัง" vertex="1">
+          <mxGeometry height="60" width="160" x="400" y="1050" as="geometry" />
+        </mxCell>
+        <mxCell id="f2_8" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" value="&lt;b&gt;[System]&lt;/b&gt;&lt;br/&gt;ล็อก FPC ก่อนคืน (MMS/OOI)" vertex="1">
+          <mxGeometry height="60" width="160" x="400" y="1150" as="geometry" />
+        </mxCell>
+        <mxCell id="e_f2_mode" edge="1" parent="1" source="mode" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;" target="f2_title">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="630" y="240" />
+              <mxPoint x="480" y="240" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e_f2_title" edge="1" parent="1" source="f2_title" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;" target="f2_1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_f2_1" edge="1" parent="1" source="f2_1" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;" target="f2_2">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_f2_2" edge="1" parent="1" source="f2_2" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;" target="f2_3">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_f2_3" edge="1" parent="1" source="f2_3" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;" target="f2_4">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_f2_4" edge="1" parent="1" source="f2_4" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;" target="f2_5">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_f2_5" edge="1" parent="1" source="f2_5" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;" target="f2_5b">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_f2_5b" edge="1" parent="1" source="f2_5b" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;" target="f2_6">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_f2_6" edge="1" parent="1" source="f2_6" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;" target="f2_7">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_f2_7" edge="1" parent="1" source="f2_7" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;" target="f2_8">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="f3_title" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;fontStyle=1;fontSize=14;" value="3. ถอด/คืน FPC (LOAD)" vertex="1">
+          <mxGeometry height="40" width="200" x="680" y="260" as="geometry" />
+        </mxCell>
+        <mxCell id="f3_1" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;" value="&lt;b&gt;[Web UI]&lt;/b&gt;&lt;br/&gt;เลือกเครื่องต้นทาง" vertex="1">
+          <mxGeometry height="60" width="160" x="700" y="350" as="geometry" />
+        </mxCell>
+        <mxCell id="f3_2" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;" value="&lt;b&gt;[Web UI]&lt;/b&gt;&lt;br/&gt;สถานะ: waiting_tray_open&lt;br/&gt;กดยืนยันเปิด Tray" vertex="1">
+          <mxGeometry height="60" width="160" x="700" y="450" as="geometry" />
+        </mxCell>
+        <mxCell id="f3_3" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;" value="&lt;b&gt;[AGV]&lt;/b&gt;&lt;br/&gt;หยิบ FPC ใบเก่าขึ้นรถ" vertex="1">
+          <mxGeometry height="60" width="160" x="700" y="550" as="geometry" />
+        </mxCell>
+        <mxCell id="f3_4" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" value="&lt;b&gt;[Operator]&lt;/b&gt;&lt;br/&gt;สถานะ: waiting_cover_head_install&lt;br/&gt;ติดตั้งฝาครอบ &amp; กดยืนยัน" vertex="1">
+          <mxGeometry height="60" width="160" x="700" y="650" as="geometry" />
+        </mxCell>
+        <mxCell id="f3_5" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;" value="&lt;b&gt;[AGV]&lt;/b&gt;&lt;br/&gt;เก็บเข้า Storage (Completed)" vertex="1">
+          <mxGeometry height="60" width="160" x="700" y="750" as="geometry" />
+        </mxCell>
+        <mxCell id="f3_6" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" value="&lt;b&gt;[System]&lt;/b&gt;&lt;br/&gt;ล็อก FPC ก่อนคืน (MMS/OOI)" vertex="1">
+          <mxGeometry height="60" width="160" x="700" y="850" as="geometry" />
+        </mxCell>
+        <mxCell id="e_f3_mode" edge="1" parent="1" source="mode" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;" target="f3_title">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="630" y="240" />
+              <mxPoint x="780" y="240" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e_f3_title" edge="1" parent="1" source="f3_title" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;" target="f3_1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_f3_1" edge="1" parent="1" source="f3_1" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;" target="f3_2">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_f3_2" edge="1" parent="1" source="f3_2" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;" target="f3_3">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_f3_3" edge="1" parent="1" source="f3_3" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;" target="f3_4">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_f3_4" edge="1" parent="1" source="f3_4" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;" target="f3_5">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_f3_5" edge="1" parent="1" source="f3_5" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;" target="f3_6">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="f4_title" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;fontStyle=1;fontSize=14;" value="Note. ย้าย FPC" vertex="1">
+          <mxGeometry height="40" width="200" x="980" y="260" as="geometry" />
+        </mxCell>
+        <mxCell id="f4_1" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;" value="&lt;b&gt;[Web UI]&lt;/b&gt;&lt;br/&gt;เลือกต้นทาง &amp; ปลายทาง" vertex="1">
+          <mxGeometry height="60" width="160" x="1000" y="350" as="geometry" />
+        </mxCell>
+        <mxCell id="f4_2" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;" value="&lt;b&gt;[Web UI]&lt;/b&gt;&lt;br/&gt;สถานะ: waiting_tray_open&lt;br/&gt;กดยืนยันเปิด Tray (ต้นทาง)" vertex="1">
+          <mxGeometry height="60" width="160" x="1000" y="450" as="geometry" />
+        </mxCell>
+        <mxCell id="f4_3" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;" value="&lt;b&gt;[AGV]&lt;/b&gt;&lt;br/&gt;หยิบ FPC" vertex="1">
+          <mxGeometry height="60" width="160" x="1000" y="550" as="geometry" />
+        </mxCell>
+        <mxCell id="f4_4" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" value="&lt;b&gt;[Operator]&lt;/b&gt;&lt;br/&gt;สถานะ: waiting_cover_head_install&lt;br/&gt;ติดตั้งฝาครอบ &amp; กดยืนยัน" vertex="1">
+          <mxGeometry height="60" width="160" x="1000" y="650" as="geometry" />
+        </mxCell>
+        <mxCell id="f4_5" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;" value="&lt;b&gt;[Web UI]&lt;/b&gt;&lt;br/&gt;สถานะ: waiting_tray_open&lt;br/&gt;กดยืนยันเปิด Tray (ปลายทาง)" vertex="1">
+          <mxGeometry height="60" width="160" x="1000" y="750" as="geometry" />
+        </mxCell>
+        <mxCell id="f4_6" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" value="&lt;b&gt;[Operator]&lt;/b&gt;&lt;br/&gt;สถานะ: waiting_cover_head_remove&lt;br/&gt;ถอดฝาครอบ &amp; กดยืนยัน" vertex="1">
+          <mxGeometry height="60" width="160" x="1000" y="850" as="geometry" />
+        </mxCell>
+        <mxCell id="f4_7" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;" value="&lt;b&gt;[AGV]&lt;/b&gt;&lt;br/&gt;วาง FPC สำเร็จ (Completed)" vertex="1">
+          <mxGeometry height="60" width="160" x="1000" y="950" as="geometry" />
+        </mxCell>
+        <mxCell id="e_f4_mode" edge="1" parent="1" source="mode" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;" target="f4_title">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="630" y="240" />
+              <mxPoint x="1080" y="240" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e_f4_title" edge="1" parent="1" source="f4_title" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;" target="f4_1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_f4_1" edge="1" parent="1" source="f4_1" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;" target="f4_2">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_f4_2" edge="1" parent="1" source="f4_2" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;" target="f4_3">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_f4_3" edge="1" parent="1" source="f4_3" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;" target="f4_4">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_f4_4" edge="1" parent="1" source="f4_4" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;" target="f4_5">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_f4_5" edge="1" parent="1" source="f4_5" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;" target="f4_6">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_f4_6" edge="1" parent="1" source="f4_6" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;" target="f4_7">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

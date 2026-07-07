@@ -28,3 +28,10 @@ dist-ssr
 agent
 skills-lock.json
 
+# Agent & config directories
+.codegraph
+.impeccable
+.superpowers
+.superpower
+.impeccacle
+
