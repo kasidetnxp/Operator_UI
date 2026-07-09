@@ -158,28 +158,28 @@ export function MachineSelector({
           <MenuItem onClick={() => handleSelectFilter('empty')} className="!text-lg !py-3 !px-5">
             <div className="flex items-center justify-between gap-6 w-full">
               <div className="flex items-center gap-2">
-                <span className="w-3 h-3 rounded-full bg-emerald-500 shrink-0" />
+                <span className="w-3 h-3 rounded-full bg-gray-400 shrink-0" />
                 <span>{t.filterEmpty}</span>
               </div>
-              <span className="bg-emerald-50 text-emerald-700 px-2.5 py-0.5 rounded-full text-xs font-bold">{counts.empty}</span>
+              <span className="bg-gray-100 text-gray-700 px-2.5 py-0.5 rounded-full text-xs font-bold">{counts.empty}</span>
             </div>
           </MenuItem>
           <MenuItem onClick={() => handleSelectFilter('occupied')} className="!text-lg !py-3 !px-5">
             <div className="flex items-center justify-between gap-6 w-full">
               <div className="flex items-center gap-2">
-                <span className="w-3 h-3 rounded-full bg-blue-500 shrink-0" />
+                <span className="w-3 h-3 rounded-full bg-emerald-500 shrink-0" />
                 <span>{t.filterOccupied}</span>
               </div>
-              <span className="bg-blue-50 text-blue-700 px-2.5 py-0.5 rounded-full text-xs font-bold">{counts.occupied}</span>
+              <span className="bg-emerald-50 text-emerald-700 px-2.5 py-0.5 rounded-full text-xs font-bold">{counts.occupied}</span>
             </div>
           </MenuItem>
           <MenuItem onClick={() => handleSelectFilter('reserved')} className="!text-lg !py-3 !px-5">
             <div className="flex items-center justify-between gap-6 w-full">
               <div className="flex items-center gap-2">
-                <span className="w-3 h-3 rounded-full bg-amber-500 shrink-0" />
+                <span className="w-3 h-3 rounded-full bg-orange-500 shrink-0" />
                 <span>{t.filterReserved}</span>
               </div>
-              <span className="bg-amber-50 text-amber-700 px-2.5 py-0.5 rounded-full text-xs font-bold">{counts.reserved}</span>
+              <span className="bg-orange-50 text-orange-700 px-2.5 py-0.5 rounded-full text-xs font-bold">{counts.reserved}</span>
             </div>
           </MenuItem>
           <MenuItem onClick={() => handleSelectFilter('unavailable')} className="!text-lg !py-3 !px-5">
@@ -208,32 +208,38 @@ export function MachineSelector({
 
             switch (machine.state) {
               case 'empty':
-                badgeClass = 'bg-emerald-50 text-emerald-700 border-emerald-200';
-                dotClass = 'bg-emerald-500';
+                badgeClass = 'bg-gray-100 text-gray-700 border-gray-200';
+                dotClass = 'bg-gray-400';
                 labelText = t.machineStateEmpty;
                 break;
               case 'occupied':
-                badgeClass = 'bg-blue-50 text-blue-700 border-blue-200';
-                dotClass = 'bg-blue-500';
+                badgeClass = 'bg-emerald-50 text-emerald-700 border-emerald-200';
+                dotClass = 'bg-emerald-500';
                 labelText = t.machineStateOccupied;
                 break;
               case 'reserved':
-                badgeClass = 'bg-amber-50 text-amber-700 border-amber-200';
-                dotClass = 'bg-amber-500';
+                badgeClass = 'bg-orange-50 text-orange-700 border-orange-200';
+                dotClass = 'bg-orange-500';
                 labelText = t.machineStateReserved;
                 break;
               case 'unavailable':
               default:
-                badgeClass = 'bg-gray-100 text-gray-600 border-gray-200';
-                dotClass = 'bg-gray-400';
                 if (machine.disableReason === 'PM / Maintenance') {
-                  labelText = language === 'th' ? 'PM / ซ่อมบำรุง' : 'PM / Maintenance';
+                  badgeClass = 'bg-yellow-50 text-yellow-700 border-yellow-200';
+                  dotClass = 'bg-yellow-500';
+                  labelText = language === 'th' ? 'PM' : 'PM';
                 } else if (machine.disableReason === 'Breakdown / Error') {
-                  labelText = language === 'th' ? 'เครื่องเสีย (Breakdown)' : 'Breakdown / Error';
+                  badgeClass = 'bg-red-50 text-red-700 border-red-200';
+                  dotClass = 'bg-red-500';
+                  labelText = language === 'th' ? 'Breakdown / Down' : 'Breakdown / Down';
                 } else if (machine.disableReason === 'Engineering Use') {
-                  labelText = language === 'th' ? 'งานวิศวกรรม (Engineering)' : 'Engineering Use';
+                  badgeClass = 'bg-blue-50 text-blue-700 border-blue-200';
+                  dotClass = 'bg-blue-500';
+                  labelText = language === 'th' ? 'Engineering Use' : 'Engineering Use';
                 } else {
-                  labelText = t.machineStateUnavailable;
+                  badgeClass = 'bg-gray-800 text-gray-100 border-gray-700';
+                  dotClass = 'bg-gray-900';
+                  labelText = language === 'th' ? 'อื่น ๆ' : 'Other';
                 }
                 break;
             }
