@@ -16,6 +16,7 @@ export interface Machine {
 
 export interface MachineWithState extends Machine {
   state: MachineState;
+  fpcId?: string; // ponytail: store active FPC card ID for occupied machine
 }
 
 export interface FPCItem {
@@ -1041,10 +1042,14 @@ export async function updateMachineAvailability(
 export async function getMachinesWithState(): Promise<MachineWithState[]> {
   const fpcItems = await getAllFPCs();
   const activeTasks = await getAllTasks();
-  return mockMachines.map(m => ({
-    ...m,
-    state: getMachineState(m, fpcItems, activeTasks)
-  }));
+  return mockMachines.map(m => {
+    const fpc = fpcItems.find(f => f.location === m.id);
+    return {
+      ...m,
+      state: getMachineState(m, fpcItems, activeTasks),
+      fpcId: fpc?.id // ponytail: resolve matching FPC ID
+    };
+  });
 }
 
 /** Update task status in-memory */
