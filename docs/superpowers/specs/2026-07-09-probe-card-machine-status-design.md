@@ -31,8 +31,8 @@ This document specifies the design for displaying the Probe Card (FPC) name in t
 ### Translations
 #### [MODIFY] [translations.ts](file:///c:/Users/kasid/OneDrive/Desktop/For_Gemini/Operator_UI/src/shared/utils/translations.ts)
 * Add `machineProbeLabel` key:
-  * English (`en`): `'Probe'`
-  * Thai (`th`): `'โพรบ'`
+  * English (`en`): `'FPC'`
+  * Thai (`th`): `'FPC'`
 
 ### User Interface Components
 #### [MODIFY] [MachineSelector.tsx](file:///c:/Users/kasid/OneDrive/Desktop/For_Gemini/Operator_UI/src/features/workflow/components/MachineSelector.tsx)
