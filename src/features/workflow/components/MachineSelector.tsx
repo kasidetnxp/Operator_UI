@@ -276,6 +276,12 @@ export function MachineSelector({
                     <span className={`w-3 h-3 rounded-full shrink-0 ${dotClass}`} />
                     <span>{labelText}</span>
                   </div>
+                  {machine.state === 'occupied' && machine.fpcId && (
+                    <div className="text-base text-muted-foreground font-mono mt-1.5">
+                      {/* ponytail: render probe card ID for occupied machine */}
+                      {t.machineProbeLabel || 'Probe'}: {machine.fpcId}
+                    </div>
+                  )}
                   {selectedMachine === machine.id && (
                     <CheckCircle className="w-7 h-7 text-info absolute top-3 right-3" />
                   )}
