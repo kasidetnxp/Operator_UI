@@ -233,7 +233,7 @@ export const translations = {
     machineTab: 'Machines',
     machineStateEmpty: 'No FPC',
     machineStateOccupied: 'Has FPC',
-    machineProbeLabel: 'Probe', // ponytail: English label for active probe card
+    machineProbeLabel: 'FPC', // ponytail: English label for active FPC card
     machineStateReserved: 'In Queue',
     machineStateUnavailable: 'Unavailable',
     confirmToggleMachineTitle: 'Set Machine to Unavailable?',
@@ -486,7 +486,7 @@ export const translations = {
     machineTab: 'เครื่องจักร',
     machineStateEmpty: 'ไม่มี FPC',
     machineStateOccupied: 'มี FPC',
-    machineProbeLabel: 'โพรบ', // ponytail: Thai label for active probe card
+    machineProbeLabel: 'FPC', // ponytail: Thai label for active FPC card
     machineStateReserved: 'In Queue',
     machineStateUnavailable: 'ไม่พร้อมใช้งาน',
     confirmToggleMachineTitle: 'ปิดใช้งานเครื่องจักร?',
