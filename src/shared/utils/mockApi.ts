@@ -238,61 +238,67 @@ export async function updateUser(
 const DEFAULT_MACHINES: Machine[] = [
   { id: 'AVT_001', name: 'AVT_001', available: true },
   { id: 'AVT_002', name: 'AVT_002', available: true },
-  { id: 'AVT_003', name: 'AVT_003', available: false },
+  { id: 'AVT_003', name: 'AVT_003', available: false, disableReason: 'PM / Maintenance', disableComment: 'Scheduled monthly PM' },
   { id: 'AVT_004', name: 'AVT_004', available: true },
   { id: 'AVT_005', name: 'AVT_005', available: true },
-  { id: 'AVT_006', name: 'AVT_006', available: false },
+  { id: 'AVT_006', name: 'AVT_006', available: false, disableReason: 'Breakdown / Error', disableComment: 'Hardware signal failure' },
   { id: 'AVT_007', name: 'AVT_007', available: true },
   { id: 'AVT_008', name: 'AVT_008', available: true },
   { id: 'AVT_009', name: 'AVT_009', available: true },
-  { id: 'AVT_010', name: 'AVT_010', available: false },
+  { id: 'AVT_010', name: 'AVT_010', available: false, disableReason: 'Engineering Use', disableComment: 'Product test optimization' },
   { id: 'AVT_011', name: 'AVT_011', available: true },
   { id: 'AVT_012', name: 'AVT_012', available: true },
   { id: 'AVT_013', name: 'AVT_013', available: true },
-  { id: 'AVT_014', name: 'AVT_014', available: false },
+  { id: 'AVT_014', name: 'AVT_014', available: false, disableReason: 'Other', disableComment: 'Annual cleaning inspection' },
   { id: 'AVT_015', name: 'AVT_015', available: true },
   { id: 'AVT_016', name: 'AVT_016', available: true },
   { id: 'AVT_017', name: 'AVT_017', available: true },
   { id: 'AVT_018', name: 'AVT_018', available: true },
-  { id: 'AVT_019', name: 'AVT_019', available: false },
+  { id: 'AVT_019', name: 'AVT_019', available: false, disableReason: 'PM / Maintenance', disableComment: 'Scheduled monthly PM' },
   { id: 'AVT_020', name: 'AVT_020', available: true },
   { id: 'AVT_021', name: 'AVT_021', available: true },
   { id: 'AVT_022', name: 'AVT_022', available: true },
-  { id: 'AVT_023', name: 'AVT_023', available: false },
+  { id: 'AVT_023', name: 'AVT_023', available: false, disableReason: 'Breakdown / Error', disableComment: 'Nozzle temperature sensor fail' },
   { id: 'AVT_024', name: 'AVT_024', available: true },
   { id: 'AVT_025', name: 'AVT_025', available: true },
   { id: 'AVT_026', name: 'AVT_026', available: true },
-  { id: 'AVT_027', name: 'AVT_027', available: false },
+  { id: 'AVT_027', name: 'AVT_027', available: false, disableReason: 'Engineering Use', disableComment: 'Engineering validation test run' },
   { id: 'AVT_028', name: 'AVT_028', available: true },
   { id: 'AVT_029', name: 'AVT_029', available: true },
   { id: 'AVT_030', name: 'AVT_030', available: true },
-  { id: 'AVT_031', name: 'AVT_031', available: false },
+  { id: 'AVT_031', name: 'AVT_031', available: false, disableReason: 'Other', disableComment: 'Offline by request' },
   { id: 'AVT_032', name: 'AVT_032', available: true },
   { id: 'AVT_033', name: 'AVT_033', available: true },
   { id: 'AVT_034', name: 'AVT_034', available: true },
   { id: 'AVT_035', name: 'AVT_035', available: true },
-  { id: 'AVT_036', name: 'AVT_036', available: false },
+  { id: 'AVT_036', name: 'AVT_036', available: false, disableReason: 'PM / Maintenance', disableComment: 'Scheduled monthly PM' },
   { id: 'AVT_037', name: 'AVT_037', available: true },
   { id: 'AVT_038', name: 'AVT_038', available: true },
   { id: 'AVT_039', name: 'AVT_039', available: true },
-  { id: 'AVT_040', name: 'AVT_040', available: false },
+  { id: 'AVT_040', name: 'AVT_040', available: false, disableReason: 'Breakdown / Error', disableComment: 'Chuck vacuum error' },
   { id: 'AVT_041', name: 'AVT_041', available: true },
   { id: 'AVT_042', name: 'AVT_042', available: true },
   { id: 'AVT_043', name: 'AVT_043', available: true },
   { id: 'AVT_044', name: 'AVT_044', available: true },
-  { id: 'AVT_045', name: 'AVT_045', available: false },
+  { id: 'AVT_045', name: 'AVT_045', available: false, disableReason: 'Engineering Use', disableComment: 'NXP custom design run' },
   { id: 'AVT_046', name: 'AVT_046', available: true },
   { id: 'AVT_047', name: 'AVT_047', available: true },
   { id: 'AVT_048', name: 'AVT_048', available: true },
   { id: 'AVT_049', name: 'AVT_049', available: true },
-  { id: 'AVT_050', name: 'AVT_050', available: false },
+  { id: 'AVT_050', name: 'AVT_050', available: false, disableReason: 'Other', disableComment: 'Offline due to network error' },
 ];
 
 function loadMachines(): Machine[] {
   const data = localStorage.getItem('nxp_machines');
   if (data) {
     try {
-      return JSON.parse(data);
+      const parsed = JSON.parse(data) as Machine[];
+      // If the loaded machines don't have disableReason keys, overwrite with defaults
+      if (!parsed.some(m => m.disableReason)) {
+        localStorage.setItem('nxp_machines', JSON.stringify(DEFAULT_MACHINES));
+        return DEFAULT_MACHINES;
+      }
+      return parsed;
     } catch (e) {
       console.error('Failed to parse nxp_machines', e);
     }
