@@ -23,15 +23,9 @@ dist-ssr
 *.sln
 *.sw?
 
-# Agent Skills
-.agents
-agent
+# Hidden dot directories and agent configs
+.*/
+.mcp.json
 skills-lock.json
 
-# Agent & config directories
-.codegraph
-.impeccable
-.superpowers
-.superpower
-.impeccacle
 
